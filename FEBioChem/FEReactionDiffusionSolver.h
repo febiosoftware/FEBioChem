@@ -10,9 +10,6 @@ public:
 	//! initialize equations
 	bool InitEquations();
 
-	//! Initialization
-	bool Init();
-
 	//! Evaluate RHS vector
 	void ForceVector(FEGlobalVector& R);
 

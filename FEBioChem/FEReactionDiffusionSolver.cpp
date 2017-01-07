@@ -22,12 +22,6 @@ bool FEReactionDiffusionSolver::InitEquations()
 	return FELinearSolver::InitEquations();
 }
 
-//! Initialization
-bool FEReactionDiffusionSolver::Init()
-{
-	return FELinearSolver::Init();
-}
-
 //! Evaluate RHS vector
 void FEReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 {

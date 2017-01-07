@@ -9,8 +9,6 @@ class FEReactionDomain : public FESolidDomain
 public:
 	FEReactionDomain(FEModel* fem);
 
-	FEMaterial* GetMaterial() { return m_mat; }
-
 	//! set the material
 	void SetMaterial(FEMaterial* pmat);
 
