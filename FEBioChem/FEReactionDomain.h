@@ -12,6 +12,9 @@ public:
 	//! set the material
 	void SetMaterial(FEMaterial* pmat);
 
+	// get the material
+	FEMaterial* GetMaterial() { return m_mat; }
+
 	//! Update the domain data (called after model state was modified)
 	void Update(const FETimeInfo& tp);
 
