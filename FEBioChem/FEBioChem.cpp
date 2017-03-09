@@ -2,14 +2,14 @@
 //
 
 #include "stdafx.h"
-#include <FECore/FECoreKernel.h>
+#include <FECore/sdk.h>
 #include "FEReactionDiffusionSolver.h"
 #include "FEReactionDiffusionMaterial.h"
 #include "FEReactionDomain.h"
 #include "FEReactionMaterial.h"
 #include "FEReactiveSpecies.h"
 
-FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)
+FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 {
 	FECoreKernel::SetInstance(&fecore);
 	fecore.RegisterDomain(new FEReactionDomainFactory);
@@ -20,7 +20,7 @@ FECORE_EXPORT void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEReactiveSpecies, FEMATERIAL_ID, "species");
 }
 
-FECORE_EXPORT int GetSDKVersion()
+FECORE_PLUGIN int GetSDKVersion()
 {
 	return FE_SDK_VERSION;
 }

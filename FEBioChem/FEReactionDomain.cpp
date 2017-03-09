@@ -19,7 +19,7 @@ FEDomain* FEReactionDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEM
 }
 
 
-FEReactionDomain::FEReactionDomain(FEModel* fem) : FESolidDomain(&fem->GetMesh())
+FEReactionDomain::FEReactionDomain(FEModel* fem) : FESolidDomain(fem)
 {
 	m_mat = 0;
 }
