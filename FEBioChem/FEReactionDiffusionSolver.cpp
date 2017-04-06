@@ -2,6 +2,7 @@
 #include "FEReactionDiffusionSolver.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEMesh.h>
+#include <FECore/FESurfaceLoad.h>
 #include "FEReactionDomain.h"
 
 FEReactionDiffusionSolver::FEReactionDiffusionSolver(FEModel* fem) : FELinearSolver(fem)
@@ -33,6 +34,13 @@ void FEReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(n));
 		if (dom) dom->ForceVector(R);
 	}
+
+	// do the surface loads
+	for (int i=0; i<fem.SurfaceLoads(); ++i)
+	{
+		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
+		sl.Residual(fem.GetTime(), R);
+	}
 }
 
 // build the stiffness matrix
@@ -47,5 +55,13 @@ bool FEReactionDiffusionSolver::StiffnessMatrix(FELinearSystem& K)
 		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(n));
 		if (dom) dom->StiffnessMatrix(K, tp.timeIncrement);
 	}
+
+	// do the surface loads
+	for (int i = 0; i<fem.SurfaceLoads(); ++i)
+	{
+		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
+		sl.StiffnessMatrix(fem.GetTime(), this);
+	}
+
 	return true;
 }
