@@ -82,7 +82,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(FEBioDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(FEBioDir)\VS2013\x64\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(FEBioDir)\VS2013\x64\Release OMP;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
