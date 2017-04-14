@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEReactiveSpecies, FEMaterial)
-	ADD_PARAMETER2(m_diffusivity, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "diffusivity");
+	ADD_PARAMETER2(m_diffusivity, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "diffusivity");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
