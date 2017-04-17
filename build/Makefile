@@ -35,7 +35,7 @@ export FCDIR
 
 # Assumes the Intel C++ compiler.  Use g++ for the gnu compiler and run "make gcc".
 export CC = icpc
-export FLG = -O3 -fPIC
+export FLG = -O3 -fPIC -stdc++11
 
 # Can be removed if not using the Intel compiler.
 export LNKFLG = -static-intel

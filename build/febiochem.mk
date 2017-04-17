@@ -1,7 +1,7 @@
 
-SRC = $(wildcard $(FCDIR)source/*.cpp)
-OBJ = $(patsubst $(FCDIR)source/%.cpp, %.o, $(SRC))
-DEP = $(patsubst $(FCDIR)source/%.cpp, %.d, $(SRC))
+SRC = $(wildcard $(FCDIR)FEBioChem/*.cpp)
+OBJ = $(patsubst $(FCDIR)FEBioChem/%.cpp, %.o, $(SRC))
+DEP = $(patsubst $(FCDIR)FEBioChem/%.cpp, %.d, $(SRC))
 
 
 SO = libfebiochem_$(PLAT).$(SFX)
@@ -22,7 +22,7 @@ else
 		$(CC) -dynamiclib $(FLG) -o $(LIB) $(OBJ) $(FEBIOLIBS)
 endif
 
-%.o: $(FCDIR)source/%.cpp
+%.o: $(FCDIR)FEBioChem/%.cpp
 	$(CC) $(INC) $(DEF) $(FLG) -MMD -c -o $@ $<
 
 clean:
