@@ -23,7 +23,7 @@ public:
 public:
 	void ForceVector(FEGlobalVector& R);
 
-	void StiffnessMatrix(FELinearSystem& K, double dt);
+	void StiffnessMatrix(FELinearSystem& K, const FETimeInfo& ti);
 
 protected:
 	void ElementForceVector(FESolidElement& el, vector<double>& fe);
@@ -32,7 +32,7 @@ protected:
 	void MassMatrix(FELinearSystem& K, double dt);
 	void ElementMassMatrix(FESolidElement& el, matrix& ke);
 
-	void DiffusionMatrix(FELinearSystem& K);
+	void DiffusionMatrix(FELinearSystem& K, const FETimeInfo& ti);
 	void ElementDiffusionMatrix(FESolidElement& el, matrix& ke);
 
 private:

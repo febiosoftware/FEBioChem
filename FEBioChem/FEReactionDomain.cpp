@@ -167,13 +167,13 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::StiffnessMatrix(FELinearSystem& K, double dt)
+void FEReactionDomain::StiffnessMatrix(FELinearSystem& K, const FETimeInfo& ti)
 {
 	// add "mass" matrix
-	MassMatrix(K, dt);
+	MassMatrix(K, ti.timeIncrement);
 
 	// add diffusion stiffness
-	DiffusionMatrix(K);
+	DiffusionMatrix(K, ti);
 }
 
 //-----------------------------------------------------------------------------
@@ -201,9 +201,6 @@ void FEReactionDomain::MassMatrix(FELinearSystem& K, double dt)
 
 		// evaluate element mass matrix
 		ElementMassMatrix(el, me);
-
-		// divide by time step size
-		me *= 1.0/dt;
 
 		// get the lm array
 		UnpackLM(el, lm);
@@ -258,7 +255,7 @@ void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::DiffusionMatrix(FELinearSystem& K)
+void FEReactionDomain::DiffusionMatrix(FELinearSystem& K, const FETimeInfo& ti)
 {
 	// get the number of concentration variables
 	const vector<int>& dofs = GetDOFList();
@@ -276,6 +273,9 @@ void FEReactionDomain::DiffusionMatrix(FELinearSystem& K)
 		int ne = el.Nodes();
 		int ndof = ne*ncv;
 
+		// get the lm array
+		UnpackLM(el, lm);
+
 		// initialize the element diffusion matrix
 		ke.resize(ndof, ndof);
 		ke.zero();
@@ -283,11 +283,36 @@ void FEReactionDomain::DiffusionMatrix(FELinearSystem& K)
 		// evaluate element mass matrix
 		ElementDiffusionMatrix(el, ke);
 
-		// get the lm array
-		UnpackLM(el, lm);
+		if (ti.alpha > 0.0)
+		{
+			ke *= ti.alpha*ti.timeIncrement;
 
-		// this component needs to be assembled to the LHS and RHS
-		K.AssembleLHS(lm, ke);
+			// this component needs to be assembled to the LHS and RHS
+			K.AssembleLHS(lm, ke);
+		}
+
+		if (ti.alpha < 1.0)
+		{
+			// get the nodal values
+			vector<double> fe(ndof, 0.0);
+			for (int i = 0; i<ne; ++i)
+			{
+				for (int j = 0; j<ncv; ++j)
+				{
+					double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
+					fe[i*ncv + j] = cn;
+				}
+			}
+
+			if (ti.alpha > 0.0)
+				ke *= -(1.0 - ti.alpha)/ti.alpha;
+			else
+				ke *= ti.timeIncrement;
+
+			fe = ke*fe;
+
+			K.AssembleRHS(lm, fe);
+		}
 	}
 }
 
