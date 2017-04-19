@@ -385,3 +385,60 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 		}
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
+{
+	// get the number of concentration variables
+	const vector<int>& dofs = GetDOFList();
+	int ncv = (int)dofs.size();
+
+	int ne = el.Nodes();
+	double Ji[3][3];
+
+	matrix Gamma(ncv, ncv);
+	Gamma.zero();
+
+	// loop over all integration points
+	int ni = el.GaussPoints();
+	const double *gw = el.GaussWeights();
+	for (int n = 0; n<ni; ++n)
+	{
+		// element shape function values at integration point n
+		double* H = el.H(n);
+
+		// calculate jacobian
+		double detJt = invjact(el, Ji, n);
+
+		// get the material point data
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
+
+		// evaluate the gamma matrix
+		for (int i=0; i<ncv; ++i)
+			for (int j=0; j<ncv; ++j)
+				{
+					Gamma[i][j] = m_mat->GetReactionRateStiffness(rp, m_mat->GetSpecies(i)->GetID(), m_mat->GetSpecies(j)->GetID());
+				}
+
+		// evaluate element matrix
+		for (int a = 0; a<ne; ++a)
+		{
+			for (int b = 0; b<ne; ++b)
+			{
+				for (int i=0; i<ncv; ++i)
+				{
+					for (int j=0; j<ncv; ++j)
+					{
+						double gij = Gamma[i][j];
+
+						double kpq = gij*H[a]*H[b]*gw[n]*detJt;
+
+						// NOTE: The negative sign is because we need to subtract this matrix from the global matrix
+						ke[a*ncv + i][b*ncv + j] -= kpq;
+					}
+				}	
+			}
+		}
+	}
+}

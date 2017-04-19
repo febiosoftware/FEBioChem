@@ -42,6 +42,9 @@
     <ClInclude Include="..\FEBioChem\FEConcentrationFlux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\FEBioChem\FENLReactionDiffusionSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\FEBioChem\dllmain.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\FEBioChem\FEConcentrationFlux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FEBioChem\FENLReactionDiffusionSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

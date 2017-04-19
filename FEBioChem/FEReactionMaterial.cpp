@@ -176,3 +176,39 @@ double FEReactionMaterial::GetReactionRate(FEReactionMaterialPoint& pt)
 
 	return rj;
 }
+
+//-----------------------------------------------------------------------------
+//! Evaluate derivative of reaction rate wrt to species Id
+double FEReactionMaterial::GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id)
+{
+	// reaction constant
+	double kj = m_rate;
+
+	// concentration values at integration points
+	vector<double>& c = pt.m_c;
+
+	// see if this concentration has a non-zero power
+	// otherwise derivative will be zero
+	if (m_vR[id] == 0.0) return 0.0;
+
+	double drj = kj;
+	for (int i = 0; i<(int)m_vR.size(); ++i)
+	{
+		int vij = m_vR[i];
+		if (i != id)
+		{
+			if      (vij == 1) drj *= c[i];
+			else if (vij == 2) drj *= c[i] * c[i];
+			else if (vij >  2) drj *= pow(c[i], vij);
+		}
+		else
+		{
+			if (vij > 1.0)
+			{
+				drj *= vij * pow(c[i], vij - 1.0);
+			}
+		}
+	}
+
+	return drj;
+}

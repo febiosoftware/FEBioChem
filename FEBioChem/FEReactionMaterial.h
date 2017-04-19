@@ -46,6 +46,9 @@ public:
 	//! Evaluate the reaction rate (forward mass action) at this integration point
 	double GetReactionRate(FEReactionMaterialPoint& pt);
 
+	//! Evaluate derivative of reaction rate wrt to species Id
+	double GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id);
+
 private:
 	double	m_rate;				//!< reaction constant (rename this, since this is not the rate)
 	char	m_equation[256];	//!< reaction equation

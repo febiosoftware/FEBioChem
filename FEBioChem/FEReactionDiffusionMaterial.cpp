@@ -14,6 +14,20 @@ FEReactionDiffusionMaterial::FEReactionDiffusionMaterial(FEModel* fem) : FEMater
 }
 
 //-----------------------------------------------------------------------------
+FEMaterialPoint* FEReactionDiffusionMaterial::CreateMaterialPointData()
+{
+	// get the global list of concentration dofs
+	DOFS& dofs = GetFEModel()->GetDOFS();
+	int ndofs = dofs.GetVariableSize("concentration");
+
+	// create a new reaction material point
+	FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;
+	pt->m_c.assign(ndofs, 0.0);
+
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
 double FEReactionDiffusionMaterial::GetReactionRate(FEReactionMaterialPoint& mp, int id)
 {
 	// initialize rate to zero
@@ -44,15 +58,27 @@ double FEReactionDiffusionMaterial::GetReactionRate(FEReactionMaterialPoint& mp,
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEReactionDiffusionMaterial::CreateMaterialPointData()
+double FEReactionDiffusionMaterial::GetReactionRateStiffness(FEReactionMaterialPoint& mp, int idA, int idB)
 {
-	// get the global list of concentration dofs
-	DOFS& dofs = GetFEModel()->GetDOFS();
-	int ndofs = dofs.GetVariableSize("concentration");
+	double G = 0.0;
 
-	// create a new reaction material point
-	FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;
-	pt->m_c.assign(ndofs, 0.0);
+	// loop over all reactions
+	int nreact = Reactions();
+	for (int k=0; k<nreact; ++k)
+	{
+		// get next reaction
+		FEReactionMaterial* reaction = GetReaction(k);
 
-	return pt;
+		// net stoichiometric coefficient for this species
+		int vik = reaction->m_v[idA];
+
+		if (vik != 0.0)
+		{
+			double drk = reaction->GetReactionRateDeriv(mp, idB);
+
+			G += vik*drk;
+		}
+	}
+
+	return G;
 }

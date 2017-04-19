@@ -28,12 +28,14 @@ public:
 protected:
 	void ElementForceVector(FESolidElement& el, vector<double>& fe);
 
-protected:
+public:
 	void MassMatrix(FELinearSystem& K, double dt);
 	void ElementMassMatrix(FESolidElement& el, matrix& ke);
 
 	void DiffusionMatrix(FELinearSystem& K, const FETimeInfo& ti);
 	void ElementDiffusionMatrix(FESolidElement& el, matrix& ke);
+
+	void ElementReactionStiffness(FESolidElement& el, matrix& ke);
 
 private:
 	FEReactionDiffusionMaterial*	m_mat;
