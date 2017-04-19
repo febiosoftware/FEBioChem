@@ -38,7 +38,10 @@ private:
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
 public:
-	double	m_Ctol;	//!< convergence tolerance
+	double	m_Ctol;				//!< convergence tolerance
+	double	m_Rtol;				//!< residual convergence tolerance
+	double	m_Rmin;				//!< min residual value
+	bool	m_forcePositive;	//!< force concentrations to remain positive
 
 private:
 	vector<double>		m_Un;	//!< solution at previous timestep

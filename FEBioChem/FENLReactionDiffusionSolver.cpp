@@ -4,15 +4,22 @@
 #include <FECore/FEModel.h>
 #include <FECore/BC.h>
 #include <FECore/log.h>
+#include <FECore/FESurfaceLoad.h>
 
 BEGIN_PARAMETER_LIST(FENLReactionDiffusionSolver, FENewtonSolver)
-	ADD_PARAMETER(m_Ctol , FE_PARAM_DOUBLE, "Ctol");
+	ADD_PARAMETER2(m_Ctol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Ctol");
+	ADD_PARAMETER2(m_Rtol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtol");
+	ADD_PARAMETER2(m_Rmin, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
 	ADD_PARAMETER(m_bsymm, FE_PARAM_BOOL, "symmetric_stiffness"); 
+	ADD_PARAMETER(m_forcePositive, FE_PARAM_BOOL, "force_positive_concentrations");
 END_PARAMETER_LIST();
 
 FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewtonSolver(fem)
 {
 	m_Ctol = 0.001;
+	m_Rtol = 0.01;
+	m_Rmin = 1.0e-20;
+	m_forcePositive = false;
 
 	// we'll need a non-symmetric stiffness matrix
 	m_bsymm = false;
@@ -128,6 +135,7 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 	vector<double> du; du.assign(neq, 0.0);
 
 	double normUi = 0.0;
+	double normRi = 0.0;
 	bool bconv = false;
 	do
 	{
@@ -149,22 +157,38 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 		// calculate norms
 		if (m_niter == 0)
 		{
+			normRi = m_R*m_R;
 			normUi = U*U;
 		}
 
-		// check convergence
+		// calculate norms
 		double normu = du*du;
 		double normU = U*U;
+		double normR = m_R*m_R;
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", time);
 		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+		felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR, (m_Rtol*m_Rtol)*normRi);
 		felog.printf("\t   concentration    %15le %15le %15le \n", normUi, normu, (m_Ctol*m_Ctol)*normU);
 
-		if (normu < (m_Ctol*m_Ctol)*normU) bconv = true;
+		// check convergence norms
+		bconv = true;
+		if ((m_Ctol > 0.0) && (normu > (m_Ctol*m_Ctol)*normU)) bconv = false;
+		if ((m_Rtol > 0.0) && (normR > (m_Rtol*m_Rtol)*normRi)) bconv = false;
 
+		// check for minimal residual
+		if ((bconv == false) && (normR <= m_Rmin))
+		{
+			// check for almost zero-residual on the first iteration
+			// this might be an indication that there is no load on the system
+			felog.printbox("WARNING", "No load acting on the system.");
+			bconv = true;
+		}
+
+		// Zero out d since the prescribed concentrations should be enforce by now
 		zero(m_d);
 
 		// increase iteration number
@@ -223,13 +247,23 @@ bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 	double dt = fem.GetTime().timeIncrement;
 	int neq = RHS.Size();
 	for (int i=0; i<neq; ++i)
-		RHS[i] *= dt;
+		RHS[i] *= -dt;
 
 	// add mass matrix contribution
 	MassVector(RHS);
 
 	// add diffusion matrix contribution
 	DiffusionVector(RHS);
+
+	// do the surface loads
+	for (int i = 0; i<fem.SurfaceLoads(); ++i)
+	{
+		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
+		sl.Residual(fem.GetTime(), RHS);
+	}
+
+	// multiply everything by -1
+	R *= -1.0;
 
 	// increase RHS counter
 	m_nrhs++;
@@ -293,7 +327,7 @@ void FENLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
 				for (int i=0; i<ndof; ++i)
 				{
 					int n = lm[i];
-					if (n >= 0) R[n] -= mun[i];
+					if (n >= 0) R[n] += mun[i];
 				}
 			}
 		}
@@ -350,7 +384,7 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R)
 				for (int i = 0; i<ndof; ++i)
 				{
 					int n = lm[i];
-					if (n >= 0) R[n] -= kun[i] * dt;
+					if (n >= 0) R[n] += kun[i] * dt;
 				}
 			}
 		}
@@ -461,6 +495,21 @@ void FENLReactionDiffusionSolver::Update(std::vector<double>& u)
 		}
 	}
 
+	// enforce all positive concentrations
+	if (m_forcePositive)
+	{
+		// update nodal positions
+		for (int i = 0; i<mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+
+			for (int k = 0; k<(int)dofs.size(); ++k)
+			{
+				double ck = node.get(dofs[k]);
+				if (ck < 0.0) node.set(dofs[k], 0.0);
+			}
+		}
+	}
 
 	// update the stresses on all domains
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
