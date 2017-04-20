@@ -13,6 +13,7 @@ typedef pair<int, string>	ReactionTerm;
 BEGIN_PARAMETER_LIST(FEReactionMaterial, FEMaterial)
 	ADD_PARAMETER(m_rate, FE_PARAM_DOUBLE, "reaction_rate");
 	ADD_PARAMETER(m_equation, FE_PARAM_STRING, "equation");
+	ADD_PARAMETER(m_posOnly, FE_PARAM_BOOL, "force_positive_concentrations");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -100,6 +101,7 @@ FEReactionMaterial::FEReactionMaterial(FEModel* fem) : FEMaterial(fem)
 {
 	m_rate = 0.0;
 	m_equation[0] = 0;
+	m_posOnly = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -168,10 +170,13 @@ double FEReactionMaterial::GetReactionRate(FEReactionMaterialPoint& pt)
 	double rj = kj;
 	for (int i=0; i<(int)m_vR.size(); ++i)
 	{
+		double ci = c[i];
+		if (m_posOnly && (ci < 0)) ci = 0.0;
+
 		int vij = m_vR[i];
-		if      (vij == 1) rj *= c[i];
-		else if (vij == 2) rj *= c[i]*c[i];
-		else if (vij >  2) rj *= pow(c[i], vij);
+		if      (vij == 1) rj *= ci;
+		else if (vij == 2) rj *= ci*ci;
+		else if (vij >  2) rj *= pow(ci, vij);
 	}
 
 	return rj;
@@ -194,18 +199,21 @@ double FEReactionMaterial::GetReactionRateDeriv(FEReactionMaterialPoint& pt, int
 	double drj = kj;
 	for (int i = 0; i<(int)m_vR.size(); ++i)
 	{
+		double ci = c[i];
+		if (m_posOnly && (ci < 0)) ci = 0.0;
+
 		int vij = m_vR[i];
 		if (i != id)
 		{
-			if      (vij == 1) drj *= c[i];
-			else if (vij == 2) drj *= c[i] * c[i];
-			else if (vij >  2) drj *= pow(c[i], vij);
+			if      (vij == 1) drj *= ci;
+			else if (vij == 2) drj *= ci * ci;
+			else if (vij >  2) drj *= pow(ci, vij);
 		}
 		else
 		{
 			if (vij > 1.0)
 			{
-				drj *= vij * pow(c[i], vij - 1.0);
+				drj *= vij * pow(ci, vij - 1.0);
 			}
 		}
 	}

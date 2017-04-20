@@ -52,6 +52,7 @@ public:
 private:
 	double	m_rate;				//!< reaction constant (rename this, since this is not the rate)
 	char	m_equation[256];	//!< reaction equation
+	bool	m_posOnly;			//!< only consider nonnegative concentrations (neg. concentrations will be treated as zero)
 
 public:
 	vector<int>	m_vR;	//!< stoichiometric coefficients for reactants
