@@ -79,10 +79,16 @@ bool convert(const char* szeq, vector<ReactionTerm>& reactants, vector<ReactionT
 
 	// find the arrow symbol
 	ch1 = strstr(szcopy, "-->");
-	if (ch1 == 0) { delete [] szcopy; return false; }
+	int narrow = 3;
+	if (ch1 == 0)
+	{
+		ch1 = strstr(szcopy, "->");
+		narrow = 2;
+		if (ch1 == 0) { delete [] szcopy; return false; }
+	}
 
 	*ch1 = 0;
-	ch2 = ch1+3;
+	ch2 = ch1 + narrow;
 	ch1 = szcopy;
 
 	// parse the equation
