@@ -442,3 +442,60 @@ void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 		}
 	}
 }
+
+void FEReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn)
+{
+	// get the number of concentration variables
+	const vector<int>& dofs = GetDOFList();
+	int ncv = (int)dofs.size();
+
+	int ne = el.Nodes();
+	int ni = el.GaussPoints();
+
+	const int EN = FEElement::MAX_NODES;
+	double Gx[EN], Gy[EN], Gz[EN];
+	double Ji[3][3];
+	double Gj[3];
+
+	// loop over all integration points
+	const double *gw = el.GaussWeights();
+	for (int n = 0; n<ni; ++n)
+	{
+		// calculate jacobian
+		double detJt = invjact(el, Ji, n);
+
+		// shape functions
+		double* H = el.H(n);
+
+		vec3d vi = el.Evaluate((vec3d*)(&vn[0]), n);
+
+		// evaluate shape function derivatives
+		for (int i = 0; i<ne; ++i)
+		{
+			double Gr = el.Gr(n)[i];
+			double Gs = el.Gs(n)[i];
+			double Gt = el.Gt(n)[i];
+
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx[i] = Ji[0][0] * Gr + Ji[1][0] * Gs + Ji[2][0] * Gt;
+			Gy[i] = Ji[0][1] * Gr + Ji[1][1] * Gs + Ji[2][1] * Gt;
+			Gz[i] = Ji[0][2] * Gr + Ji[1][2] * Gs + Ji[2][2] * Gt;
+		}
+
+		// loop over all nodes
+		for (int a = 0; a<ne; ++a)
+		{
+			for (int b = 0; b<ne; ++b)
+			{
+				Gj[0] = Gx[b];
+				Gj[1] = Gy[b];
+				Gj[2] = Gz[b];
+
+				double kab = (H[a] * (vi.x*Gj[0] + vi.y*Gj[1] + vi.z*Gj[2]))*detJt*gw[n];
+
+				for (int i = 0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab;
+			}
+		}
+	}
+}

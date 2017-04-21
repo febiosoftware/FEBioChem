@@ -12,6 +12,7 @@ BEGIN_PARAMETER_LIST(FENLReactionDiffusionSolver, FENewtonSolver)
 	ADD_PARAMETER2(m_Rmin, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
 	ADD_PARAMETER(m_bsymm, FE_PARAM_BOOL, "symmetric_stiffness"); 
 	ADD_PARAMETER(m_forcePositive, FE_PARAM_BOOL, "force_positive_concentrations");
+	ADD_PARAMETER(m_convection, FE_PARAM_BOOL, "convection");
 END_PARAMETER_LIST();
 
 FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewtonSolver(fem)
@@ -20,6 +21,7 @@ FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewto
 	m_Rtol = 0.01;
 	m_Rmin = 1.0e-20;
 	m_forcePositive = false;
+	m_convection = false;
 
 	// we'll need a non-symmetric stiffness matrix
 	m_bsymm = false;
@@ -340,6 +342,14 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R)
 	FEMesh& mesh = fem.GetMesh();
 	double dt = fem.GetTime().timeIncrement;
 
+	DOFS& Dofs = fem.GetDOFS();
+	vector<int> velDofs;
+	if (m_convection)
+	{
+		Dofs.GetDOFList("velocity", velDofs);
+		assert(velDofs.size() == 3);
+	}
+
 	int NDOM = mesh.Domains();
 	for (int ndom = 0; ndom<NDOM; ++ndom)
 	{
@@ -350,6 +360,7 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R)
 			const vector<int>& dofs = dom->GetDOFList();
 			int ncv = (int)dofs.size();
 
+			vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0,0,0));
 			vector<int> lm;
 			matrix ke;
 			int NE = dom->Elements();
@@ -365,6 +376,15 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R)
 
 				// get the element mass matrix
 				dom->ElementDiffusionMatrix(el, ke);
+
+				// get the nodal velocities
+				if (m_convection)
+				{
+					for (int i = 0; i<ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(velDofs[0], velDofs[1], velDofs[2]);
+
+					// add the convection matrix
+					dom->ElementConvectionMatrix(el, ke, vn);
+				}
 
 				// get the nodal values
 				vector<double> un(ndof, 0.0);
@@ -399,6 +419,14 @@ bool FENLReactionDiffusionSolver::StiffnessMatrix(const FETimeInfo& tp)
 	// zero the stiffness matrix
 	m_pK->Zero();
 
+	DOFS& Dofs = m_fem.GetDOFS();
+	vector<int> velDofs;
+	if (m_convection)
+	{
+		Dofs.GetDOFList("velocity", velDofs);
+		assert(velDofs.size() == 3);
+	}
+
 	// add contributions from domains
 	FEMesh& mesh = m_fem.GetMesh();
 	int NDOM = mesh.Domains();
@@ -411,6 +439,7 @@ bool FENLReactionDiffusionSolver::StiffnessMatrix(const FETimeInfo& tp)
 			const vector<int>& dofs = dom->GetDOFList();
 			int ncv = (int)dofs.size();
 
+			vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
 			vector<int> lm;
 			matrix ke;
 
@@ -429,6 +458,15 @@ bool FENLReactionDiffusionSolver::StiffnessMatrix(const FETimeInfo& tp)
 
 				// get the diffusion matrix
 				dom->ElementDiffusionMatrix(el, ke);
+
+				// get the nodal velocities
+				if (m_convection)
+				{
+					for (int i = 0; i<ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(velDofs[0], velDofs[1], velDofs[2]);
+
+					// add convection matrix
+					dom->ElementConvectionMatrix(el, ke, vn);
+				}
 
 				// subtract (!) the reaction stiffness
 				dom->ElementReactionStiffness(el, ke);

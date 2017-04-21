@@ -37,6 +37,8 @@ public:
 
 	void ElementReactionStiffness(FESolidElement& el, matrix& ke);
 
+	void ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn);
+
 private:
 	FEReactionDiffusionMaterial*	m_mat;
 };
