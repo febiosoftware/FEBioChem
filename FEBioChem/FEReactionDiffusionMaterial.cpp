@@ -23,6 +23,7 @@ FEMaterialPoint* FEReactionDiffusionMaterial::CreateMaterialPointData()
 	// create a new reaction material point
 	FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;
 	pt->m_c.assign(ndofs, 0.0);
+	pt->m_ca.assign(ndofs, 0.0);
 
 	return pt;
 }

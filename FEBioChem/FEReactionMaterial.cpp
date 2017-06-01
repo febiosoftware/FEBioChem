@@ -170,7 +170,7 @@ double FEReactionMaterial::GetReactionRate(FEReactionMaterialPoint& pt)
 	double kj = m_rate;
 
 	// concentration values at integration points
-	vector<double>& c = pt.m_c;
+	vector<double>& c = pt.m_ca;
 
 	// calculate reaction rate
 	double rj = kj;
@@ -196,7 +196,7 @@ double FEReactionMaterial::GetReactionRateDeriv(FEReactionMaterialPoint& pt, int
 	double kj = m_rate;
 
 	// concentration values at integration points
-	vector<double>& c = pt.m_c;
+	vector<double>& c = pt.m_ca;
 
 	// see if this concentration has a non-zero power
 	// otherwise derivative will be zero

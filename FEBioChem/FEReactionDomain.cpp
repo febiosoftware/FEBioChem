@@ -97,7 +97,14 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 			for (int i = 0; i<nspecies; ++i)
 			{
 				FEReactiveSpecies* s = m_mat->GetSpecies(i);
-				rp.m_c[s->GetID()] = el.Evaluate(&(c[i][0]), n);
+
+				// evaluate concentration
+				double ci = el.Evaluate(&(c[i][0]), n);
+				rp.m_c[s->GetID()] = ci;
+
+				// evaluate "actual" concentration (this is used by the chemcial reactions)
+				double kappa = s->PartitionCoefficient();
+				rp.m_ca[s->GetID()] = kappa * ci;
 			}
 		}
 	}
