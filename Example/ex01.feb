@@ -16,6 +16,9 @@
 			<species name="A">
 				<diffusivity>1</diffusivity>
 			</species>
+			<species name="B">
+				<diffusivity>0.05</diffusivity>
+			</species>
 			<reaction type="reaction">
 				<equation>A --> B</equation>
 				<reaction_rate>0.5</reaction_rate>
@@ -95,6 +98,8 @@
 		<plotfile type="febio">
 			<var type="concentration['c1']=c1"/>
 			<var type="concentration['c2']=c2"/>
+			<var type="actual concentration['c1']=actual c1"/>
+			<var type="actual concentration['c2']=actual c2"/>
 		</plotfile>
 	</Output>
 </febio_spec>

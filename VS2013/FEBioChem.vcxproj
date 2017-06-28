@@ -216,6 +216,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\FEBioChem\FEBioChemPlot.h" />
     <ClInclude Include="..\FEBioChem\FEConcentrationFlux.h" />
     <ClInclude Include="..\FEBioChem\FENLReactionDiffusionSolver.h" />
     <ClInclude Include="..\FEBioChem\FEReactionDiffusionConvection.h" />
@@ -249,6 +250,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\FEBioChem\FEBioChem.cpp" />
+    <ClCompile Include="..\FEBioChem\FEBioChemPlot.cpp" />
     <ClCompile Include="..\FEBioChem\FEConcentrationFlux.cpp" />
     <ClCompile Include="..\FEBioChem\FENLReactionDiffusionSolver.cpp" />
     <ClCompile Include="..\FEBioChem\FEReactionDiffusionConvectionSolver.cpp" />
