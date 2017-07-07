@@ -245,6 +245,13 @@ bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 		}
 	}
 
+	// do the surface loads
+	for (int i = 0; i<fem.SurfaceLoads(); ++i)
+	{
+		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
+		sl.Residual(fem.GetTime(), RHS);
+	}
+
 	// multiply by time step
 	double dt = fem.GetTime().timeIncrement;
 	int neq = RHS.Size();
@@ -256,13 +263,6 @@ bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 
 	// add diffusion matrix contribution
 	DiffusionVector(RHS);
-
-	// do the surface loads
-	for (int i = 0; i<fem.SurfaceLoads(); ++i)
-	{
-		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
-		sl.Residual(fem.GetTime(), RHS);
-	}
 
 	// multiply everything by -1
 	R *= -1.0;
