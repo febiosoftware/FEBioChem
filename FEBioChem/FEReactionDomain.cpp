@@ -98,6 +98,9 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 			{
 				FEReactiveSpecies* s = m_mat->GetSpecies(i);
 
+				// evaluate gradient at this integration point
+				vec3d grad_c = gradient(el, &c[i][0], n);
+
 				// evaluate concentration
 				double ci = el.Evaluate(&(c[i][0]), n);
 				rp.m_c[s->GetID()] = ci;
@@ -105,6 +108,9 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				// evaluate "actual" concentration (this is used by the chemcial reactions)
 				double kappa = s->PartitionCoefficient();
 				rp.m_ca[s->GetID()] = kappa * ci;
+
+				// evaluate the flux
+				rp.m_j[s->GetID()] = -grad_c * s->Diffusivity();
 			}
 		}
 	}

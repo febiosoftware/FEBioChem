@@ -24,6 +24,7 @@ FEMaterialPoint* FEReactionDiffusionMaterial::CreateMaterialPointData()
 	FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;
 	pt->m_c.assign(ndofs, 0.0);
 	pt->m_ca.assign(ndofs, 0.0);
+	pt->m_j.assign(ndofs, vec3d(0,0,0));
 
 	return pt;
 }

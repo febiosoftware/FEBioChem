@@ -26,6 +26,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEReactiveSpecies                  , FEMATERIAL_ID   , "species");
 	REGISTER_FECORE_CLASS(FEConcentrationFlux                , FESURFACELOAD_ID, "concentration flux");
 	REGISTER_FECORE_CLASS(FEPlotActualConcentration          , FEPLOTDATA_ID   , "actual concentration");
+	REGISTER_FECORE_CLASS(FEPlotConcentrationFlux			 , FEPLOTDATA_ID   , "concentration flux");
 }
 
 FECORE_PLUGIN int GetSDKVersion()

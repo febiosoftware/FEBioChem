@@ -19,6 +19,7 @@ public:
 		FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;
 		pt->m_c = m_c;
 		pt->m_ca = m_ca;
+		pt->m_j = m_j;
 		if (m_pNext) pt->m_pNext = m_pNext->Copy();
 		return pt;
 	}
@@ -26,6 +27,7 @@ public:
 public:
 	vector<double>	m_c;	//!< concentration values at integration points (of ALL concentration dofs)
 	vector<double>	m_ca;	//!< "actual" concentrations, i.e. concentrations multiplied by partition coefficient
+	vector<vec3d>	m_j;	//!< concentration flux
 };
 
 //-----------------------------------------------------------------------------
