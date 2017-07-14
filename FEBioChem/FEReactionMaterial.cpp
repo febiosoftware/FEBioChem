@@ -20,7 +20,7 @@ END_PARAMETER_LIST();
 // helper function for parsing the chemical equation string.
 bool parseFormula(char* sz, vector<ReactionTerm>& term)
 {
-	if ((sz == 0) || (*sz==0)) return false;
+	if (sz == 0) return false;
 	ReactionTerm t;
 	t.first = 1;
 	char* ch = sz;
