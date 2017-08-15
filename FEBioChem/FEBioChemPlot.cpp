@@ -4,6 +4,36 @@
 #include "FEReactionMaterial.h"
 
 //-----------------------------------------------------------------------------
+FEPlotEffectiveConcentration::FEPlotEffectiveConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE)
+{
+	m_pfem = pfem;
+	m_nsol = -1;
+}
+
+//-----------------------------------------------------------------------------
+// Resolve solute by solute ID
+bool FEPlotEffectiveConcentration::SetFilter(const char* sz)
+{
+	m_nsol = m_pfem->GetDOFIndex(sz);
+	return (m_nsol != -1);
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveConcentration::Save(FEDomain &dom, FEDataStream& a)
+{
+	// make sure we have a valid index
+	if (m_nsol == -1) return false;
+
+	int N = dom.Nodes();
+	for (int i = 0; i<N; ++i)
+	{
+		FENode& node = dom.Node(i);
+		a << node.get(m_nsol);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 FEPlotActualConcentration::FEPlotActualConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;

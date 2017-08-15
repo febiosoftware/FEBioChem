@@ -98,6 +98,7 @@
 		<plotfile type="febio">
 			<var type="concentration['c1']=c1"/>
 			<var type="concentration['c2']=c2"/>
+			<var type="effective concentration['c1']=effective c1"/>
 			<var type="actual concentration['c1']=actual c1"/>
 			<var type="actual concentration['c2']=actual c2"/>
 		</plotfile>
