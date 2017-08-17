@@ -55,7 +55,7 @@ bool FEReactionDomain::Initialize()
 		FEReactiveSpecies* s = m_mat->GetSpecies(i);
 		dofList[i] = c[s->GetID()];
 	}
-	SetDOF(dofList);
+	SetDOFList(dofList);
 
 	return true;
 }
@@ -120,7 +120,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 void FEReactionDomain::ForceVector(FEGlobalVector& R)
 {
 	// get the number of degrees of freedom active in this domain
-	int ndof = GetDOFS();
+	int ndof = GetDOFCount();
 
 	vector<double> fe;
 	vector<int> lm;
@@ -243,7 +243,7 @@ void FEReactionDomain::MassMatrix(FELinearSystem& K, double dt)
 //-----------------------------------------------------------------------------
 void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
-	int ncv = GetDOFS();
+	int ncv = GetDOFCount();
 	int ne = el.Nodes();
 	int nint = el.GaussPoints();
 	double* gw = el.GaussWeights();
