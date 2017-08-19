@@ -110,7 +110,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				rp.m_ca[s->GetID()] = kappa * ci;
 
 				// evaluate the flux
-				rp.m_j[s->GetID()] = -grad_c * s->Diffusivity();
+				rp.m_j[s->GetID()] = -grad_c * s->Diffusivity() * kappa;
 			}
 		}
 	}
@@ -344,8 +344,7 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 	int ni = el.GaussPoints();
 
 	const int EN = FEElement::MAX_NODES;
-	double Gx[EN], Gy[EN], Gz[EN];
-	double Ji[3][3];
+	vec3d G[EN];
 	double Gi[3], Gj[3];
 	double DB[3];
 
@@ -354,35 +353,22 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 	for (int n = 0; n<ni; ++n)
 	{
 		// calculate jacobian
-		double detJt = invjact(el, Ji, n);
+		double detJt = ShapeGradient(el, n, G);
 
 		// evaluate the conductivity
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 
-		for (int i = 0; i<ne; ++i)
-		{
-			double Gr = el.Gr(n)[i];
-			double Gs = el.Gs(n)[i];
-			double Gt = el.Gt(n)[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0] * Gr + Ji[1][0] * Gs + Ji[2][0] * Gt;
-			Gy[i] = Ji[0][1] * Gr + Ji[1][1] * Gs + Ji[2][1] * Gt;
-			Gz[i] = Ji[0][2] * Gr + Ji[1][2] * Gs + Ji[2][2] * Gt;
-		}
-
 		for (int a = 0; a<ne; ++a)
 		{
-			Gi[0] = Gx[a];
-			Gi[1] = Gy[a];
-			Gi[2] = Gz[a];
+			Gi[0] = G[a].x;
+			Gi[1] = G[a].y;
+			Gi[2] = G[a].z;
 
 			for (int b = 0; b<ne; ++b)
 			{
-				Gj[0] = Gx[b];
-				Gj[1] = Gy[b];
-				Gj[2] = Gz[b];
+				Gj[0] = G[b].x;
+				Gj[1] = G[b].y;
+				Gj[2] = G[b].z;
 
 				for (int i = 0; i<ncv; ++i)
 				{
@@ -466,46 +452,27 @@ void FEReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& ke, c
 	int ni = el.GaussPoints();
 
 	const int EN = FEElement::MAX_NODES;
-	double Gx[EN], Gy[EN], Gz[EN];
-	double Ji[3][3];
-	double Gj[3];
+	vec3d G[EN];
 
 	// loop over all integration points
 	const double *gw = el.GaussWeights();
 	for (int n = 0; n<ni; ++n)
 	{
-		// calculate jacobian
-		double detJt = invjact(el, Ji, n);
+		// calculate jacobian and shape function gradients
+		double detJt = ShapeGradient(el, n, G);
 
 		// shape functions
 		double* H = el.H(n);
 
+		// evaluate velocity
 		vec3d vi = el.Evaluate((vec3d*)(&vn[0]), n);
-
-		// evaluate shape function derivatives
-		for (int i = 0; i<ne; ++i)
-		{
-			double Gr = el.Gr(n)[i];
-			double Gs = el.Gs(n)[i];
-			double Gt = el.Gt(n)[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0] * Gr + Ji[1][0] * Gs + Ji[2][0] * Gt;
-			Gy[i] = Ji[0][1] * Gr + Ji[1][1] * Gs + Ji[2][1] * Gt;
-			Gz[i] = Ji[0][2] * Gr + Ji[1][2] * Gs + Ji[2][2] * Gt;
-		}
 
 		// loop over all nodes
 		for (int a = 0; a<ne; ++a)
 		{
 			for (int b = 0; b<ne; ++b)
 			{
-				Gj[0] = Gx[b];
-				Gj[1] = Gy[b];
-				Gj[2] = Gz[b];
-
-				double kab = (H[a] * (vi.x*Gj[0] + vi.y*Gj[1] + vi.z*Gj[2]))*detJt*gw[n];
+				double kab = (H[a] * (vi * G[b]))*detJt*gw[n];
 
 				for (int i = 0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab;
 			}
