@@ -23,11 +23,8 @@ public:
 
 	bool SetAttribute(const char* szname, const char* szval);
 
-	double PartitionCoefficient();
-
 private:
 	double	m_diffusivity;				//!< diffusion constant
-	double	m_partitionCoefficient;		//!< partition coefficient
 	
 	int		m_id;			//!< global id of species (must be set by parent material)
 

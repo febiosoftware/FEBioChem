@@ -32,6 +32,12 @@ void FEReactionDomain::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
+double FEReactionDomain::VolumeFraction()
+{
+	return m_mat->VolumeFraction();
+}
+
+//-----------------------------------------------------------------------------
 // Initializes domain data.
 // This creates a list of active degrees of freedom in this domain
 bool FEReactionDomain::Initialize()
@@ -71,6 +77,9 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 	int nspecies = m_mat->Species();
 	assert(nspecies == ndof);
 
+	// fluid volume fraction
+	double phi = m_mat->VolumeFraction();
+
 	int NE = Elements();
 	for (int iel = 0; iel<NE; ++iel)
 	{
@@ -106,11 +115,10 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				rp.m_c[s->GetID()] = ci;
 
 				// evaluate "actual" concentration (this is used by the chemcial reactions)
-				double kappa = s->PartitionCoefficient();
-				rp.m_ca[s->GetID()] = kappa * ci;
+				rp.m_ca[s->GetID()] = ci;
 
 				// evaluate the flux
-				rp.m_j[s->GetID()] = -grad_c * s->Diffusivity() * kappa;
+				rp.m_j[s->GetID()] = -grad_c * s->Diffusivity() * phi;
 			}
 		}
 	}
@@ -243,6 +251,9 @@ void FEReactionDomain::MassMatrix(FELinearSystem& K, double dt)
 //-----------------------------------------------------------------------------
 void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
+	// fluid volume fraction
+	double phi = VolumeFraction();
+
 	int ncv = GetDOFCount();
 	int ne = el.Nodes();
 	int nint = el.GaussPoints();
@@ -261,7 +272,7 @@ void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 			{
 				double kab = H[a]*H[b]*gw[n]*detJ;
 
-				for (int i=0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab;
+				for (int i=0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab * phi;
 			}
 		}
 	}
@@ -336,6 +347,8 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 	const vector<int>& dofs = GetDOFList();
 	int ncv = (int)dofs.size();
 
+	double phi = m_mat->VolumeFraction();
+
 	// get the diffusion coefficients
 	vector<double> D(ncv);
 	for (int i=0; i<ncv; ++i) D[i] = m_mat->GetSpecies(i)->Diffusivity();
@@ -378,7 +391,7 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 
 					double kab = (Gi[0] * DB[0] + Gi[1] * DB[1] + Gi[2] * DB[2])*detJt*gw[n];
 
-					ke[a*ncv + i][b*ncv + i] += kab;
+					ke[a*ncv + i][b*ncv + i] += kab * phi;
 				}
 			}
 		}

@@ -4,11 +4,14 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEReactionDiffusionMaterial, FEMaterial)
+	ADD_PARAMETER2(m_phi, FE_PARAM_DOUBLE, FE_RANGE_LEFT_OPEN(0.0, 1.0), "phi");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FEReactionDiffusionMaterial::FEReactionDiffusionMaterial(FEModel* fem) : FEMaterial(fem)
 {
+	m_phi = 1.0;
+
 	AddProperty(&m_species , "species", false);
 	AddProperty(&m_reaction, "reaction", false);
 }

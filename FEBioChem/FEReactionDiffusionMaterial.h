@@ -35,10 +35,16 @@ public:
 
 	// return a specific species
 	FEReactiveSpecies* GetSpecies(int i) { return m_species[i]; }
+
+	// fluid volume fraction
+	double VolumeFraction() { return m_phi; }
 	 
 protected:
 	FEVecPropertyT<FEReactiveSpecies>	m_species;	//!< list of species active for this material
 	FEVecPropertyT<FEReactionMaterial>	m_reaction;	//!< list of reactions occuring in this material
+
+private:
+	double	m_phi;		//!< fluid volume fraction
 
 	DECLARE_PARAMETER_LIST();
 };

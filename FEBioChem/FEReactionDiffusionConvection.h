@@ -1,8 +1,8 @@
 #pragma once
 #include "FENLReactionDiffusionSolver.h"
 
-class FEReactionDiffusionConvectionSolver : public FENLReactionDiffusionSolver
+class FENLReactionDiffusionConvectionSolver : public FENLReactionDiffusionSolver
 {
 public:
-	FEReactionDiffusionConvectionSolver(FEModel* fem);
+	FENLReactionDiffusionConvectionSolver(FEModel* fem);
 };
