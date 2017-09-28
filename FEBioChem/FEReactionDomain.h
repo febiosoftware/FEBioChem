@@ -20,9 +20,6 @@ public:
 
 	bool Initialize();
 
-	// fluid volume fraction
-	double VolumeFraction();
-
 public:
 	void ForceVector(FEGlobalVector& R);
 

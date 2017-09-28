@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEReactionDiffusionMaterial, FEMaterial)
-	ADD_PARAMETER2(m_phi, FE_PARAM_DOUBLE, FE_RANGE_LEFT_OPEN(0.0, 1.0), "phi");
+	ADD_PARAMETER2(m_phi, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(0.0, 1.0), "solid_volume_fraction");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

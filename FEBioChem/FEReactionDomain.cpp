@@ -32,12 +32,6 @@ void FEReactionDomain::SetMaterial(FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-double FEReactionDomain::VolumeFraction()
-{
-	return m_mat->VolumeFraction();
-}
-
-//-----------------------------------------------------------------------------
 // Initializes domain data.
 // This creates a list of active degrees of freedom in this domain
 bool FEReactionDomain::Initialize()
@@ -78,7 +72,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 	assert(nspecies == ndof);
 
 	// fluid volume fraction
-	double phi = m_mat->VolumeFraction();
+	double phi = m_mat->Porosity();
 
 	int NE = Elements();
 	for (int iel = 0; iel<NE; ++iel)
@@ -160,6 +154,9 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 	int ndof = (int) dofs.size();
 	vector<double> R(ndof, 0.0);
 
+	// fluid volume fraction
+	double phi = m_mat->Porosity();
+
 	// loop over all integration points
 	int ne = el.Nodes();
 	int ni = el.GaussPoints();
@@ -172,7 +169,7 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 		// evaluate the reaction rates
 		for (int i=0; i<ndof; ++i)
 		{
-			R[i] = m_mat->GetReactionRate(pt, m_mat->GetSpecies(i)->GetID());
+			R[i] = phi * m_mat->GetReactionRate(pt, m_mat->GetSpecies(i)->GetID());
 		}
 
 		double detJ = detJt(el, n);
@@ -252,7 +249,7 @@ void FEReactionDomain::MassMatrix(FELinearSystem& K, double dt)
 void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
 	// fluid volume fraction
-	double phi = VolumeFraction();
+	double phi = m_mat->Porosity();
 
 	int ncv = GetDOFCount();
 	int ne = el.Nodes();
@@ -347,7 +344,7 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 	const vector<int>& dofs = GetDOFList();
 	int ncv = (int)dofs.size();
 
-	double phi = m_mat->VolumeFraction();
+	double phi = m_mat->Porosity();
 
 	// get the diffusion coefficients
 	vector<double> D(ncv);
@@ -411,6 +408,9 @@ void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 	matrix Gamma(ncv, ncv);
 	Gamma.zero();
 
+	// fluid volume fraction
+	double phi = m_mat->Porosity();
+
 	// loop over all integration points
 	int ni = el.GaussPoints();
 	const double *gw = el.GaussWeights();
@@ -430,7 +430,7 @@ void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 		for (int i=0; i<ncv; ++i)
 			for (int j=0; j<ncv; ++j)
 				{
-					Gamma[i][j] = m_mat->GetReactionRateStiffness(rp, m_mat->GetSpecies(i)->GetID(), m_mat->GetSpecies(j)->GetID());
+					Gamma[i][j] = phi*m_mat->GetReactionRateStiffness(rp, m_mat->GetSpecies(i)->GetID(), m_mat->GetSpecies(j)->GetID());
 				}
 
 		// evaluate element matrix
