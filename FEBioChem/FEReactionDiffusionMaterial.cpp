@@ -10,7 +10,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FEReactionDiffusionMaterial::FEReactionDiffusionMaterial(FEModel* fem) : FEMaterial(fem)
 {
-	m_phi = 1.0;
+	m_phi = 0.0;
 
 	AddProperty(&m_species , "species", false);
 	AddProperty(&m_reaction, "reaction", false);
