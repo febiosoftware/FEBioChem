@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEReactionMaterial.h"
+#include "FEReactionDiffusionMaterial.h"
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
@@ -11,9 +12,9 @@ typedef pair<int, string>	ReactionTerm;
 //-----------------------------------------------------------------------------
 // Define parameter list
 BEGIN_PARAMETER_LIST(FEReactionMaterial, FEMaterial)
-	ADD_PARAMETER(m_rate, FE_PARAM_DOUBLE, "reaction_rate");
+	ADD_PARAMETER(m_rate    , FE_PARAM_DOUBLE, "reaction_rate");
 	ADD_PARAMETER(m_equation, FE_PARAM_STRING, "equation");
-	ADD_PARAMETER(m_posOnly, FE_PARAM_BOOL, "force_positive_concentrations");
+	ADD_PARAMETER(m_posOnly , FE_PARAM_BOOL  , "force_positive_concentrations");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -61,7 +62,7 @@ bool parseFormula(char* sz, vector<ReactionTerm>& term)
 bool convert(const char* szeq, vector<ReactionTerm>& reactants, vector<ReactionTerm>& products)
 {
 	// make a copy
-	int l = strlen(szeq);
+	int l = (int)strlen(szeq);
 	if (l == 0) return false;
 	char* szcopy = new char[l+1];
 	strncpy(szcopy, szeq, l);
@@ -108,6 +109,14 @@ FEReactionMaterial::FEReactionMaterial(FEModel* fem) : FEMaterial(fem)
 	m_rate = 0.0;
 	m_equation[0] = 0;
 	m_posOnly = false;
+	m_pRDM = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! set the parent material
+void FEReactionMaterial::SetReactionDiffusionParent(FEReactionDiffusionMaterial* mat)
+{
+	m_pRDM = mat;
 }
 
 //-----------------------------------------------------------------------------
@@ -115,6 +124,9 @@ FEReactionMaterial::FEReactionMaterial(FEModel* fem) : FEMaterial(fem)
 // Parses the chemical equation and builds the stoichiometric tables.
 bool FEReactionMaterial::Init()
 {
+	// make sure a parent material was set
+	if (m_pRDM == 0) return MaterialError("No parent material set for reaction material");
+
 	// base class initialization
 	if (FEMaterial::Init() == false) return false;
 
@@ -123,37 +135,53 @@ bool FEReactionMaterial::Init()
 	vector<ReactionTerm> products;
 	if (convert(m_equation, reactants, products) == false) return MaterialError("Error in parsing chemical equation");
 
-	// see if these species actually exist
-	FEModel& fem = *GetFEModel();
-	DOFS& dofs = fem.GetDOFS();
-	int ncv = dofs.GetVariableSize("concentration");
-	m_vP.resize(ncv, 0);
-	m_vR.resize(ncv, 0);
-	m_v.resize(ncv, 0);
-	for (int i=0; i<fem.GlobalDataItems(); ++i)
+	// get the number of species for this material
+	int nsol = m_pRDM->Species();
+	int nsbm = m_pRDM->SolidBoundSpecies();
+	int ntot = nsol + nsbm;
+
+	// allocate coefficient tables
+	m_vP.resize(ntot, 0);
+	m_vR.resize(ntot, 0);
+	m_v.resize(ntot, 0);
+
+	// loop over reactants
+	for (int i=0; i<reactants.size(); ++i)
 	{
-		FEGlobalData* var = fem.GetGlobalData(i);
+		ReactionTerm& reactant_i = reactants[i];
 
-		// see if this species is used as a reactant
-		for (int j=0; j<reactants.size(); ++j)
+		// try to find the reactive species
+		FEReactiveSpeciesBase* spec = m_pRDM->FindSpecies(reactant_i.second);
+		if (spec == 0)
 		{
-			if (reactants[j].second == var->m_szname)
-			{
-				m_vR[i] = reactants[j].first;
-				break;
-			}
+			// Oh, oh. This shouldn't happen
+			return MaterialError("Invalid reaction equation");
+		}
+		
+		// set the reactant coefficient
+		m_vR[spec->GetLocalID()] = reactant_i.first;
+	}
+
+	// loop over products
+	for (int i=0; i<products.size(); ++i)
+	{
+		ReactionTerm& prod_i = products[i];
+
+		// try to find the reactive species
+		FEReactiveSpeciesBase* spec = m_pRDM->FindSpecies(prod_i.second);
+		if (spec == 0)
+		{
+			// Oh, oh. This shouldn't happen
+			return MaterialError("Invalid reaction equation");
 		}
 
-		// see if this species is used as a product
-		for (int j = 0; j<products.size(); ++j)
-		{
-			if (products[j].second == var->m_szname)
-			{
-				m_vP[i] = products[j].first;
-			}
-		}
+		// set the product coefficient
+		m_vP[spec->GetLocalID()] = prod_i.first;
+	}
 
-		// net stoichiometric coefficient
+	// evaluate net stoichiometric coefficients
+	for (int i=0; i<ntot; ++i)
+	{
 		m_v[i] = m_vP[i] - m_vR[i];
 	}
 
@@ -189,7 +217,7 @@ double FEReactionMaterial::GetReactionRate(FEReactionMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-//! Evaluate derivative of reaction rate wrt to species Id
+//! Evaluate derivative of reaction rate wrt to species with local id
 double FEReactionMaterial::GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id)
 {
 	// reaction constant

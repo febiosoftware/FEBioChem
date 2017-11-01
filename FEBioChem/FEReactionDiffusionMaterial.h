@@ -13,6 +13,9 @@ public:
 	// constructor
 	FEReactionDiffusionMaterial(FEModel* fem);
 
+	// initialization
+	bool Init() override;
+
 	// number of reactions defined in this material
 	int Reactions() { return (int) m_reaction.size(); }
 
@@ -31,20 +34,33 @@ public:
 	FEMaterialPoint* CreateMaterialPointData();
 
 	// number of species active in this domain
-	int Species() { return (int) m_species.size(); }
+	int Species() const { return (int) m_species.size(); }
 
 	// return a specific species
 	FEReactiveSpecies* GetSpecies(int i) { return m_species[i]; }
 
-	// Porosity (i.e. fluid volume fraction
-	double Porosity() { return 1.0 - m_phi; }
-	 
+	// Find a species by name
+	FEReactiveSpeciesBase* FindSpecies(const string& name);
+
+	// number of solid-bound species
+	int SolidBoundSpecies() const { return (int)m_sbs.size(); }
+
+	// return a specific solid-bound species
+	FESolidBoundSpecies* GetSolidBoundSpecies(int i) { return m_sbs[i]; }
+
+	// Porosity (i.e. fluid volume fraction)
+	double Porosity(FEReactionMaterialPoint& mp) { return 1.0 - mp.m_phi; }
+
+	// evaluate the current solid volume fraction
+	double SolidVolumeFraction(FEReactionMaterialPoint& mp);
+
 protected:
 	FEVecPropertyT<FEReactiveSpecies>	m_species;	//!< list of species active for this material
+	FEVecPropertyT<FESolidBoundSpecies> m_sbs;		//!< list of solid-bound species active for this material
 	FEVecPropertyT<FEReactionMaterial>	m_reaction;	//!< list of reactions occuring in this material
 
 private:
-	double	m_phi;		//!< solid volume fraction
+	double	m_phi;		//!< solid volume fraction (of solid not explicitly modeled by SBMs; remains constant throughout analysis)
 
 	DECLARE_PARAMETER_LIST();
 };

@@ -61,19 +61,26 @@ bool FEReactionDomain::Initialize()
 }
 
 //-----------------------------------------------------------------------------
+// Update domain data. Called after the model's solution vectors have changed.
 void FEReactionDomain::Update(const FETimeInfo& tp)
 {
+	double dt = tp.timeIncrement;
+
+	// get the degrees of freedom for this domain
 	const vector<int>& dofs = GetDOFList();
 	int ndof = (int)dofs.size();
 
+	// get the mesh
 	FEMesh& mesh = *GetMesh();
 
-	int nspecies = m_mat->Species();
-	assert(nspecies == ndof);
+	// count solutes and sbms
+	int nsol = m_mat->Species();
+	int nsbm = m_mat->SolidBoundSpecies();
 
-	// fluid volume fraction
-	double phi = m_mat->Porosity();
+	// the number of solutes must equal the number of degrees of freedom active in this domain
+	assert(nsol == ndof);
 
+	// loop over all elements
 	int NE = Elements();
 	for (int iel = 0; iel<NE; ++iel)
 	{
@@ -96,8 +103,15 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 			FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
 
+			// update the solid volume fraction
+			// (Do this before the fluid volume fraction)
+			rp.m_phi = m_mat->SolidVolumeFraction(rp);
+
+			// fluid volume fraction
+			double f = m_mat->Porosity(rp);
+
 			// evaluate concentrations at integration points
-			for (int i = 0; i<nspecies; ++i)
+			for (int i = 0; i<nsol; ++i)
 			{
 				FEReactiveSpecies* s = m_mat->GetSpecies(i);
 
@@ -106,13 +120,29 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 
 				// evaluate concentration
 				double ci = el.Evaluate(&(c[i][0]), n);
-				rp.m_c[s->GetID()] = ci;
+				rp.m_c[s->GetLocalID()] = ci;
 
 				// evaluate "actual" concentration (this is used by the chemcial reactions)
-				rp.m_ca[s->GetID()] = ci;
+				rp.m_ca[s->GetLocalID()] = ci;
 
 				// evaluate the flux
-				rp.m_j[s->GetID()] = -grad_c * s->Diffusivity() * phi;
+				rp.m_j[s->GetLocalID()] = -grad_c * s->Diffusivity() * f;
+			}
+
+			// evaluate the solid-bound species concentrations
+			for (int i=0; i<nsbm; ++i)
+			{
+				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
+
+				// evaluate the mass supply for this SBM
+				double rhohati = m_mat->GetReactionRate(rp, s->GetLocalID());
+
+				// update the solid-bound apparent density
+				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*rhohati;
+
+				// evaluate the equivalent concentration (per fluid volume)
+				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
+				rp.m_ca[s->GetLocalID()] = ci;
 			}
 		}
 	}
@@ -154,9 +184,6 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 	int ndof = (int) dofs.size();
 	vector<double> R(ndof, 0.0);
 
-	// fluid volume fraction
-	double phi = m_mat->Porosity();
-
 	// loop over all integration points
 	int ne = el.Nodes();
 	int ni = el.GaussPoints();
@@ -166,10 +193,13 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEReactionMaterialPoint& pt = *mp.ExtractData<FEReactionMaterialPoint>();
 
+		// fluid volume fraction
+		double phi = m_mat->Porosity(pt);
+
 		// evaluate the reaction rates
 		for (int i=0; i<ndof; ++i)
 		{
-			R[i] = phi * m_mat->GetReactionRate(pt, m_mat->GetSpecies(i)->GetID());
+			R[i] = phi * m_mat->GetReactionRate(pt, m_mat->GetSpecies(i)->GetLocalID());
 		}
 
 		double detJ = detJt(el, n);
@@ -248,15 +278,18 @@ void FEReactionDomain::MassMatrix(FELinearSystem& K, double dt)
 //-----------------------------------------------------------------------------
 void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
-	// fluid volume fraction
-	double phi = m_mat->Porosity();
-
 	int ncv = GetDOFCount();
 	int ne = el.Nodes();
 	int nint = el.GaussPoints();
 	double* gw = el.GaussWeights();
 	for (int n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEReactionMaterialPoint& pt = *mp.ExtractData<FEReactionMaterialPoint>();
+
+		// fluid volume fraction
+		double phi = m_mat->Porosity(pt);
+
 		// element shape function values at integration point n
 		double* H = el.H(n);
 
@@ -344,8 +377,6 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 	const vector<int>& dofs = GetDOFList();
 	int ncv = (int)dofs.size();
 
-	double phi = m_mat->Porosity();
-
 	// get the diffusion coefficients
 	vector<double> D(ncv);
 	for (int i=0; i<ncv; ++i) D[i] = m_mat->GetSpecies(i)->Diffusivity();
@@ -367,6 +398,10 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 
 		// evaluate the conductivity
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEReactionMaterialPoint& pt = *mp.ExtractData<FEReactionMaterialPoint>();
+
+		// fluid volume fraction
+		double phi = m_mat->Porosity(pt);
 
 		for (int a = 0; a<ne; ++a)
 		{
@@ -408,9 +443,6 @@ void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 	matrix Gamma(ncv, ncv);
 	Gamma.zero();
 
-	// fluid volume fraction
-	double phi = m_mat->Porosity();
-
 	// loop over all integration points
 	int ni = el.GaussPoints();
 	const double *gw = el.GaussWeights();
@@ -426,11 +458,14 @@ void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
 
+		// fluid volume fraction
+		double phi = m_mat->Porosity(rp);
+
 		// evaluate the gamma matrix
 		for (int i=0; i<ncv; ++i)
 			for (int j=0; j<ncv; ++j)
 				{
-					Gamma[i][j] = phi*m_mat->GetReactionRateStiffness(rp, m_mat->GetSpecies(i)->GetID(), m_mat->GetSpecies(j)->GetID());
+					Gamma[i][j] = phi*m_mat->GetReactionRateStiffness(rp, m_mat->GetSpecies(i)->GetLocalID(), m_mat->GetSpecies(j)->GetLocalID());
 				}
 
 		// evaluate element matrix

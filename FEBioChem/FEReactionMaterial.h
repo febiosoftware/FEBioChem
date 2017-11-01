@@ -5,6 +5,8 @@
 #include <string>
 using namespace std;
 
+class FEReactionDiffusionMaterial;
+
 //-----------------------------------------------------------------------------
 // The reaction material point stores the current concentration values at the integration point. 
 // Note that it stores the values of all concentration degrees of freedom, not only
@@ -20,14 +22,32 @@ public:
 		pt->m_c = m_c;
 		pt->m_ca = m_ca;
 		pt->m_j = m_j;
+		pt->m_sbmr = m_sbmr;
+		pt->m_sbmrp = m_sbmrp;
 		if (m_pNext) pt->m_pNext = m_pNext->Copy();
 		return pt;
 	}
 
+	// This is called during PreSolveUpdate
+	void Update(const FETimeInfo& ti) override
+	{
+		// update sbm apparent densities.
+		m_sbmrp = m_sbmr;
+
+		// update solid volume fraction
+		m_phip = m_phi;
+	}
+
 public:
 	vector<double>	m_c;	//!< concentration values at integration points (of ALL concentration dofs)
-	vector<double>	m_ca;	//!< "actual" concentrations, i.e. concentrations multiplied by partition coefficient
+	vector<double>	m_ca;	//!< "actual" concentrations (includes both free species and solid-bound species)
 	vector<vec3d>	m_j;	//!< concentration flux
+
+	vector<double>	m_sbmr;		//!< apparent densities of solid-bound molecules at current time
+	vector<double>	m_sbmrp;	//!< apparent densities of solid-bound molecules at previous time
+
+	double	m_phi;		//!< current solid volume fraction
+	double	m_phip;		//!< previous solid volume fraction
 };
 
 //-----------------------------------------------------------------------------
@@ -53,10 +73,15 @@ public:
 	//! Evaluate derivative of reaction rate wrt to species Id
 	double GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id);
 
+	//! set the parent material
+	void SetReactionDiffusionParent(FEReactionDiffusionMaterial* mat);
+
 private:
 	double	m_rate;				//!< reaction constant (rename this, since this is not the rate)
 	char	m_equation[256];	//!< reaction equation
 	bool	m_posOnly;			//!< only consider nonnegative concentrations (neg. concentrations will be treated as zero)
+
+	FEReactionDiffusionMaterial*	m_pRDM;	//!< parent reaction-diffusion material (will be set by parent during Init)
 
 public:
 	vector<int>	m_vR;	//!< stoichiometric coefficients for reactants
