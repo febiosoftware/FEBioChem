@@ -133,6 +133,12 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 		if (dc.IsActive()) dc.PrepStep(m_d);
 	}
 
+	// do the pre-solve update of the domains
+	for (int i=0; i<mesh.Domains(); ++i)
+	{
+		mesh.Domain(i).PreSolveUpdate(tp);
+	}
+
 	vector<double> U; U.assign(neq, 0.0);
 	vector<double> du; du.assign(neq, 0.0);
 

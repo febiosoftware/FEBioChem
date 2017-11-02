@@ -43,3 +43,43 @@ protected:
 	int			m_nsol;
 	FEModel*	m_pfem;
 };
+
+//-----------------------------------------------------------------------------
+//! SBS concentration
+class FEPlotSBSConcentration : public FEDomainData
+{
+public:
+	FEPlotSBSConcentration(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+	bool SetFilter(const char* sz);
+
+protected:
+	std::string	m_sbmName;
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! SBS apparent density
+class FEPlotSBSApparentDensity : public FEDomainData
+{
+public:
+	FEPlotSBSApparentDensity(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+	bool SetFilter(const char* sz);
+
+protected:
+	std::string	m_sbmName;
+	FEModel*	m_pfem;
+};
+
+//-----------------------------------------------------------------------------
+//! solid volume fraction
+class FEPlotSolidVolumeFraction : public FEDomainData
+{
+public:
+	FEPlotSolidVolumeFraction(FEModel* pfem);
+	bool Save(FEDomain& dom, FEDataStream& a);
+
+protected:
+	FEModel*	m_pfem;
+};

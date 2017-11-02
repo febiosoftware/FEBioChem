@@ -61,6 +61,21 @@ bool FEReactionDomain::Initialize()
 }
 
 //-----------------------------------------------------------------------------
+void FEReactionDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
+{
+	for (size_t i = 0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		int n = el.GaussPoints();
+		for (int j = 0; j<n; ++j)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+			mp.Update(timeInfo);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Update domain data. Called after the model's solution vectors have changed.
 void FEReactionDomain::Update(const FETimeInfo& tp)
 {

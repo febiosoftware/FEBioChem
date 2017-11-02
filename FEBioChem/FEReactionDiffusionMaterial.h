@@ -42,6 +42,9 @@ public:
 	// Find a species by name
 	FEReactiveSpeciesBase* FindSpecies(const string& name);
 
+	// Find a species form a global ID
+	FEReactiveSpecies* FindSpeciesFromGlobalID(int id);
+
 	// number of solid-bound species
 	int SolidBoundSpecies() const { return (int)m_sbs.size(); }
 

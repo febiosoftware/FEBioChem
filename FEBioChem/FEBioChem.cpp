@@ -24,10 +24,14 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEReactionDiffusionMaterial          , FEMATERIAL_ID   , "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FEReactionMaterial                   , FEMATERIAL_ID   , "reaction");
 	REGISTER_FECORE_CLASS(FEReactiveSpecies                    , FEMATERIAL_ID   , "species");
+	REGISTER_FECORE_CLASS(FESolidBoundSpecies                  , FEMATERIAL_ID   , "solid_bound_species");
 	REGISTER_FECORE_CLASS(FEConcentrationFlux                  , FESURFACELOAD_ID, "concentration flux");
 	REGISTER_FECORE_CLASS(FEPlotActualConcentration            , FEPLOTDATA_ID   , "actual concentration");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveConcentration         , FEPLOTDATA_ID   , "effective concentration");
 	REGISTER_FECORE_CLASS(FEPlotConcentrationFlux			   , FEPLOTDATA_ID   , "concentration flux");
+	REGISTER_FECORE_CLASS(FEPlotSBSConcentration               , FEPLOTDATA_ID   , "sbs concentration");
+	REGISTER_FECORE_CLASS(FEPlotSBSApparentDensity             , FEPLOTDATA_ID   , "sbs apparent density");
+	REGISTER_FECORE_CLASS(FEPlotSolidVolumeFraction            , FEPLOTDATA_ID   , "solid volume fraction");
 }
 
 FECORE_PLUGIN int GetSDKVersion()

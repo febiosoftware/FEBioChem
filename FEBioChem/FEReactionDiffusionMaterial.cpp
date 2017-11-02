@@ -14,9 +14,9 @@ FEReactionDiffusionMaterial::FEReactionDiffusionMaterial(FEModel* fem) : FEMater
 	m_phi = 0.0;
 
 	// define the material's properties
-	AddProperty(&m_species , "species"    , 0);
-	AddProperty(&m_sbs     , "solid_bound", 0);
-	AddProperty(&m_reaction, "reaction"   , 0);
+	AddProperty(&m_species , "species"            , 0);
+	AddProperty(&m_sbs     , "solid_bound_species", 0);
+	AddProperty(&m_reaction, "reaction"           , 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -89,6 +89,18 @@ FEReactiveSpeciesBase* FEReactionDiffusionMaterial::FindSpecies(const string& na
 	}
 
 	// sorry, no luck
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Find a species form a global ID
+FEReactiveSpecies* FEReactionDiffusionMaterial::FindSpeciesFromGlobalID(int id)
+{
+	for (int i=0; i<Species(); ++i)
+	{
+		if (m_species[i]->GetID() == id) return m_species[i];
+	}
+
 	return 0;
 }
 

@@ -18,6 +18,8 @@ public:
 	//! Update the domain data (called after model state was modified)
 	void Update(const FETimeInfo& tp);
 
+	void PreSolveUpdate(const FETimeInfo& timeInfo);
+
 	bool Initialize();
 
 public:

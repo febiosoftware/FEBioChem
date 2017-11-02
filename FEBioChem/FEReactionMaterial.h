@@ -36,6 +36,8 @@ public:
 
 		// update solid volume fraction
 		m_phip = m_phi;
+
+		if (m_pNext) m_pNext->Update(ti);
 	}
 
 public:

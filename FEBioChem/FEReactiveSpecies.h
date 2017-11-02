@@ -66,8 +66,12 @@ public:
 	// Molar mass
 	double MolarMass() const { return m_M; }
 
+	// Density (overridden from FEMaterial)
+	double Density() { return m_rhoT; }
+
 private:
 	double	m_rho0;	//!< initial apparent density
+	double	m_rhoT;	//!< true density
 	double	m_M;	//!< Molar mass
 
 	DECLARE_PARAMETER_LIST();

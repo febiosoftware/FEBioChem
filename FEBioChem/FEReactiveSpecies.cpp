@@ -29,9 +29,9 @@ bool FEReactiveSpeciesBase::SetAttribute(const char* szname, const char* szval)
 		for (int i = 0; i<nvar; ++i)
 		{
 			FEGlobalData& d = *fem.GetGlobalData(i);
-			if (strcmp(d.m_szname, szval) == 0)
+			if (d.GetName() == szval)
 			{
-				SetID(i);
+				SetID(d.GetID());
 				m_name = szval;
 				return true;
 			}
@@ -59,6 +59,7 @@ FEReactiveSpecies::FEReactiveSpecies(FEModel* fem) : FEReactiveSpeciesBase(fem)
 BEGIN_PARAMETER_LIST(FESolidBoundSpecies, FEReactiveSpeciesBase)
 	ADD_PARAMETER2(m_rho0, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0");
 	ADD_PARAMETER2(m_M   , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "molar_mass");
+	ADD_PARAMETER2(m_rhoT, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "density");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -66,4 +67,5 @@ FESolidBoundSpecies::FESolidBoundSpecies(FEModel* fem) : FEReactiveSpeciesBase(f
 {
 	m_rho0 = 0.0;
 	m_M = 0.0;
+	m_rhoT = 0.0;
 }
