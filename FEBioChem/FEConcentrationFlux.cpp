@@ -74,7 +74,7 @@ void FEConcentrationFlux::Residual(const FETimeInfo& tp, FEGlobalVector& R)
 
 			for (int j = 0; j<neln; ++j)
 			{
-				fe[j] += N[j] * m_flux * w[n] * J;
+				fe[j] -= N[j] * m_flux * w[n] * J;
 			}
 		}
 

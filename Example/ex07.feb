@@ -850,7 +850,7 @@
 	<Loads>
 		<surface_load type="concentration flux" surface="SurfaceLoad1">
 			<solute_id>1</solute_id>
-			<flux lc="1">1</flux>
+			<flux lc="1">-1</flux>
 		</surface_load>
 	</Loads>
 	<LoadData>
@@ -863,6 +863,8 @@
 		<plotfile type="febio">
 			<var type="concentration['c1']=c1"/>
 			<var type="concentration['c2']=c2"/>
+			<var type="concentration flux['c1']=solute 1 flux"/>
+			<var type="concentration flux['c2']=solute 2 flux"/>
 		</plotfile>
 	</Output>
 </febio_spec>

@@ -82,23 +82,10 @@
 			<value>1.0</value>
 		</init>
 	</Initial>
-	<!--Boundary>
-		<prescribe bc="c1" node_set="PrescribedBC1">
-			<scale lc="1">1</scale>
-			<relative>0</relative>
-		</prescribe>
-	</Boundary>
-	<LoadData>
-		<loadcurve id="1" type="smooth">
-			<point>0,0</point>
-			<point>1,1</point>
-		</loadcurve>
-	</LoadData-->
 	<Output>
 		<plotfile type="febio">
 			<var type="concentration['c1']=c1"/>
 			<var type="concentration['c2']=c2"/>
-			<var type="effective concentration['c1']=effective c1"/>
 			<var type="actual concentration['c1']=actual c1"/>
 			<var type="actual concentration['c2']=actual c2"/>
 		</plotfile>
