@@ -137,7 +137,10 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				// evaluate the mass supply for this SBM
 				double rhohati = m_mat->GetReactionRate(rp, s->GetLocalID());
 
-				// update the solid-bound apparent density
+				// convert from molar supply to mass supply
+				rhohati *= f*s->MolarMass();
+
+				// update the solid-bound apparent density (i.e. mass supply)
 				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*rhohati;
 
 				// evaluate the equivalent concentration (per fluid volume)

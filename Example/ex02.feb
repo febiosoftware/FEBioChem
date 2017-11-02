@@ -20,6 +20,9 @@
 			<species name="B">
 				<diffusivity>0.1</diffusivity>
 			</species>
+			<species name="C">
+				<diffusivity>0</diffusivity>
+			</species>
 			<reaction type="reaction">
 				<equation>A --> B</equation>
 				<reaction_rate>0.5</reaction_rate>
