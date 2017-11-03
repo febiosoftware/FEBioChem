@@ -69,10 +69,18 @@ public:
 	// Density (overridden from FEMaterial)
 	double Density() { return m_rhoT; }
 
+	// min apparent density
+	double MinApparentDensity() const { return m_rhomin; }
+
+	// max apparent density
+	double MaxApparentDensity() const { return m_rhomax; }
+
 private:
 	double	m_rho0;	//!< initial apparent density
 	double	m_rhoT;	//!< true density
 	double	m_M;	//!< Molar mass
+
+	double	m_rhomin, m_rhomax;	//!< min, max range for apparent density
 
 	DECLARE_PARAMETER_LIST();
 };

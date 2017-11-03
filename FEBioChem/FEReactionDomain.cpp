@@ -73,6 +73,90 @@ void FEReactionDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 			mp.Update(timeInfo);
 		}
 	}
+
+	Update(timeInfo);
+}
+
+//-----------------------------------------------------------------------------
+void FEReactionDomain::Activate()
+{
+	FESolidDomain::Activate();
+
+	// get the degrees of freedom for this domain
+	const vector<int>& dofs = GetDOFList();
+	int ndof = (int)dofs.size();
+
+	// get the mesh
+	FEMesh& mesh = *GetMesh();
+
+	// count solutes and sbms
+	int nsol = m_mat->Species();
+	int nsbm = m_mat->SolidBoundSpecies();
+
+	// the number of solutes must equal the number of degrees of freedom active in this domain
+	assert(nsol == ndof);
+
+	// loop over all elements
+	int NE = Elements();
+	for (int iel = 0; iel<NE; ++iel)
+	{
+		// get the next element 
+		FESolidElement& el = Element(iel);
+
+		// get the current nodal concentration values
+		int ne = el.Nodes();
+		vector<vector<double> > c(ndof, vector<double>(ne));
+		for (int i = 0; i<ne; ++i)
+		{
+			FENode& node = mesh.Node(el.m_node[i]);
+			for (int j = 0; j<ndof; ++j) c[j][i] = node.get(dofs[j]);
+		}
+
+		// evaluate integration point values
+		int nint = el.GaussPoints();
+		for (int n = 0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+			FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
+
+			// fluid volume fraction
+			double f = m_mat->Porosity(rp);
+
+			// evaluate concentrations at integration points
+			for (int i = 0; i<nsol; ++i)
+			{
+				FEReactiveSpecies* s = m_mat->GetSpecies(i);
+
+				// evaluate gradient at this integration point
+				vec3d grad_c = gradient(el, &c[i][0], n);
+
+				// evaluate concentration
+				double ci = el.Evaluate(&(c[i][0]), n);
+				rp.m_c[s->GetLocalID()] = ci;
+
+				// evaluate "actual" concentration (this is used by the chemcial reactions)
+				rp.m_ca[s->GetLocalID()] = ci;
+
+				// evaluate the flux
+				rp.m_j[s->GetLocalID()] = -grad_c * s->Diffusivity() * f;
+			}
+
+			// update the solid volume fraction
+			// (Do this before the fluid volume fraction)
+			rp.m_phi = m_mat->SolidVolumeFraction(rp);
+			f = m_mat->Porosity(rp);
+
+			// evaluate the solid-bound species concentrations
+			for (int i = 0; i<nsbm; ++i)
+			{
+				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
+
+				// evaluate the equivalent concentration (per fluid volume)
+				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
+				rp.m_ca[s->GetLocalID()] = ci;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -118,12 +202,38 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 			FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
 
+			// fluid volume fraction
+			double f = m_mat->Porosity(rp);
+
+			// evaluate the solid-bound species concentrations
+			for (int i = 0; i<nsbm; ++i)
+			{
+				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
+
+				// evaluate the mass supply for this SBM
+				double rhohati = m_mat->GetReactionRate(rp, s->GetLocalID());
+
+				// convert from molar supply to mass supply
+				rhohati *= f*s->MolarMass();
+
+				// update the solid-bound apparent density (i.e. mass supply)
+				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*rhohati;
+
+				// clamp to range
+				double rmin = s->MinApparentDensity();
+				double rmax = s->MaxApparentDensity();
+				if (rp.m_sbmr[i] < rmin) rp.m_sbmr[i] = rmin;
+				if ((rmax > 0.0) && (rp.m_sbmr[i] > rmax)) rp.m_sbmr[i] = rmax;
+
+				// evaluate the equivalent concentration (per fluid volume)
+				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
+				rp.m_ca[s->GetLocalID()] = ci;
+			}
+
 			// update the solid volume fraction
 			// (Do this before the fluid volume fraction)
 			rp.m_phi = m_mat->SolidVolumeFraction(rp);
-
-			// fluid volume fraction
-			double f = m_mat->Porosity(rp);
+			f = m_mat->Porosity(rp);
 
 			// evaluate concentrations at integration points
 			for (int i = 0; i<nsol; ++i)
@@ -142,25 +252,6 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 
 				// evaluate the flux
 				rp.m_j[s->GetLocalID()] = -grad_c * s->Diffusivity() * f;
-			}
-
-			// evaluate the solid-bound species concentrations
-			for (int i=0; i<nsbm; ++i)
-			{
-				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
-
-				// evaluate the mass supply for this SBM
-				double rhohati = m_mat->GetReactionRate(rp, s->GetLocalID());
-
-				// convert from molar supply to mass supply
-				rhohati *= f*s->MolarMass();
-
-				// update the solid-bound apparent density (i.e. mass supply)
-				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*rhohati;
-
-				// evaluate the equivalent concentration (per fluid volume)
-				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
-				rp.m_ca[s->GetLocalID()] = ci;
 			}
 		}
 	}

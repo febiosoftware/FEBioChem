@@ -22,6 +22,8 @@ public:
 
 	bool Initialize();
 
+	void Activate() override;
+
 public:
 	void ForceVector(FEGlobalVector& R);
 

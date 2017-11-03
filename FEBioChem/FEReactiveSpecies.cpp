@@ -60,6 +60,8 @@ BEGIN_PARAMETER_LIST(FESolidBoundSpecies, FEReactiveSpeciesBase)
 	ADD_PARAMETER2(m_rho0, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0");
 	ADD_PARAMETER2(m_M   , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "molar_mass");
 	ADD_PARAMETER2(m_rhoT, FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "density");
+	ADD_PARAMETER2(m_rhomin, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rhomin");
+	ADD_PARAMETER2(m_rhomax, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "rhomax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -68,4 +70,7 @@ FESolidBoundSpecies::FESolidBoundSpecies(FEModel* fem) : FEReactiveSpeciesBase(f
 	m_rho0 = 0.0;
 	m_M = 0.0;
 	m_rhoT = 0.0;
+
+	m_rhomin = 0.0;
+	m_rhomax = 0.0;
 }
