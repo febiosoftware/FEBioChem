@@ -36,7 +36,7 @@ bool FEReactionDiffusionMaterial::Init()
 	}
 	for (int i=0; i<SolidBoundSpecies(); ++i)
 	{
-		m_sbs[i]->SetLocalID(Reactions() + i);
+		m_sbs[i]->SetLocalID(Species() + i);
 	}
 
 	// base class initialization
