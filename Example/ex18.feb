@@ -2,7 +2,7 @@
 <febio_spec version="2.5">
   <Module type="reaction-diffusion"/>
   <Control>
-    		<time_steps>80000</time_steps>
+    	<time_steps>80000</time_steps>
 		<step_size>0.1</step_size>
 		<max_refs>5</max_refs>
 		<max_ups>10</max_ups>

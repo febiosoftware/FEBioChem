@@ -224,16 +224,22 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				double rmax = s->MaxApparentDensity();
 				if (rp.m_sbmr[i] < rmin) rp.m_sbmr[i] = rmin;
 				if ((rmax > 0.0) && (rp.m_sbmr[i] > rmax)) rp.m_sbmr[i] = rmax;
+			}
+
+			// update the solid volume fraction
+			rp.m_phi = m_mat->SolidVolumeFraction(rp);
+			f = m_mat->Porosity(rp);
+
+			// evaluate the solid-bound species concentrations
+			for (int i = 0; i<nsbm; ++i)
+			{
+				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
 
 				// evaluate the equivalent concentration (per fluid volume)
 				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
 				rp.m_ca[s->GetLocalID()] = ci;
 			}
 
-			// update the solid volume fraction
-			// (Do this before the fluid volume fraction)
-			rp.m_phi = m_mat->SolidVolumeFraction(rp);
-			f = m_mat->Porosity(rp);
 
 			// evaluate concentrations at integration points
 			for (int i = 0; i<nsol; ++i)
