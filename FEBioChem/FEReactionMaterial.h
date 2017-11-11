@@ -24,6 +24,9 @@ public:
 		pt->m_j = m_j;
 		pt->m_sbmr = m_sbmr;
 		pt->m_sbmrp = m_sbmrp;
+		pt->m_sbmri = m_sbmri;
+		pt->m_sbmrhat = m_sbmrhat;
+		pt->m_sbmrhatp = m_sbmrhatp;
 		if (m_pNext) pt->m_pNext = m_pNext->Copy();
 		return pt;
 	}
@@ -37,6 +40,8 @@ public:
 		// update solid volume fraction
 		m_phip = m_phi;
 
+		m_sbmrhatp = m_sbmrhat;
+
 		if (m_pNext) m_pNext->Update(ti);
 	}
 
@@ -47,6 +52,10 @@ public:
 
 	vector<double>	m_sbmr;		//!< apparent densities of solid-bound molecules at current time
 	vector<double>	m_sbmrp;	//!< apparent densities of solid-bound molecules at previous time
+	vector<double>	m_sbmri;	//!< increment of apparent density of solid-bound molecules at current time
+
+	vector<double>	m_sbmrhat;
+	vector<double>	m_sbmrhatp;
 
 	double	m_phi;		//!< current solid volume fraction
 	double	m_phip;		//!< previous solid volume fraction

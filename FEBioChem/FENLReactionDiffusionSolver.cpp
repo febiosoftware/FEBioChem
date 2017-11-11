@@ -8,6 +8,7 @@
 
 BEGIN_PARAMETER_LIST(FENLReactionDiffusionSolver, FENewtonSolver)
 	ADD_PARAMETER2(m_Ctol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Ctol");
+	ADD_PARAMETER2(m_Stol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Stol");
 	ADD_PARAMETER2(m_Rtol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtol");
 	ADD_PARAMETER2(m_Rmin, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
 	ADD_PARAMETER(m_bsymm, FE_PARAM_BOOL, "symmetric_stiffness"); 
@@ -19,6 +20,7 @@ FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewto
 {
 	m_Ctol = 0.001;
 	m_Rtol = 0.01;
+	m_Stol = 0.0;
 	m_Rmin = 1.0e-20;
 	m_forcePositive = false;
 	m_convection = false;
@@ -138,6 +140,7 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 
 	double normUi = 0.0;
 	double normRi = 0.0;
+	double normSi = 0.0;	// initial SBM concentrations
 	bool bconv = false;
 	do
 	{
@@ -163,6 +166,30 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 			normUi = U*U;
 		}
 
+		// calculate SBM norms
+		double normS = 0.0;
+		for (int i = 0; i<mesh.Domains(); ++i)
+		{
+			FEDomain& dom = mesh.Domain(i);
+			for (int j = 0; j<dom.Elements(); ++j)
+			{
+				FEElement& el = dom.ElementRef(j);
+				double si = 0.0;
+				for (int n = 0; n<el.GaussPoints(); ++n)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+					FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
+
+					int m = rp.m_sbmri.size();
+					for (int k = 0; k<m; ++k) si += (rp.m_sbmri[k] * rp.m_sbmri[k]) / m;
+				}
+				si /= el.GaussPoints();
+
+				normS += si;
+			}
+		}
+		if (m_niter == 0) normSi = normS;
+
 		// calculate norms
 		double normu = du*du;
 		double normU = U*U;
@@ -173,16 +200,18 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		felog.printf("\t   residual         %15le %15le %15le \n", normRi, normR, (m_Rtol*m_Rtol)*normRi);
-		felog.printf("\t   concentration    %15le %15le %15le \n", normUi, normu, (m_Ctol*m_Ctol)*normU);
+		felog.printf("\t   residual          %15le %15le %15le \n", normRi, normR, (m_Rtol*m_Rtol)*normRi);
+		felog.printf("\t   concentration     %15le %15le %15le \n", normUi, normu, (m_Ctol*m_Ctol)*normU);
+		felog.printf("\t   sbm concentration %15le %15le %15le \n", normSi, normS, (m_Stol*m_Stol)*normSi);
 
 		// check convergence norms
 		bconv = true;
 		if ((m_Ctol > 0.0) && (normu > (m_Ctol*m_Ctol)*normU)) bconv = false;
 		if ((m_Rtol > 0.0) && (normR > (m_Rtol*m_Rtol)*normRi)) bconv = false;
+		if ((normSi > 0.0) && (m_Stol > 0.0) && (normS > (m_Stol*m_Stol)*normSi)) bconv = false;
 
 		// check for minimal residual
-		if ((bconv == false) && (normR <= m_Rmin))
+		if ((bconv == false) && (m_Rmin > 0.0) && (normR <= m_Rmin))
 		{
 			// check for almost zero-residual on the first iteration
 			// this might be an indication that there is no load on the system

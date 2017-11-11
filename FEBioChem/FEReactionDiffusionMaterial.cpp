@@ -65,11 +65,15 @@ FEMaterialPoint* FEReactionDiffusionMaterial::CreateMaterialPointData()
 	// initialize solid-bound species data
 	pt->m_sbmr.resize(nsbm, 0.0);
 	pt->m_sbmrp.resize(nsbm, 0.0);
+	pt->m_sbmri.resize(nsbm, 0.0);
 	for (int i=0; i<nsbm; ++i)
 	{
 		FESolidBoundSpecies* sbs = GetSolidBoundSpecies(i);
 		pt->m_sbmr[i] = pt->m_sbmrp[i] = sbs->InitialApparentDensity();
 	}
+
+	pt->m_sbmrhat.resize(nsbm, 0.0);
+	pt->m_sbmrhatp.resize(nsbm, 0.0);
 
 	// initialize solid volume fraction
 	pt->m_phi = pt->m_phip = m_phi;

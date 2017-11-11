@@ -154,6 +154,13 @@ void FEReactionDomain::Activate()
 				// evaluate the equivalent concentration (per fluid volume)
 				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
 				rp.m_ca[s->GetLocalID()] = ci;
+
+				// evaluate the mass supply for this SBM
+				double rhohati = m_mat->GetReactionRate(rp, s->GetLocalID());
+
+				// convert from molar supply to mass supply
+				rhohati *= f*s->MolarMass();
+				rp.m_sbmrhat[i] = rp.m_sbmrhatp[i] = rhohati;
 			}
 		}
 	}
@@ -217,7 +224,11 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				rhohati *= f*s->MolarMass();
 
 				// update the solid-bound apparent density (i.e. mass supply)
-				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*rhohati;
+				rp.m_sbmri[i] = rp.m_sbmr[i];
+				rp.m_sbmr[i] = rp.m_sbmrp[i] + 0.5*dt*(rhohati + rp.m_sbmrhatp[i]);
+				rp.m_sbmri[i] = rp.m_sbmr[i] - rp.m_sbmri[i];
+
+				rp.m_sbmrhat[i] = rhohati;
 
 				// clamp to range
 				double rmin = s->MinApparentDensity();
