@@ -24,9 +24,9 @@
 			<species name="B">
 				<diffusivity>0.8</diffusivity>
 			</species>
-			<reaction type="reaction">
+			<reaction type="mass action">
 				<equation>A --> B</equation>
-				<reaction_rate>0.1</reaction_rate>
+				<rate_constant>0.1</rate_constant>
 			</reaction>
 		</material>
 		<material id="2" name="Material1" type="reaction-diffusion">
@@ -39,9 +39,9 @@
 				<molar_mass>0.5</molar_mass>
 				<density>0.75</density>
 			</solid_bound_species>
-			<reaction type="reaction">
+			<reaction type="mass action">
 				<equation>B --> C</equation>
-				<reaction_rate>0.05</reaction_rate>
+				<rate_constant>0.05</rate_constant>
 			</reaction>
 		</material>
 	</Material>

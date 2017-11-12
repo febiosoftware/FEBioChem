@@ -24,9 +24,9 @@
 			<species name="B">
 				<diffusivity>0.1</diffusivity>
 			</species>
-			<reaction>
+			<reaction type="mass action">
 				<equation>A --> B</equation>
-				<reaction_rate>0.5</reaction_rate>
+				<rate_constant>0.5</rate_constant>
 			</reaction>
 		</material>
 	</Material>

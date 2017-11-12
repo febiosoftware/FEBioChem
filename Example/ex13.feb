@@ -24,9 +24,9 @@
 			<species name="B">
 				<diffusivity>1</diffusivity>
 			</species>
-			<reaction type="reaction">
+			<reaction type="mass action">
 				<equation>A --> B</equation>
-				<reaction_rate>0.1</reaction_rate>
+				<rate_constant>0.1</rate_constant>
 			</reaction>
 		</material>
 		<material id="2" name="Material1" type="reaction-diffusion">
@@ -39,7 +39,7 @@
 			</species>
 			<reaction type="reaction">
 				<equation>B --> C</equation>
-				<reaction_rate>0.1</reaction_rate>
+				<rate_constant>0.1</rate_constant>
 			</reaction>
 		</material>
 	</Material>

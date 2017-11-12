@@ -39,9 +39,9 @@
 		    <molar_mass>110</molar_mass>
 		    <density>1430</density>
 		  </solid_bound_species>
-		  <reaction>
+		  <reaction type="mass action">
 		    <equation>SBS1->SBS2</equation>
-		    <reaction_rate>420e-6</reaction_rate>
+		    <rate_constant>420e-6</rate_constant>
 		  </reaction>
 		</material>
 	</Material>

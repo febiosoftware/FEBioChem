@@ -19,11 +19,13 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	FECoreKernel::SetInstance(&fecore);
 	fecore.RegisterDomain(new FEReactionDomainFactory);
 
+	fecore.SetActiveModule("reaction-diffusion");
+
 	REGISTER_FECORE_CLASS(FEReactionDiffusionSolver            , FESOLVER_ID     , "explicit reaction-diffusion");
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionSolver          , FESOLVER_ID     , "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, FESOLVER_ID     , "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEReactionDiffusionMaterial          , FEMATERIAL_ID   , "reaction-diffusion");
-	REGISTER_FECORE_CLASS(FEMassActionReaction                 , FEMATERIAL_ID   , "reaction");
+	REGISTER_FECORE_CLASS(FEMassActionReaction                 , FEMATERIAL_ID   , "mass action");
 	REGISTER_FECORE_CLASS(FEMichaelisMentenReaction            , FEMATERIAL_ID   , "Michaelis-Menten");
 	REGISTER_FECORE_CLASS(FEReactiveSpecies                    , FEMATERIAL_ID   , "species");
 	REGISTER_FECORE_CLASS(FESolidBoundSpecies                  , FEMATERIAL_ID   , "solid_bound_species");

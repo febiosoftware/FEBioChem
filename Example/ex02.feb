@@ -23,13 +23,13 @@
 			<species name="C">
 				<diffusivity>0</diffusivity>
 			</species>
-			<reaction type="reaction">
+			<reaction type="mass action">
 				<equation>A --> B</equation>
-				<reaction_rate>0.5</reaction_rate>
+				<rate_constant>0.5</rate_constant>
 			</reaction>
-			<reaction type="reaction">
+			<reaction type="mass action">
 				<equation>B --> C</equation>
-				<reaction_rate>0.1</reaction_rate>
+				<rate_constant>0.1</rate_constant>
 			</reaction>
 		</material>
 	</Material>

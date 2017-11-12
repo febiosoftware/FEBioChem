@@ -25,9 +25,9 @@
 				<molar_mass>1</molar_mass>
 				<density>1</density>
 			</solid_bound_species>
-			<reaction type="reaction">
+			<reaction type="mass action">
 				<equation>A --> B</equation>
-				<reaction_rate>0.1</reaction_rate>
+				<rate_constant>0.1</rate_constant>
 			</reaction>
 		</material>
 	</Material>
