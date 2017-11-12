@@ -78,26 +78,22 @@ public:
 	//! one-time initialization
 	bool Init();
 
-	//! Evaluate the reaction rate (forward mass action) at this integration point
-	double GetReactionRate(FEReactionMaterialPoint& pt);
-
-	//! Evaluate derivative of reaction rate wrt to species Id
-	double GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id);
-
 	//! set the parent material
 	void SetReactionDiffusionParent(FEReactionDiffusionMaterial* mat);
 
-private:
-	double	m_rate;				//!< reaction constant (rename this, since this is not the rate)
-	char	m_equation[256];	//!< reaction equation
-	bool	m_posOnly;			//!< only consider nonnegative concentrations (neg. concentrations will be treated as zero)
+public:
 
-	FEReactionDiffusionMaterial*	m_pRDM;	//!< parent reaction-diffusion material (will be set by parent during Init)
+	//! Evaluate the reaction rate at this integration point
+	virtual double GetReactionRate(FEReactionMaterialPoint& pt) = 0;
+
+	//! Evaluate derivative of reaction rate wrt to species Id
+	virtual double GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id) = 0;
 
 public:
 	vector<int>	m_vR;	//!< stoichiometric coefficients for reactants
 	vector<int>	m_vP;	//!< stoichiometric coefficients for products
 	vector<int>	m_v;	//!< net stoichiometric coefficients (vP - vR)
 
-	DECLARE_PARAMETER_LIST();
+protected:
+	FEReactionDiffusionMaterial*	m_pRDM;	//!< parent reaction-diffusion material (will be set by parent during Init)
 };

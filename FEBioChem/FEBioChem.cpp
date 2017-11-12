@@ -8,7 +8,8 @@
 #include "FEReactionDiffusionConvection.h"
 #include "FEReactionDiffusionMaterial.h"
 #include "FEReactionDomain.h"
-#include "FEReactionMaterial.h"
+#include "FEMassActionReaction.h"
+#include "FEMichaelisMentenReaction.h"
 #include "FEReactiveSpecies.h"
 #include "FEConcentrationFlux.h"
 #include "FEBioChemPlot.h"
@@ -22,7 +23,8 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionSolver          , FESOLVER_ID     , "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, FESOLVER_ID     , "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEReactionDiffusionMaterial          , FEMATERIAL_ID   , "reaction-diffusion");
-	REGISTER_FECORE_CLASS(FEReactionMaterial                   , FEMATERIAL_ID   , "reaction");
+	REGISTER_FECORE_CLASS(FEMassActionReaction                 , FEMATERIAL_ID   , "reaction");
+	REGISTER_FECORE_CLASS(FEMichaelisMentenReaction            , FEMATERIAL_ID   , "Michaelis-Menten");
 	REGISTER_FECORE_CLASS(FEReactiveSpecies                    , FEMATERIAL_ID   , "species");
 	REGISTER_FECORE_CLASS(FESolidBoundSpecies                  , FEMATERIAL_ID   , "solid_bound_species");
 	REGISTER_FECORE_CLASS(FEConcentrationFlux                  , FESURFACELOAD_ID, "concentration flux");

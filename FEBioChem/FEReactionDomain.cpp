@@ -225,7 +225,13 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 
 				// update the solid-bound apparent density (i.e. mass supply)
 				rp.m_sbmri[i] = rp.m_sbmr[i];
-				rp.m_sbmr[i] = rp.m_sbmrp[i] + 0.5*dt*(rhohati + rp.m_sbmrhatp[i]);
+
+				// Backward Euler
+				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*rhohati;
+
+				// trapezoidal
+//				rp.m_sbmr[i] = rp.m_sbmrp[i] + 0.5*dt*(rhohati + rp.m_sbmrhatp[i]);
+
 				rp.m_sbmri[i] = rp.m_sbmr[i] - rp.m_sbmri[i];
 
 				rp.m_sbmrhat[i] = rhohati;
