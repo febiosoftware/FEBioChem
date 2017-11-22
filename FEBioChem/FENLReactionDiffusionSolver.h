@@ -32,7 +32,9 @@ public: // from FENewtonSolver
 private:
 	void MassVector(FEGlobalVector& R);
 
-	void DiffusionVector(FEGlobalVector& R);
+	void DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp);
+
+	void ForceVector(FEGlobalVector& F);
 
 	//! assemble element stiffness matrix
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
@@ -44,11 +46,14 @@ public:
 	double	m_Rmin;				//!< min residual value
 	bool	m_forcePositive;	//!< force concentrations to remain positive
 	bool	m_convection;		//!< do convection as well
+	double	m_alpha;			//!< alpha parameter for generalized trapezoidal rule
 
 private:
-	vector<double>		m_Un;	//!< solution at previous timestep
 	vector<double>		m_R;	//!< right-hand-side vector
 	vector<double>		m_d;	//!< vector of prescribed values
+	vector<double>		m_Un;	//!< solution at previous timestep
+	vector<double>		m_Fp;	//!< supply vector at previous timestep
+	vector<double>		m_F;	//!< supply vector at current timestep
 
 	DECLARE_PARAMETER_LIST();
 };

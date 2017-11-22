@@ -14,6 +14,7 @@ BEGIN_PARAMETER_LIST(FENLReactionDiffusionSolver, FENewtonSolver)
 	ADD_PARAMETER(m_bsymm, FE_PARAM_BOOL, "symmetric_stiffness"); 
 	ADD_PARAMETER(m_forcePositive, FE_PARAM_BOOL, "force_positive_concentrations");
 	ADD_PARAMETER(m_convection, FE_PARAM_BOOL, "convection");
+	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "alpha");
 END_PARAMETER_LIST();
 
 FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewtonSolver(fem)
@@ -24,6 +25,12 @@ FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewto
 	m_Rmin = 1.0e-20;
 	m_forcePositive = false;
 	m_convection = false;
+
+	// generalized trapezoidal integration parameter
+	// alpha = 0    --> Forward Euler (conditionally stable)
+	// alpha = 0.5  --> Trapezoidal rule (unconditionally stable, second-order accurate)
+	// alpha = 1.0  --> Backward Euler (unconditionally stable, first-order accurate)
+	m_alpha = 0.5;
 
 	// we'll need a non-symmetric stiffness matrix
 	m_bsymm = false;
@@ -40,6 +47,8 @@ bool FENLReactionDiffusionSolver::Init()
 
 	int neq = NumberOfEquations();
 	m_Un.assign(neq, 0.0);
+	m_Fp.assign(neq, 0.0);
+	m_F.assign(neq, 0.0);
 	m_R.assign(neq, 0.0);
 	m_d.assign(neq, 0.0);
 
@@ -58,6 +67,11 @@ bool FENLReactionDiffusionSolver::Init()
 			if (n >= 0) m_Un[n] = node.get(dofs[k]);
 		}
 	}
+
+	// evaluate the initial supply
+	vector<double> dummy(neq, 0.0);
+	FEGlobalVector R(GetFEModel(), m_Fp, dummy);
+	ForceVector(R);
 
 	return true;
 }
@@ -115,6 +129,7 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 
 	FEModel& fem = GetFEModel();
 	FETimeInfo tp = fem.GetTime();
+	tp.alpha = m_alpha;
 
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
@@ -250,7 +265,35 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 			}
 		}
 	}
+
+	// store the force vector
+	m_Fp = m_F;
+
 	return true;
+}
+
+void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
+{
+	FEModel& fem = GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int NDOM = mesh.Domains();
+
+	// loop over all domains
+	for (int n = 0; n<NDOM; ++n)
+	{
+		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(n));
+		if (dom)
+		{
+			dom->ForceVector(R);
+		}
+	}
+
+	// do the surface loads
+	for (int i = 0; i<fem.SurfaceLoads(); ++i)
+	{
+		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
+		sl.Residual(fem.GetTime(), R);
+	}
 }
 
 //! calculates the global residual vector
@@ -260,38 +303,30 @@ bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 
+	FETimeInfo ti = fem.GetTime();
+	ti.alpha = m_alpha;
+	double dt = fem.GetTime().timeIncrement;
+
 	zero(R);
 	vector<double> dummy(R);
 	FEGlobalVector RHS(GetFEModel(), R, dummy);
+	int neq = RHS.Size();
 
-	// loop over all domains
-	for (int n=0; n<NDOM; ++n)
-	{
-		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(n));
-		if (dom)
-		{
-			dom->ForceVector(RHS);
-		}
-	}
+	// evaluate force vector
+	ForceVector(RHS);
 
-	// do the surface loads
-	for (int i = 0; i<fem.SurfaceLoads(); ++i)
-	{
-		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
-		sl.Residual(fem.GetTime(), RHS);
-	}
+	// store this vector since we'll need it later
+	for (int i = 0; i<neq; ++i) m_F[i] = RHS[i];
 
 	// multiply by time step
-	double dt = fem.GetTime().timeIncrement;
-	int neq = RHS.Size();
 	for (int i=0; i<neq; ++i)
-		RHS[i] *= -dt;
+		RHS[i] = -dt*(m_alpha*RHS[i] + (1.0 - m_alpha)*m_Fp[i]);
 
 	// add mass matrix contribution
 	MassVector(RHS);
 
 	// add diffusion matrix contribution
-	DiffusionVector(RHS);
+	DiffusionVector(RHS, ti);
 
 	// multiply everything by -1
 	R *= -1.0;
@@ -365,11 +400,12 @@ void FENLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
 	}
 }
 
-void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R)
+void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEModel& fem = GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	double dt = fem.GetTime().timeIncrement;
+	double dt = tp.timeIncrement;
+	double alpha = tp.alpha;
 
 	DOFS& Dofs = fem.GetDOFS();
 	vector<int> velDofs;
@@ -403,7 +439,7 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R)
 				ke.zero();
 				dom->UnpackLM(el, lm);
 
-				// get the element mass matrix
+				// get the element diffusion matrix
 				dom->ElementDiffusionMatrix(el, ke);
 
 				// get the nodal velocities
@@ -422,11 +458,22 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R)
 					for (int j = 0; j<ncv; ++j)
 					{
 						double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
-						un[i*ncv + j] = cn;
+						un[i*ncv + j] = alpha*cn;
 					}
 				}
 
-				// multiply with mass matrix
+				// add previous values
+				if (alpha != 1.0)
+				{
+					for (int i = 0; i<ndof; ++i)
+					{
+						int n = lm[i];
+						if (-n - 2 >= 0) n = -n - 2;
+						if (n >= 0) un[i] += (1.0 - alpha) * m_Un[n];
+					}
+				}
+
+				// multiply with diffusion matrix
 				vector<double> kun = ke*un;
 
 				// add to RHS
@@ -443,7 +490,8 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R)
 //! calculates the global stiffness matrix
 bool FENLReactionDiffusionSolver::StiffnessMatrix(const FETimeInfo& tp)
 {
-	double dt = m_fem.GetTime().timeIncrement;
+	double dt = tp.timeIncrement;
+	double alpha = m_alpha;
 
 	// zero the stiffness matrix
 	m_pK->Zero();
@@ -500,8 +548,8 @@ bool FENLReactionDiffusionSolver::StiffnessMatrix(const FETimeInfo& tp)
 				// subtract (!) the reaction stiffness
 				dom->ElementReactionStiffness(el, ke);
 
-				// multiply by dt
-				ke *= dt;
+				// multiply by alpha*dt
+				ke *= alpha*dt;
 
 				// add mass matrix
 				dom->ElementMassMatrix(el, ke);
@@ -520,6 +568,7 @@ void FENLReactionDiffusionSolver::Update(std::vector<double>& u)
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	FEMesh& mesh = m_fem.GetMesh();
 	FETimeInfo tp = m_fem.GetTime();
+	tp.alpha = m_alpha;
 
 	DOFS& DOF = m_fem.GetDOFS();
 	vector<int> dofs;
@@ -578,6 +627,6 @@ void FENLReactionDiffusionSolver::Update(std::vector<double>& u)
 		}
 	}
 
-	// update the stresses on all domains
+	// update the domains
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).Update(tp);
 }

@@ -171,6 +171,7 @@ void FEReactionDomain::Activate()
 void FEReactionDomain::Update(const FETimeInfo& tp)
 {
 	double dt = tp.timeIncrement;
+	double alpha = tp.alpha;
 
 	// get the degrees of freedom for this domain
 	const vector<int>& dofs = GetDOFList();
@@ -226,11 +227,10 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				// update the solid-bound apparent density (i.e. mass supply)
 				rp.m_sbmri[i] = rp.m_sbmr[i];
 
-				// Backward Euler
-				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*rhohati;
-
-				// trapezoidal
-//				rp.m_sbmr[i] = rp.m_sbmrp[i] + 0.5*dt*(rhohati + rp.m_sbmrhatp[i]);
+				// time integration
+				// alpha = 1, backward Euler
+				// alpha = 1/2, trapezoidal rule
+				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*(alpha*rhohati + (1.0 - alpha)*rp.m_sbmrhatp[i]);
 
 				rp.m_sbmri[i] = rp.m_sbmr[i] - rp.m_sbmri[i];
 
