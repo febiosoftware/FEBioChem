@@ -25,10 +25,21 @@ public:
 	// used for parsing input file
 	bool SetAttribute(const char* szname, const char* szval);
 
+public:
+	// Molar mass
+	double MolarMass() const { return m_M; }
+
+	// Density (overridden from FEMaterial)
+	double Density() { return m_rhoT; }
+
 protected:
 	std::string		m_name;		//!< name of species (for convenience only, should be the same as model data variable with this id)
 	int				m_id;		//!< global id of species (must be set by parent material)
 	int				m_lid;		//!< local id in parent's reaction tables
+
+protected:
+	double		m_rhoT;	//!< true density
+	double		m_M;	//!< Molar mass
 };
 
 //-----------------------------------------------------------------------------
@@ -63,12 +74,6 @@ public:
 	// initial apparent density
 	double InitialApparentDensity() const { return m_rho0; }
 
-	// Molar mass
-	double MolarMass() const { return m_M; }
-
-	// Density (overridden from FEMaterial)
-	double Density() { return m_rhoT; }
-
 	// min apparent density
 	double MinApparentDensity() const { return m_rhomin; }
 
@@ -77,9 +82,6 @@ public:
 
 private:
 	double	m_rho0;	//!< initial apparent density
-	double	m_rhoT;	//!< true density
-	double	m_M;	//!< Molar mass
-
 	double	m_rhomin, m_rhomax;	//!< min, max range for apparent density
 
 	DECLARE_PARAMETER_LIST();
