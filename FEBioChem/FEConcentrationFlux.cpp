@@ -91,3 +91,10 @@ void FEConcentrationFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolve
 {
 	// Nothing to see here! Please move on!
 }
+
+//=================================================================================================
+BEGIN_PARAMETER_LIST(FESoluteFlux, FEConcentrationFlux)
+	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
+END_PARAMETER_LIST();
+
+FESoluteFlux::FESoluteFlux(FEModel* fem) : FEConcentrationFlux(fem) {}

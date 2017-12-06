@@ -23,3 +23,16 @@ private:
 
 	DECLARE_PARAMETER_LIST();
 };
+
+// NOTE: For compatibility issues, let's define a "solute" flux, analogously to FEBioMix' solute flux.
+// This allows users to create Reaction-diffusion problems in PreView, without complicating PreView too much.
+// This is probably a temporary feature until a more elegant solution can be found.
+class FESoluteFlux : public FEConcentrationFlux
+{
+public:
+	FESoluteFlux(FEModel* fem);
+
+private:
+	bool	m_blinear;	// not used, but needed for compatibility with the FEBioMix feature
+	DECLARE_PARAMETER_LIST();
+};

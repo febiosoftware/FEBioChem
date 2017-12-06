@@ -36,6 +36,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEPlotSBSConcentration               , FEPLOTDATA_ID   , "sbs concentration");
 	REGISTER_FECORE_CLASS(FEPlotSBSApparentDensity             , FEPLOTDATA_ID   , "sbs apparent density");
 	REGISTER_FECORE_CLASS(FEPlotSolidVolumeFraction            , FEPLOTDATA_ID   , "solid volume fraction");
+	REGISTER_FECORE_CLASS(FESoluteFlux                         , FESURFACELOAD_ID, "soluteflux");
 }
 
 FECORE_PLUGIN int GetSDKVersion()
