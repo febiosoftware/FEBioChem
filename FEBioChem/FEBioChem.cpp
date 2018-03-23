@@ -19,7 +19,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	FECoreKernel::SetInstance(&fecore);
 	fecore.RegisterDomain(new FEReactionDomainFactory);
 
-	fecore.SetActiveModule("reaction-diffusion");
+	fecore.CreateModule("reaction-diffusion");
 
 	REGISTER_FECORE_CLASS(FEReactionDiffusionSolver            , FESOLVER_ID     , "explicit reaction-diffusion");
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionSolver          , FESOLVER_ID     , "reaction-diffusion");
