@@ -36,10 +36,10 @@ bool FEReactiveSpeciesBase::SetAttribute(const char* szname, const char* szval)
 
 				// copy the parameters
 				FEParameterList& pl = d.GetParameterList();
-				FEParam* p = pl.Find("density");
+				FEParam* p = pl.FindFromName("density");
 				if (p) { m_rhoT = p->value<double>(); }
 
-				p = pl.Find("molar_mass");
+				p = pl.FindFromName("molar_mass");
 				if (p) { m_M = p->value<double>(); }
 			
 				return true;

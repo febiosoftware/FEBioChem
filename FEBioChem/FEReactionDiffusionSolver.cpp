@@ -69,7 +69,7 @@ void FEReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 bool FEReactionDiffusionSolver::StiffnessMatrix(FELinearSystem& K)
 {
 	FEModel& fem = GetFEModel();
-	FETimeInfo tp = fem.GetTime();
+	FETimeInfo& tp = fem.GetTime();
 	tp.alpha = m_alpha;
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();

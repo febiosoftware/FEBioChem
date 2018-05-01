@@ -118,17 +118,17 @@ void FENLReactionDiffusionSolver::AssembleStiffness(vector<int>& en, vector<int>
 
 //! Do a Quasi-Newton step
 //! This is called from SolveStep and must be implemented by derived classes.
-bool FENLReactionDiffusionSolver::Quasin(double time)
+bool FENLReactionDiffusionSolver::Quasin()
 {
 	// initialize counters
 	m_niter = 0;		// nr of iterations
 	m_nrhs = 0;			// nr of RHS evaluations
 	m_nref = 0;			// nr of stiffness reformations
 	m_ntotref = 0;
-	m_pbfgs->m_nups = 0;	// nr of stiffness updates between reformations
+	m_strategy->m_nups = 0;	// nr of stiffness updates between reformations
 
 	FEModel& fem = GetFEModel();
-	FETimeInfo tp = fem.GetTime();
+	FETimeInfo& tp = fem.GetTime();
 	tp.alpha = m_alpha;
 
 	FEMesh& mesh = m_fem.GetMesh();
@@ -165,7 +165,7 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 		Residual(m_R);
 
 		// build the stiffness matrix
-		ReformStiffness(tp);
+		ReformStiffness();
 
 		// solve the equations
 		SolveLinearSystem(du, m_R);
@@ -195,7 +195,7 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 					FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
 
-					int m = rp.m_sbmri.size();
+					int m = (int)rp.m_sbmri.size();
 					for (int k = 0; k<m; ++k) si += (rp.m_sbmri[k] * rp.m_sbmri[k]) / m;
 				}
 				si /= el.GaussPoints();
@@ -210,8 +210,8 @@ bool FENLReactionDiffusionSolver::Quasin(double time)
 		double normU = U*U;
 		double normR = m_R*m_R;
 
-		felog.printf(" Nonlinear solution status: time= %lg\n", time);
-		felog.printf("\tstiffness updates             = %d\n", m_pbfgs->m_nups);
+		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
+		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
 		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
@@ -303,7 +303,7 @@ bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 
-	FETimeInfo ti = fem.GetTime();
+	FETimeInfo& ti = fem.GetTime();
 	ti.alpha = m_alpha;
 	double dt = fem.GetTime().timeIncrement;
 
@@ -488,8 +488,9 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETim
 }
 
 //! calculates the global stiffness matrix
-bool FENLReactionDiffusionSolver::StiffnessMatrix(const FETimeInfo& tp)
+bool FENLReactionDiffusionSolver::StiffnessMatrix()
 {
+	FETimeInfo& tp = m_fem.GetTime();
 	double dt = tp.timeIncrement;
 	double alpha = m_alpha;
 
@@ -567,7 +568,7 @@ void FENLReactionDiffusionSolver::Update(std::vector<double>& u)
 {
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	FEMesh& mesh = m_fem.GetMesh();
-	FETimeInfo tp = m_fem.GetTime();
+	FETimeInfo& tp = m_fem.GetTime();
 	tp.alpha = m_alpha;
 
 	DOFS& DOF = m_fem.GetDOFS();

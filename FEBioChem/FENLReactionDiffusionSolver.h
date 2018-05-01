@@ -18,10 +18,10 @@ public: // from FENewtonSolver
 
 	//! Do a Quasi-Newton step
 	//! This is called from SolveStep and must be implemented by derived classes.
-	bool Quasin(double time);
+	bool Quasin();
 
 	//! calculates the global stiffness matrix
-	bool StiffnessMatrix(const FETimeInfo& tp);
+	bool StiffnessMatrix();
 
 	//! calculates the global residual vector
 	bool Residual(vector<double>& R);

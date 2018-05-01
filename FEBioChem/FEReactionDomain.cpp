@@ -34,10 +34,10 @@ void FEReactionDomain::SetMaterial(FEMaterial* pmat)
 //-----------------------------------------------------------------------------
 // Initializes domain data.
 // This creates a list of active degrees of freedom in this domain
-bool FEReactionDomain::Initialize()
+bool FEReactionDomain::Init()
 {
 	// do base class first
-	if (FESolidDomain::Initialize() == false) return false;
+	if (FESolidDomain::Init() == false) return false;
 
 	// make sure we have a material
 	if (m_mat == 0) return false;

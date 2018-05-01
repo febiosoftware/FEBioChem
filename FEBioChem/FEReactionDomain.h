@@ -20,7 +20,7 @@ public:
 
 	void PreSolveUpdate(const FETimeInfo& timeInfo);
 
-	bool Initialize();
+	bool Init() override;
 
 	void Activate() override;
 
