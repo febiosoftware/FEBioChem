@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEReactionDomain.h"
+#include "FENLReactionDiffusionSolver.h"
 #include <FECore/FEModel.h>
 #include <FECore/Integrate.h>
 
@@ -281,6 +282,69 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
+void FEReactionDomain::StiffnessMatrix(FENLReactionDiffusionSolver* solver)
+{
+	FEMesh& mesh = *GetMesh();
+
+	FEModel& fem = solver->GetFEModel();
+	FETimeInfo& tp = fem.GetTime();
+
+	// get the number of concentration variables
+	const vector<int>& dofs = GetDOFList();
+	int ncv = (int)dofs.size();
+
+	vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
+	vector<int> lm;
+	matrix ke;
+
+	DOFS& Dofs = fem.GetDOFS();
+	vector<int> velDofs;
+	if (solver->DoConvection())
+	{
+		Dofs.GetDOFList("velocity", velDofs);
+		assert(velDofs.size() == 3);
+	}
+
+	int NE = Elements();
+	for (int iel = 0; iel<NE; ++iel)
+	{
+		FESolidElement& el = Element(iel);
+		int ne = el.Nodes();
+		int ndof = ne*ncv;
+
+		UnpackLM(el, lm);
+
+		// allocate element stiffness matrix
+		ke.resize(ndof, ndof);
+		ke.zero();
+
+		// get the diffusion matrix
+		ElementDiffusionMatrix(el, ke);
+
+		// get the nodal velocities
+		if (solver->DoConvection())
+		{
+			for (int i = 0; i<ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(velDofs[0], velDofs[1], velDofs[2]);
+
+			// add convection matrix
+			ElementConvectionMatrix(el, ke, vn);
+		}
+
+		// subtract (!) the reaction stiffness
+		ElementReactionStiffness(el, ke);
+
+		// multiply by alpha*dt
+		ke *= tp.alpha*tp.timeIncrement;
+
+		// add mass matrix
+		ElementMassMatrix(el, ke);
+
+		// assemble into global stiffness
+		solver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEReactionDomain::ForceVector(FEGlobalVector& R)
 {
 	// get the number of degrees of freedom active in this domain
@@ -347,67 +411,6 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::StiffnessMatrix(FELinearSystem& K, const FETimeInfo& ti)
-{
-	// add "mass" matrix
-	MassMatrix(K, ti.timeIncrement);
-
-	// add diffusion stiffness
-	DiffusionMatrix(K, ti);
-}
-
-//-----------------------------------------------------------------------------
-void FEReactionDomain::MassMatrix(FELinearSystem& K, double dt)
-{
-	// get the number of concentration variables
-	const vector<int>& dofs = GetDOFList();
-	int ncv = (int)dofs.size();
-
-	vector<int> lm;
-	matrix me;
-
-	FEMesh& mesh = *GetMesh();
-
-	int NE = Elements();
-	for (int iel=0; iel<NE; ++iel)
-	{
-		FESolidElement& el = Element(iel);
-		int ne = el.Nodes();
-		int ndof = ne*ncv;
-
-		// initialize the element mass matrix
-		me.resize(ndof, ndof);
-		me.zero();
-
-		// evaluate element mass matrix
-		ElementMassMatrix(el, me);
-
-		// get the lm array
-		UnpackLM(el, lm);
-
-		// this component needs to be assembled to the LHS and RHS
-		K.AssembleLHS(lm, me);
-
-		// get the nodal values
-		vector<double> fe(ndof, 0.0);
-		for (int i=0; i<ne; ++i)
-		{
-			for (int j = 0; j<ncv; ++j)
-			{
-				double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
-				fe[i*ncv + j] = cn;
-			}
-		}
-
-		// multiply with me
-		fe = me*fe;
-
-		// assemble this vector to the right-hand side
-		K.AssembleRHS(lm, fe);
-	}
-}
-
-//-----------------------------------------------------------------------------
 void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
 	int ncv = GetDOFCount();
@@ -436,68 +439,6 @@ void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 
 				for (int i=0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab * phi;
 			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEReactionDomain::DiffusionMatrix(FELinearSystem& K, const FETimeInfo& ti)
-{
-	// get the number of concentration variables
-	const vector<int>& dofs = GetDOFList();
-	int ncv = (int)dofs.size();
-
-	vector<int> lm;
-	matrix ke;
-
-	FEMesh& mesh = *GetMesh();
-
-	int NE = Elements();
-	for (int iel = 0; iel<NE; ++iel)
-	{
-		FESolidElement& el = Element(iel);
-		int ne = el.Nodes();
-		int ndof = ne*ncv;
-
-		// get the lm array
-		UnpackLM(el, lm);
-
-		// initialize the element diffusion matrix
-		ke.resize(ndof, ndof);
-		ke.zero();
-
-		// evaluate element mass matrix
-		ElementDiffusionMatrix(el, ke);
-
-		if (ti.alpha > 0.0)
-		{
-			ke *= ti.alpha*ti.timeIncrement;
-
-			// this component needs to be assembled to the LHS and RHS
-			K.AssembleLHS(lm, ke);
-		}
-
-		if (ti.alpha < 1.0)
-		{
-			// get the nodal values
-			vector<double> fe(ndof, 0.0);
-			for (int i = 0; i<ne; ++i)
-			{
-				for (int j = 0; j<ncv; ++j)
-				{
-					double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
-					fe[i*ncv + j] = cn;
-				}
-			}
-
-			if (ti.alpha > 0.0)
-				ke *= -(1.0 - ti.alpha)/ti.alpha;
-			else
-				ke *= ti.timeIncrement;
-
-			fe = ke*fe;
-
-			K.AssembleRHS(lm, fe);
 		}
 	}
 }

@@ -5,6 +5,7 @@
 #include <FECore/BC.h>
 #include <FECore/log.h>
 #include <FECore/FESurfaceLoad.h>
+#include <FECore/FEGlobalMatrix.h>
 
 BEGIN_PARAMETER_LIST(FENLReactionDiffusionSolver, FENewtonSolver)
 	ADD_PARAMETER2(m_Ctol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Ctol");
@@ -129,28 +130,8 @@ bool FENLReactionDiffusionSolver::Quasin()
 			normUi = U*U;
 		}
 
-		// calculate SBM norms
-		double normS = 0.0;
-		for (int i = 0; i<mesh.Domains(); ++i)
-		{
-			FEDomain& dom = mesh.Domain(i);
-			for (int j = 0; j<dom.Elements(); ++j)
-			{
-				FEElement& el = dom.ElementRef(j);
-				double si = 0.0;
-				for (int n = 0; n<el.GaussPoints(); ++n)
-				{
-					FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-					FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
-
-					int m = (int)rp.m_sbmri.size();
-					for (int k = 0; k<m; ++k) si += (rp.m_sbmri[k] * rp.m_sbmri[k]) / m;
-				}
-				si /= el.GaussPoints();
-
-				normS += si;
-			}
-		}
+		// calculate SBM norm
+		double normS = CalculateSBMNorm();
 		if (m_niter == 0) normSi = normS;
 
 		// calculate norms
@@ -174,7 +155,7 @@ bool FENLReactionDiffusionSolver::Quasin()
 		if ((normSi > 0.0) && (m_Stol > 0.0) && (normS > (m_Stol*m_Stol)*normSi)) bconv = false;
 
 		// check for minimal residual
-		if ((bconv == false) && (m_Rmin > 0.0) && (normR <= m_Rmin))
+		if ((bconv == false) && (m_Rmin > 0.0) && (normR <= m_Rmin) && (m_niter == 0))
 		{
 			// check for almost zero-residual on the first iteration
 			// this might be an indication that there is no load on the system
@@ -228,6 +209,35 @@ bool FENLReactionDiffusionSolver::Quasin()
 	m_Fp = m_F;
 
 	return true;
+}
+
+double FENLReactionDiffusionSolver::CalculateSBMNorm()
+{
+	FEMesh& mesh = m_fem.GetMesh();
+
+	double normS = 0.0;
+	for (int i = 0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& dom = mesh.Domain(i);
+		for (int j = 0; j<dom.Elements(); ++j)
+		{
+			FEElement& el = dom.ElementRef(j);
+			double si = 0.0;
+			for (int n = 0; n<el.GaussPoints(); ++n)
+			{
+				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+				FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
+
+				int m = (int)rp.m_sbmri.size();
+				for (int k = 0; k<m; ++k) si += (rp.m_sbmri[k] * rp.m_sbmri[k]) / m;
+			}
+			si /= el.GaussPoints();
+
+			normS += si;
+		}
+	}
+
+	return normS;
 }
 
 void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
@@ -448,75 +458,13 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETim
 //! calculates the global stiffness matrix
 bool FENLReactionDiffusionSolver::StiffnessMatrix()
 {
-	FETimeInfo& tp = m_fem.GetTime();
-	double dt = tp.timeIncrement;
-	double alpha = m_alpha;
-
-	// zero the stiffness matrix
-	m_pK->Zero();
-
-	DOFS& Dofs = m_fem.GetDOFS();
-	vector<int> velDofs;
-	if (m_convection)
-	{
-		Dofs.GetDOFList("velocity", velDofs);
-		assert(velDofs.size() == 3);
-	}
-
 	// add contributions from domains
 	FEMesh& mesh = m_fem.GetMesh();
 	int NDOM = mesh.Domains();
 	for (int ndom=0; ndom<NDOM; ++ndom)
 	{
 		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(ndom));
-		if (dom)
-		{
-			// get the number of concentration variables
-			const vector<int>& dofs = dom->GetDOFList();
-			int ncv = (int)dofs.size();
-
-			vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
-			vector<int> lm;
-			matrix ke;
-
-			int NE = dom->Elements();
-			for (int iel=0; iel<NE; ++iel)
-			{
-				FESolidElement& el = dom->Element(iel);
-				int ne = el.Nodes();
-				int ndof = ne*ncv;
-
-				dom->UnpackLM(el, lm);
-
-				// allocate element stiffness matrix
-				ke.resize(ndof, ndof);
-				ke.zero();
-
-				// get the diffusion matrix
-				dom->ElementDiffusionMatrix(el, ke);
-
-				// get the nodal velocities
-				if (m_convection)
-				{
-					for (int i = 0; i<ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(velDofs[0], velDofs[1], velDofs[2]);
-
-					// add convection matrix
-					dom->ElementConvectionMatrix(el, ke, vn);
-				}
-
-				// subtract (!) the reaction stiffness
-				dom->ElementReactionStiffness(el, ke);
-
-				// multiply by alpha*dt
-				ke *= alpha*dt;
-
-				// add mass matrix
-				dom->ElementMassMatrix(el, ke);
-
-				// assemble into global stiffness
-				AssembleStiffness(el.m_node, lm, ke);
-			}			
-		}
+		if (dom) dom->StiffnessMatrix(this);
 	}
 
 	return true;

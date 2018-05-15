@@ -14,6 +14,9 @@ public:
 	//! initialization
 	bool Init();
 
+	//! do convection or not
+	bool DoConvection() const { return m_convection; }
+
 public: // from FENewtonSolver
 
 	//! Do a Quasi-Newton step
@@ -35,6 +38,9 @@ private:
 	void DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp);
 
 	void ForceVector(FEGlobalVector& F);
+
+private:
+	double CalculateSBMNorm();
 
 public:
 	double	m_Ctol;				//!< convergence tolerance

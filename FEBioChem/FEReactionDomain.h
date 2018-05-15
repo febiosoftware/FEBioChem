@@ -1,8 +1,9 @@
 #pragma once
 #include <FECore/FESolidDomain.h>
 #include <FECore/FECoreKernel.h>
-#include <FECore/FELinearSystem.h>
 #include "FEReactionDiffusionMaterial.h"
+
+class FENLReactionDiffusionSolver;
 
 class FEReactionDomain : public FESolidDomain
 {
@@ -27,16 +28,14 @@ public:
 public:
 	void ForceVector(FEGlobalVector& R);
 
-	void StiffnessMatrix(FELinearSystem& K, const FETimeInfo& ti);
+	void StiffnessMatrix(FENLReactionDiffusionSolver* solver);
 
 protected:
 	void ElementForceVector(FESolidElement& el, vector<double>& fe);
 
 public:
-	void MassMatrix(FELinearSystem& K, double dt);
 	void ElementMassMatrix(FESolidElement& el, matrix& ke);
 
-	void DiffusionMatrix(FELinearSystem& K, const FETimeInfo& ti);
 	void ElementDiffusionMatrix(FESolidElement& el, matrix& ke);
 
 	void ElementReactionStiffness(FESolidElement& el, matrix& ke);
