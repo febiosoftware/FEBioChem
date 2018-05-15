@@ -213,10 +213,31 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 			// fluid volume fraction
 			double f = m_mat->Porosity(rp);
 
+			// evaluate concentrations at integration points
+			for (int i = 0; i<nsol; ++i)
+			{
+				FEReactiveSpecies* s = m_mat->GetSpecies(i);
+
+				// evaluate gradient at this integration point
+				vec3d grad_c = gradient(el, &c[i][0], n);
+
+				// evaluate concentration
+				double ci = el.Evaluate(&(c[i][0]), n);
+				rp.m_c[s->GetLocalID()] = ci;
+
+				// evaluate "actual" concentration (this is used by the chemcial reactions)
+				rp.m_ca[s->GetLocalID()] = ci;
+
+				// evaluate the flux
+				rp.m_j[s->GetLocalID()] = -grad_c * s->Diffusivity() * f;
+			}
+
 			// evaluate the solid-bound species concentrations
 			for (int i = 0; i<nsbm; ++i)
 			{
 				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
+
+				double tmp = rp.m_sbmr[i];
 
 				// evaluate the mass supply for this SBM
 				double rhohati = m_mat->GetReactionRate(rp, s->GetLocalID());
@@ -225,14 +246,13 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				rhohati *= f*s->MolarMass();
 
 				// update the solid-bound apparent density (i.e. mass supply)
-				rp.m_sbmri[i] = rp.m_sbmr[i];
 
 				// time integration
 				// alpha = 1, backward Euler
 				// alpha = 1/2, trapezoidal rule
 				rp.m_sbmr[i] = rp.m_sbmrp[i] + dt*(alpha*rhohati + (1.0 - alpha)*rp.m_sbmrhatp[i]);
 
-				rp.m_sbmri[i] = rp.m_sbmr[i] - rp.m_sbmri[i];
+				rp.m_sbmri[i] = rp.m_sbmr[i] - tmp;
 
 				rp.m_sbmrhat[i] = rhohati;
 
@@ -255,26 +275,6 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 				// evaluate the equivalent concentration (per fluid volume)
 				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
 				rp.m_ca[s->GetLocalID()] = ci;
-			}
-
-
-			// evaluate concentrations at integration points
-			for (int i = 0; i<nsol; ++i)
-			{
-				FEReactiveSpecies* s = m_mat->GetSpecies(i);
-
-				// evaluate gradient at this integration point
-				vec3d grad_c = gradient(el, &c[i][0], n);
-
-				// evaluate concentration
-				double ci = el.Evaluate(&(c[i][0]), n);
-				rp.m_c[s->GetLocalID()] = ci;
-
-				// evaluate "actual" concentration (this is used by the chemcial reactions)
-				rp.m_ca[s->GetLocalID()] = ci;
-
-				// evaluate the flux
-				rp.m_j[s->GetLocalID()] = -grad_c * s->Diffusivity() * f;
 			}
 		}
 	}

@@ -18,16 +18,16 @@ public: // from FENewtonSolver
 
 	//! Do a Quasi-Newton step
 	//! This is called from SolveStep and must be implemented by derived classes.
-	bool Quasin();
+	bool Quasin() override;
 
 	//! calculates the global stiffness matrix
-	bool StiffnessMatrix();
+	bool StiffnessMatrix() override;
 
 	//! calculates the global residual vector
-	bool Residual(vector<double>& R);
+	bool Residual(vector<double>& R) override;
 
 	//! Update the state of the sytem
-	void Update(std::vector<double>& u);
+	void Update(std::vector<double>& u) override;
 
 private:
 	void MassVector(FEGlobalVector& R);
@@ -49,8 +49,6 @@ public:
 	double	m_alpha;			//!< alpha parameter for generalized trapezoidal rule
 
 private:
-	vector<double>		m_R;	//!< right-hand-side vector
-	vector<double>		m_d;	//!< vector of prescribed values
 	vector<double>		m_Un;	//!< solution at previous timestep
 	vector<double>		m_Fp;	//!< supply vector at previous timestep
 	vector<double>		m_F;	//!< supply vector at current timestep

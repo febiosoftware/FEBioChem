@@ -49,8 +49,6 @@ bool FENLReactionDiffusionSolver::Init()
 	m_Un.assign(neq, 0.0);
 	m_Fp.assign(neq, 0.0);
 	m_F.assign(neq, 0.0);
-	m_R.assign(neq, 0.0);
-	m_d.assign(neq, 0.0);
 
 	// initialize Un with initial values
 	FEMesh& mesh = m_fem.GetMesh();
@@ -105,7 +103,7 @@ void FENLReactionDiffusionSolver::AssembleStiffness(vector<int>& en, vector<int>
 					if (I >= 0)
 					{
 						// dof i is not a prescribed degree of freedom
-						m_R[I] -= ke[i][j] * m_d[J];
+						m_Fd[I] -= ke[i][j] * m_ui[J];
 					}
 				}
 
@@ -142,16 +140,19 @@ bool FENLReactionDiffusionSolver::Quasin()
 	DOF.GetDOFList("concentration", dofs);
 
 	// set-up the prescribed displacements
-	zero(m_d);
+	zero(m_ui);
 	int nbc = m_fem.PrescribedBCs();
 	for (int i = 0; i<nbc; ++i)
 	{
 		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*m_fem.PrescribedBC(i));
-		if (dc.IsActive()) dc.PrepStep(m_d);
+		if (dc.IsActive()) dc.PrepStep(m_ui);
 	}
 
+	// total solution vector
 	vector<double> U; U.assign(neq, 0.0);
-	vector<double> du; du.assign(neq, 0.0);
+
+	// Initialize QN method
+	QNInit();
 
 	double normUi = 0.0;
 	double normRi = 0.0;
@@ -161,23 +162,16 @@ bool FENLReactionDiffusionSolver::Quasin()
 	{
 		felog.printf(" %d\n", m_niter + 1);
 
-		// evaluate the residual
-		Residual(m_R);
-
-		// build the stiffness matrix
-		ReformStiffness();
-
-		// solve the equations
-		SolveLinearSystem(du, m_R);
+		// solve the equations (returns line search; solution stored in m_ui)
+		double ls = QNSolve();
 
 		// update solution
-		U += du;
-		Update(du);
+		U += m_ui;
 
 		// calculate norms
 		if (m_niter == 0)
 		{
-			normRi = m_R*m_R;
+			normRi = m_R0*m_R0;
 			normUi = U*U;
 		}
 
@@ -206,9 +200,9 @@ bool FENLReactionDiffusionSolver::Quasin()
 		if (m_niter == 0) normSi = normS;
 
 		// calculate norms
-		double normu = du*du;
+		double normu = m_ui*m_ui;
 		double normU = U*U;
-		double normR = m_R*m_R;
+		double normR = m_R1*m_R1;
 
 		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
 		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
@@ -234,8 +228,14 @@ bool FENLReactionDiffusionSolver::Quasin()
 			bconv = true;
 		}
 
-		// Zero out d since the prescribed concentrations should be enforce by now
-		zero(m_d);
+		if (bconv == false)
+		{
+			// do the QN update (this may also do a stiffness reformation if necessary)
+			bool bret = QNUpdate();
+
+			// Oh, oh, something went wrong
+			if (bret == false) break;
+		}
 
 		// increase iteration number
 		m_niter++;
@@ -575,7 +575,7 @@ void FENLReactionDiffusionSolver::Update(std::vector<double>& u)
 	vector<int> dofs;
 	DOF.GetDOFList("concentration", dofs);
 
-	// update nodal positions
+	// update nodal concentrations
 	for (int i = 0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
