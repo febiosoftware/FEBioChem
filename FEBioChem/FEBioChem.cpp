@@ -3,7 +3,6 @@
 
 #include "stdafx.h"
 #include <FECore/sdk.h>
-#include "FEReactionDiffusionSolver.h"
 #include "FENLReactionDiffusionSolver.h"
 #include "FEReactionDiffusionConvection.h"
 #include "FEReactionDiffusionMaterial.h"
@@ -21,7 +20,6 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 
 	fecore.CreateModule("reaction-diffusion");
 
-	REGISTER_FECORE_CLASS(FEReactionDiffusionSolver            , FESOLVER_ID     , "explicit reaction-diffusion");
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionSolver          , FESOLVER_ID     , "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, FESOLVER_ID     , "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEReactionDiffusionMaterial          , FEMATERIAL_ID   , "reaction-diffusion");

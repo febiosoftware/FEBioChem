@@ -354,7 +354,6 @@
     <ClInclude Include="..\FEBioChem\FENLReactionDiffusionSolver.h" />
     <ClInclude Include="..\FEBioChem\FEReactionDiffusionConvection.h" />
     <ClInclude Include="..\FEBioChem\FEReactionDiffusionMaterial.h" />
-    <ClInclude Include="..\FEBioChem\FEReactionDiffusionSolver.h" />
     <ClInclude Include="..\FEBioChem\FEReactionDomain.h" />
     <ClInclude Include="..\FEBioChem\FEReactionMaterial.h" />
     <ClInclude Include="..\FEBioChem\FEReactiveSpecies.h" />
@@ -402,7 +401,6 @@
     <ClCompile Include="..\FEBioChem\FENLReactionDiffusionSolver.cpp" />
     <ClCompile Include="..\FEBioChem\FEReactionDiffusionConvectionSolver.cpp" />
     <ClCompile Include="..\FEBioChem\FEReactionDiffusionMaterial.cpp" />
-    <ClCompile Include="..\FEBioChem\FEReactionDiffusionSolver.cpp" />
     <ClCompile Include="..\FEBioChem\FEReactionDomain.cpp" />
     <ClCompile Include="..\FEBioChem\FEReactionMaterial.cpp" />
     <ClCompile Include="..\FEBioChem\FEReactiveSpecies.cpp" />

@@ -74,46 +74,6 @@ bool FENLReactionDiffusionSolver::Init()
 	return true;
 }
 
-void FENLReactionDiffusionSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& ke)
-{
-	if (lm.size() == 0) return;
-
-	// assemble into the global stiffness
-	m_pK->Assemble(ke, lm);
-
-	// if there are prescribed bc's we need to adjust the residual
-	if (m_fem.PrescribedBCs() > 0)
-	{
-		SparseMatrix& K = *m_pK;
-
-		int N = ke.rows();
-
-		// loop over columns
-		for (int j = 0; j<N; ++j)
-		{
-			int J = -lm[j] - 2;
-			if ((J >= 0) && (J<m_neq))
-			{
-				// dof j is a prescribed degree of freedom
-
-				// loop over rows
-				for (int i = 0; i<N; ++i)
-				{
-					int I = lm[i];
-					if (I >= 0)
-					{
-						// dof i is not a prescribed degree of freedom
-						m_Fd[I] -= ke[i][j] * m_ui[J];
-					}
-				}
-
-				// set the diagonal element of K to 1
-				K.set(J, J, 1);
-			}
-		}
-	}
-}
-
 //! Do a Quasi-Newton step
 //! This is called from SolveStep and must be implemented by derived classes.
 bool FENLReactionDiffusionSolver::Quasin()
@@ -132,13 +92,6 @@ bool FENLReactionDiffusionSolver::Quasin()
 	FEMesh& mesh = m_fem.GetMesh();
 	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
 
-	// get the equation number
-	int neq = NumberOfEquations();
-
-	DOFS& DOF = fem.GetDOFS();
-	vector<int> dofs;
-	DOF.GetDOFList("concentration", dofs);
-
 	// set-up the prescribed displacements
 	zero(m_ui);
 	int nbc = m_fem.PrescribedBCs();
@@ -149,6 +102,7 @@ bool FENLReactionDiffusionSolver::Quasin()
 	}
 
 	// total solution vector
+	int neq = NumberOfEquations();
 	vector<double> U; U.assign(neq, 0.0);
 
 	// Initialize QN method
@@ -250,6 +204,10 @@ bool FENLReactionDiffusionSolver::Quasin()
 	while (!bconv);
 
 	// store the solution
+	DOFS& DOF = fem.GetDOFS();
+	vector<int> dofs;
+	DOF.GetDOFList("concentration", dofs);
+
 	zero(m_Un);
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{

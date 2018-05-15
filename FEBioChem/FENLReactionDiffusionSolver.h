@@ -36,9 +36,6 @@ private:
 
 	void ForceVector(FEGlobalVector& F);
 
-	//! assemble element stiffness matrix
-	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
-
 public:
 	double	m_Ctol;				//!< convergence tolerance
 	double	m_Stol;				//!< convergence tolerance for SBMs
