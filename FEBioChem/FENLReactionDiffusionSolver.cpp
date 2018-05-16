@@ -47,13 +47,19 @@ bool FENLReactionDiffusionSolver::Init()
 	if (FENewtonSolver::Init() == false) return false;
 
 	int neq = NumberOfEquations();
+	m_U.assign(neq, 0.0);
 	m_Un.assign(neq, 0.0);
 	m_Fp.assign(neq, 0.0);
 	m_F.assign(neq, 0.0);
 
+	// set the time step parameters
+	FEModel& fem = GetFEModel();
+	FETimeInfo& tp = fem.GetTime();
+	tp.alpha = m_alpha;
+
 	// initialize Un with initial values
-	FEMesh& mesh = m_fem.GetMesh();
-	DOFS& DOF = m_fem.GetDOFS();
+	FEMesh& mesh = fem.GetMesh();
+	DOFS& DOF = fem.GetDOFS();
 	vector<int> dofs;
 	DOF.GetDOFList("concentration", dofs);
 	for (int i=0; i<mesh.Nodes(); ++i)
@@ -75,140 +81,80 @@ bool FENLReactionDiffusionSolver::Init()
 	return true;
 }
 
-//! Do a Quasi-Newton step
-//! This is called from SolveStep and must be implemented by derived classes.
-bool FENLReactionDiffusionSolver::Quasin()
+bool FENLReactionDiffusionSolver::CheckConvergence(int niter, const vector<double>& ui, double ls)
 {
-	// initialize counters
-	m_niter = 0;		// nr of iterations
-	m_nrhs = 0;			// nr of RHS evaluations
-	m_nref = 0;			// nr of stiffness reformations
-	m_ntotref = 0;
-	m_strategy->m_nups = 0;	// nr of stiffness updates between reformations
+	// update solution
+	if (niter == 0) m_U = m_ui;
+	else m_U += m_ui;
+
+	// calculate initial norms
+	if (niter == 0)
+	{
+		m_normRi = m_R0*m_R0;
+		m_normUi = m_U*m_U;
+	}
+
+	// calculate SBM norm
+	double normS = CalculateSBMNorm();
+	if (m_niter == 0) m_normSi = normS;
+
+	// calculate norms
+	double normu = m_ui*m_ui;
+	double normU = m_U*m_U;
+	double normR = m_R1*m_R1;
 
 	FEModel& fem = GetFEModel();
 	FETimeInfo& tp = fem.GetTime();
-	tp.alpha = m_alpha;
+	felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+	felog.printf("\t   residual          %15le %15le %15le \n", m_normRi, normR, (m_Rtol*m_Rtol)*m_normRi);
+	felog.printf("\t   concentration     %15le %15le %15le \n", m_normUi, normu, (m_Ctol*m_Ctol)*normU);
+	felog.printf("\t   sbm concentration %15le %15le %15le \n", m_normSi, normS, (m_Stol*m_Stol)*m_normSi);
 
-	FEMesh& mesh = m_fem.GetMesh();
-	for (int i = 0; i<mesh.Domains(); ++i) mesh.Domain(i).PreSolveUpdate(tp);
+	// check convergence norms
+	bool bconv = true;
+	if ((m_Ctol > 0.0) && (normu > (m_Ctol*m_Ctol)*normU)) bconv = false;
+	if ((m_Rtol > 0.0) && (normR > (m_Rtol*m_Rtol)*m_normRi)) bconv = false;
+	if ((m_normSi > 0.0) && (m_Stol > 0.0) && (normS > (m_Stol*m_Stol)*m_normSi)) bconv = false;
 
-	// set-up the prescribed displacements
-	zero(m_ui);
-	int nbc = m_fem.PrescribedBCs();
-	for (int i = 0; i<nbc; ++i)
+	// check for minimal residual
+	if ((bconv == false) && (m_Rmin > 0.0) && (normR <= m_Rmin) && (m_niter == 0))
 	{
-		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*m_fem.PrescribedBC(i));
-		if (dc.IsActive()) dc.PrepStep(m_ui);
-	}
-
-	// total solution vector
-	int neq = NumberOfEquations();
-	vector<double> U; U.assign(neq, 0.0);
-
-	// Initialize QN method
-	QNInit();
-
-	double normUi = 0.0;
-	double normRi = 0.0;
-	double normSi = 0.0;	// initial SBM concentrations
-	bool bconv = false;
-	do
-	{
-		felog.printf(" %d\n", m_niter + 1);
-
-		// solve the equations (returns line search; solution stored in m_ui)
-		double ls = QNSolve();
-
-		// update solution
-		U += m_ui;
-
-		// calculate norms
-		if (m_niter == 0)
-		{
-			normRi = m_R0*m_R0;
-			normUi = U*U;
-		}
-
-		// calculate SBM norm
-		double normS = CalculateSBMNorm();
-		if (m_niter == 0) normSi = normS;
-
-		// calculate norms
-		double normu = m_ui*m_ui;
-		double normU = U*U;
-		double normR = m_R1*m_R1;
-
-		felog.printf(" Nonlinear solution status: time= %lg\n", tp.currentTime);
-		felog.printf("\tstiffness updates             = %d\n", m_strategy->m_nups);
-		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
-		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		felog.printf("\t   residual          %15le %15le %15le \n", normRi, normR, (m_Rtol*m_Rtol)*normRi);
-		felog.printf("\t   concentration     %15le %15le %15le \n", normUi, normu, (m_Ctol*m_Ctol)*normU);
-		felog.printf("\t   sbm concentration %15le %15le %15le \n", normSi, normS, (m_Stol*m_Stol)*normSi);
-
-		// check convergence norms
+		// check for almost zero-residual on the first iteration
+		// this might be an indication that there is no load on the system
+		felog.printbox("WARNING", "No load acting on the system.");
 		bconv = true;
-		if ((m_Ctol > 0.0) && (normu > (m_Ctol*m_Ctol)*normU)) bconv = false;
-		if ((m_Rtol > 0.0) && (normR > (m_Rtol*m_Rtol)*normRi)) bconv = false;
-		if ((normSi > 0.0) && (m_Stol > 0.0) && (normS > (m_Stol*m_Stol)*normSi)) bconv = false;
-
-		// check for minimal residual
-		if ((bconv == false) && (m_Rmin > 0.0) && (normR <= m_Rmin) && (m_niter == 0))
-		{
-			// check for almost zero-residual on the first iteration
-			// this might be an indication that there is no load on the system
-			felog.printbox("WARNING", "No load acting on the system.");
-			bconv = true;
-		}
-
-		if (bconv == false)
-		{
-			// do the QN update (this may also do a stiffness reformation if necessary)
-			bool bret = QNUpdate();
-
-			// Oh, oh, something went wrong
-			if (bret == false) break;
-		}
-
-		// increase iteration number
-		m_niter++;
-
-		// let's flush the logfile to make sure the last output will not get lost
-		felog.flush();
-
-		// do minor iterations callbacks
-		m_fem.DoCallback(CB_MINOR_ITERS);
-
 	}
-	while (!bconv);
 
-	// store the solution
-	DOFS& DOF = fem.GetDOFS();
-	vector<int> dofs;
-	DOF.GetDOFList("concentration", dofs);
-
-	zero(m_Un);
-	for (int i=0; i<mesh.Nodes(); ++i)
+	if (bconv)
 	{
-		FENode& node = mesh.Node(i);
-		for (int k=0; k<dofs.size(); ++k)
+		// store the solution
+		DOFS& DOF = GetFEModel().GetDOFS();
+		vector<int> dofs;
+		DOF.GetDOFList("concentration", dofs);
+
+		// TODO: Why can't I just copy m_U?
+		zero(m_Un);
+		FEMesh& mesh = fem.GetMesh();
+		for (int i = 0; i<mesh.Nodes(); ++i)
 		{
-			int dofk = dofs[k];
-			int n = node.m_ID[dofk];
-			if (-n-2 >= 0) n = -n-2;
-			if (n >= 0)
+			FENode& node = mesh.Node(i);
+			for (int k = 0; k<dofs.size(); ++k)
 			{
-				m_Un[n] = node.get(dofk);
+				int dofk = dofs[k];
+				int n = node.m_ID[dofk];
+				if (-n - 2 >= 0) n = -n - 2;
+				if (n >= 0)
+				{
+					m_Un[n] = node.get(dofk);
+				}
 			}
 		}
+
+		// store the force vector
+		m_Fp = m_F;
 	}
 
-	// store the force vector
-	m_Fp = m_F;
-
-	return true;
+	return bconv;
 }
 
 double FENLReactionDiffusionSolver::CalculateSBMNorm()
@@ -250,10 +196,7 @@ void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 	for (int n = 0; n<NDOM; ++n)
 	{
 		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(n));
-		if (dom)
-		{
-			dom->ForceVector(R);
-		}
+		if (dom) dom->ForceVector(R);
 	}
 
 	// do the surface loads
@@ -313,58 +256,7 @@ void FENLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
 	for (int n = 0; n<NDOM; ++n)
 	{
 		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(n));
-		if (dom)
-		{
-			// get the number of concentration variables
-			const vector<int>& dofs = dom->GetDOFList();
-			int ncv = (int)dofs.size();
-
-			vector<int> lm;
-			matrix me;
-			int NE = dom->Elements();
-			for (int iel=0; iel<NE; ++iel)
-			{
-				FESolidElement& el = dom->Element(iel);
-				int ne = el.Nodes();
-				int ndof = ne*ncv;
-
-				me.resize(ndof, ndof);
-				me.zero();
-				dom->UnpackLM(el, lm);
-
-				// get the element mass matrix
-				dom->ElementMassMatrix(el, me);
-
-				// get the nodal values
-				vector<double> un(ndof, 0.0);
-				for (int i = 0; i<ne; ++i)
-				{
-					for (int j = 0; j<ncv; ++j)
-					{
-						double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
-						un[i*ncv + j] = cn;
-					}
-				}
-
-				// subtract previous values
-				for (int i=0; i<ndof; ++i)
-				{
-					int n = lm[i];
-					if (-n-2 >= 0) n = -n -2;
-					if (n >= 0) un[i] -= m_Un[n];
-				}
-
-				// multiply with mass matrix
-				vector<double> mun = me*un;
-
-				// add to RHS
-				for (int i=0; i<ndof; ++i)
-				{
-					int n = lm[i];
-					if (n >= 0) R[n] += mun[i];
-				}
-			}
-		}
+		if (dom) dom->MassVector(R, m_Un);
 	}
 }
 
@@ -372,86 +264,11 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETim
 {
 	FEModel& fem = GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	double dt = tp.timeIncrement;
-	double alpha = tp.alpha;
-
-	DOFS& Dofs = fem.GetDOFS();
-	vector<int> velDofs;
-	if (m_convection)
-	{
-		Dofs.GetDOFList("velocity", velDofs);
-		assert(velDofs.size() == 3);
-	}
-
 	int NDOM = mesh.Domains();
 	for (int ndom = 0; ndom<NDOM; ++ndom)
 	{
 		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(ndom));
-		if (dom)
-		{
-			// get the number of concentration variables
-			const vector<int>& dofs = dom->GetDOFList();
-			int ncv = (int)dofs.size();
-
-			vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0,0,0));
-			vector<int> lm;
-			matrix ke;
-			int NE = dom->Elements();
-			for (int iel = 0; iel<NE; ++iel)
-			{
-				FESolidElement& el = dom->Element(iel);
-				int ne = el.Nodes();
-				int ndof = ne*ncv;
-
-				ke.resize(ndof, ndof);
-				ke.zero();
-				dom->UnpackLM(el, lm);
-
-				// get the element diffusion matrix
-				dom->ElementDiffusionMatrix(el, ke);
-
-				// get the nodal velocities
-				if (m_convection)
-				{
-					for (int i = 0; i<ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(velDofs[0], velDofs[1], velDofs[2]);
-
-					// add the convection matrix
-					dom->ElementConvectionMatrix(el, ke, vn);
-				}
-
-				// get the nodal values
-				vector<double> un(ndof, 0.0);
-				for (int i = 0; i<ne; ++i)
-				{
-					for (int j = 0; j<ncv; ++j)
-					{
-						double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
-						un[i*ncv + j] = alpha*cn;
-					}
-				}
-
-				// add previous values
-				if (alpha != 1.0)
-				{
-					for (int i = 0; i<ndof; ++i)
-					{
-						int n = lm[i];
-						if (-n - 2 >= 0) n = -n - 2;
-						if (n >= 0) un[i] += (1.0 - alpha) * m_Un[n];
-					}
-				}
-
-				// multiply with diffusion matrix
-				vector<double> kun = ke*un;
-
-				// add to RHS
-				for (int i = 0; i<ndof; ++i)
-				{
-					int n = lm[i];
-					if (n >= 0) R[n] += kun[i] * dt;
-				}
-			}
-		}
+		if (dom) dom->DiffusionVector(R, tp, m_Un, m_convection);
 	}
 }
 

@@ -30,6 +30,10 @@ public:
 
 	void StiffnessMatrix(FENLReactionDiffusionSolver* solver);
 
+	void MassVector(FEGlobalVector& R, const vector<double>& Un);
+
+	void DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un, bool bconvection);
+
 protected:
 	void ElementForceVector(FESolidElement& el, vector<double>& fe);
 
@@ -44,6 +48,7 @@ public:
 
 private:
 	FEReactionDiffusionMaterial*	m_mat;
+	int		m_dofV[3];	// velocity degrees of freedom
 };
 
 class FEReactionDomainFactory : public FEDomainFactory

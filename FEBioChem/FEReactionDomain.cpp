@@ -58,6 +58,16 @@ bool FEReactionDomain::Init()
 	}
 	SetDOFList(dofList);
 
+	// for convection problems we'll need the velocity degrees of freedom
+	m_dofV[0] = m_dofV[1] = m_dofV[2];
+	int vel = dofs.GetVariableIndex("velocity");
+	if (vel != -1)
+	{
+		m_dofV[0] = dofs.GetDOF(vel, 0);
+		m_dofV[1] = dofs.GetDOF(vel, 1);
+		m_dofV[2] = dofs.GetDOF(vel, 2);
+	}
+
 	return true;
 }
 
@@ -411,6 +421,61 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 }
 
 //-----------------------------------------------------------------------------
+void FEReactionDomain::MassVector(FEGlobalVector& R, const vector<double>& Un)
+{
+	// get the number of concentration variables
+	const vector<int>& dofs = GetDOFList();
+	int ncv = (int)dofs.size();
+
+	vector<int> lm;
+	matrix me;
+	int NE = Elements();
+	FEMesh& mesh = *GetMesh();
+	for (int iel = 0; iel<NE; ++iel)
+	{
+		FESolidElement& el = Element(iel);
+		int ne = el.Nodes();
+		int ndof = ne*ncv;
+
+		me.resize(ndof, ndof);
+		me.zero();
+		UnpackLM(el, lm);
+
+		// get the element mass matrix
+		ElementMassMatrix(el, me);
+
+		// get the nodal values
+		vector<double> un(ndof, 0.0);
+		for (int i = 0; i<ne; ++i)
+		{
+			for (int j = 0; j<ncv; ++j)
+			{
+				double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
+				un[i*ncv + j] = cn;
+			}
+		}
+
+		// subtract previous values
+		for (int i = 0; i<ndof; ++i)
+		{
+			int n = lm[i];
+			if (-n - 2 >= 0) n = -n - 2;
+			if (n >= 0) un[i] -= Un[n];
+		}
+
+		// multiply with mass matrix
+		vector<double> mun = me*un;
+
+		// add to RHS
+		for (int i = 0; i<ndof; ++i)
+		{
+			int n = lm[i];
+			if (n >= 0) R[n] += mun[i];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
 	int ncv = GetDOFCount();
@@ -439,6 +504,77 @@ void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 
 				for (int i=0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab * phi;
 			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un, bool bconvection)
+{
+	double dt = tp.timeIncrement;
+	double alpha = tp.alpha;
+
+	// get the number of concentration variables
+	const vector<int>& dofs = GetDOFList();
+	int ncv = (int)dofs.size();
+
+	vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
+	vector<int> lm;
+	matrix ke;
+	int NE = Elements();
+	FEMesh& mesh = *GetMesh();
+	for (int iel = 0; iel<NE; ++iel)
+	{
+		FESolidElement& el = Element(iel);
+		int ne = el.Nodes();
+		int ndof = ne*ncv;
+
+		ke.resize(ndof, ndof);
+		ke.zero();
+		UnpackLM(el, lm);
+
+		// get the element diffusion matrix
+		ElementDiffusionMatrix(el, ke);
+
+		// get the nodal velocities
+		if (bconvection)
+		{
+			for (int i = 0; i<ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+
+			// add the convection matrix
+			ElementConvectionMatrix(el, ke, vn);
+		}
+
+		// get the nodal values
+		vector<double> un(ndof, 0.0);
+		for (int i = 0; i<ne; ++i)
+		{
+			for (int j = 0; j<ncv; ++j)
+			{
+				double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
+				un[i*ncv + j] = alpha*cn;
+			}
+		}
+
+		// add previous values
+		if (alpha != 1.0)
+		{
+			for (int i = 0; i<ndof; ++i)
+			{
+				int n = lm[i];
+				if (-n - 2 >= 0) n = -n - 2;
+				if (n >= 0) un[i] += (1.0 - alpha) * Un[n];
+			}
+		}
+
+		// multiply with diffusion matrix
+		vector<double> kun = ke*un;
+
+		// add to RHS
+		for (int i = 0; i<ndof; ++i)
+		{
+			int n = lm[i];
+			if (n >= 0) R[n] += kun[i] * dt;
 		}
 	}
 }
