@@ -9,13 +9,13 @@ public:
 	FEConcentrationFlux(FEModel* fem);
 
 	//! unpack LM vector
-	void UnpackLM(FESurfaceElement& el, vector<int>& lm);
+	void UnpackLM(FESurfaceElement& el, vector<int>& lm) override;
 
 	//! calculate stiffness matrix
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver);
+	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
 
-	//! calculate residual
-	void Residual(const FETimeInfo& tp, FEGlobalVector& R);
+	//! evaluate nodal values
+	void NodalValues(FESurfaceElement& el, vector<double>& v) override;
 
 private:
 	double	m_flux;	//!< flux value

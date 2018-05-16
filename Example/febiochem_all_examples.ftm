@@ -28,6 +28,7 @@
 		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex25.feb"/>
 		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex26.feb"/>
 		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex27.feb"/>
+		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex28.feb"/>
 	</Files>
 	<Plugins>
 		<import config="Debug">C:\Users\steve\Documents\Visual Studio 2013\Projects\Plugins\FEBioChem\VS2013\x64\Debug Dll\FEBioChem.dll</import>
