@@ -45,15 +45,15 @@ export INC = -I$(FEBINC)
 export INTEL_LIB = $(INTELROOT)/compiler/lib/
 
 lnx64 lnx64d lnx32 gcc gcc64:
-	( cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="so" )
+	( mkdir -p $(PLAT); cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="so" )
 
 osx osxd:
-	( cd $(PLAT); $(MAKE) -f ./febiochem.mk SFX="dylib" )
+	( mkdir -p $(PLAT); cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="dylib" )
 
 lnx64clean lnx64dclean lnx32clean gccclean gcc64clean:
 	( cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="so" clean )
 
 osxclean osxdclean:
-	( cd $(PLAT); $(MAKE) -f ./febiochem.mk SFX="dylib" clean )
+	( cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="dylib" clean )
 
 .PHONY: lnx64 lnx64d lnx32 osx osxd gcc gcc64
