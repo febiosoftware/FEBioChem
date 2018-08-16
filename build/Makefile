@@ -1,5 +1,5 @@
 FCDIR = $(dir $(CURDIR))
-PLGN = febiochem
+export PLGN = febiochem
 
 # This needs to be set in order to find the febio .h files.
 # FEBINC = $(HOME)/FEBio2

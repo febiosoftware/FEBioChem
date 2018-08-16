@@ -4,7 +4,7 @@ OBJ = $(patsubst $(FCDIR)$(THIS)/%.cpp, %.o, $(SRC))
 DEP = $(patsubst $(FCDIR)$(THIS)/%.cpp, %.d, $(SRC))
 
 
-SO = lib$(THIS)_$(PLAT).$(SFX)
+SO = lib$(PLGN)_$(PLAT).$(SFX)
 LIB = $(FCDIR)build/lib/$(SO)
 
 FECORE = $(FEBLIB)/libfecore_$(PLAT).a
