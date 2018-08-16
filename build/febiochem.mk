@@ -1,10 +1,10 @@
+THIS = FEBioChem
+SRC = $(wildcard $(FCDIR)$(THIS)/*.cpp)
+OBJ = $(patsubst $(FCDIR)$(THIS)/%.cpp, %.o, $(SRC))
+DEP = $(patsubst $(FCDIR)$(THIS)/%.cpp, %.d, $(SRC))
 
-SRC = $(wildcard $(FCDIR)FEBioChem/*.cpp)
-OBJ = $(patsubst $(FCDIR)FEBioChem/%.cpp, %.o, $(SRC))
-DEP = $(patsubst $(FCDIR)FEBioChem/%.cpp, %.d, $(SRC))
 
-
-SO = libfebiochem_$(PLAT).$(SFX)
+SO = lib$(THIS)_$(PLAT).$(SFX)
 LIB = $(FCDIR)build/lib/$(SO)
 
 FECORE = $(FEBLIB)/libfecore_$(PLAT).a
@@ -22,7 +22,7 @@ else
 		$(CC) -dynamiclib $(FLG) -o $(LIB) $(OBJ) $(FEBIOLIBS) $(INTEL_LIB)libiomp5.a
 endif
 
-%.o: $(FCDIR)FEBioChem/%.cpp
+%.o: $(FCDIR)$(THIS)/%.cpp
 	$(CC) $(INC) $(DEF) $(FLG) -MMD -c -o $@ $<
 
 clean:

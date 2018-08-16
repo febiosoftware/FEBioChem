@@ -1,4 +1,5 @@
 FCDIR = $(dir $(CURDIR))
+PLGN = febiochem
 
 # This needs to be set in order to find the febio .h files.
 # FEBINC = $(HOME)/FEBio2
@@ -45,15 +46,15 @@ export INC = -I$(FEBINC)
 export INTEL_LIB = $(INTELROOT)/compiler/lib/
 
 lnx64 lnx64d lnx32 gcc gcc64:
-	( mkdir -p $(PLAT); cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="so" )
+	( mkdir -p $(PLAT); cd $(PLAT); $(MAKE) -f ../$(PLGN).mk SFX="so" )
 
 osx osxd:
-	( mkdir -p $(PLAT); cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="dylib" )
+	( mkdir -p $(PLAT); cd $(PLAT); $(MAKE) -f ../$(PLGN).mk SFX="dylib" )
 
 lnx64clean lnx64dclean lnx32clean gccclean gcc64clean:
-	( cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="so" clean )
+	( cd $(PLAT); $(MAKE) -f ../$(PLGN).mk SFX="so" clean )
 
 osxclean osxdclean:
-	( cd $(PLAT); $(MAKE) -f ../febiochem.mk SFX="dylib" clean )
+	( cd $(PLAT); $(MAKE) -f ../$(PLGN).mk SFX="dylib" clean )
 
 .PHONY: lnx64 lnx64d lnx32 osx osxd gcc gcc64
