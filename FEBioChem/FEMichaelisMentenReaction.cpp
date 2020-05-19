@@ -5,12 +5,12 @@
 
 //-----------------------------------------------------------------------------
 // Define parameter list
-BEGIN_PARAMETER_LIST(FEMichaelisMentenReaction, FEReactionMaterial)
-	ADD_PARAMETER2(m_Rmax, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_rate");
-	ADD_PARAMETER2(m_Km  , FE_PARAM_DOUBLE, FE_RANGE_GREATER(0.0), "Km");
-	ADD_PARAMETER(m_sub , FE_PARAM_STRING, "substrate");
-	ADD_PARAMETER(m_prd, FE_PARAM_STRING, "product");
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FEMichaelisMentenReaction, FEReactionMaterial)
+	ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_rate");
+	ADD_PARAMETER(m_Km  , FE_RANGE_GREATER(0.0), "Km");
+	ADD_PARAMETER(m_sub , "substrate");
+	ADD_PARAMETER(m_prd, "product");
+END_FECORE_CLASS();
 
 FEMichaelisMentenReaction::FEMichaelisMentenReaction(FEModel* fem) : FEReactionMaterial(fem)
 {
@@ -30,11 +30,11 @@ bool FEMichaelisMentenReaction::Init()
 
 	// Find the subtrate
 	FEReactiveSpeciesBase* sub = m_pRDM->FindSpecies(m_sub);
-	if (sub == 0) return MaterialError("Cannot find substrate. Check the name.");
+	if (sub == 0) return false; // MaterialError("Cannot find substrate. Check the name.");
 
 	// find the product
 	FEReactiveSpeciesBase* prd = m_pRDM->FindSpecies(m_prd);
-	if (prd == 0) return MaterialError("Cannot find product. Check the name.");
+	if (prd == 0) return false; // MaterialError("Cannot find product. Check the name.");
 
 	// get the number of species for this material
 	int nsol = m_pRDM->Species();

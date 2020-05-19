@@ -61,5 +61,5 @@ private:
 	vector<double>		m_Fp;	//!< supply vector at previous timestep
 	vector<double>		m_F;	//!< supply vector at current timestep
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

@@ -22,8 +22,8 @@ private:
 	int		m_prdID;	//!< product (local) ID
 
 private:
-	char	m_sub[64];	//!< name of subtrate
-	char	m_prd[64];	//!< name of product
+	string	m_sub;	//!< name of subtrate
+	string	m_prd;	//!< name of product
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

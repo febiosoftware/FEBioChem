@@ -5,7 +5,7 @@
 #include "FEReactionDomain.h"
 
 //-----------------------------------------------------------------------------
-FEPlotEffectiveConcentration::FEPlotEffectiveConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE)
+FEPlotEffectiveConcentration::FEPlotEffectiveConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_NODE)
 {
 	m_pfem = pfem;
 	m_nsol = -1;
@@ -35,7 +35,7 @@ bool FEPlotEffectiveConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotActualConcentration::FEPlotActualConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotActualConcentration::FEPlotActualConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 	m_nsol = -1;
@@ -86,7 +86,7 @@ bool FEPlotActualConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotConcentrationFlux::FEPlotConcentrationFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM)
+FEPlotConcentrationFlux::FEPlotConcentrationFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM)
 {
 	m_pfem = pfem;
 	m_nsol = -1;
@@ -137,7 +137,7 @@ bool FEPlotConcentrationFlux::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotSBSConcentration::FEPlotSBSConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotSBSConcentration::FEPlotSBSConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 }
@@ -197,7 +197,7 @@ bool FEPlotSBSConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotSBSApparentDensity::FEPlotSBSApparentDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotSBSApparentDensity::FEPlotSBSApparentDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 }
@@ -257,7 +257,7 @@ bool FEPlotSBSApparentDensity::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotSolidVolumeFraction::FEPlotSolidVolumeFraction(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM)
+FEPlotSolidVolumeFraction::FEPlotSolidVolumeFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 }

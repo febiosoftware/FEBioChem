@@ -3,20 +3,21 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FEReactionDiffusionMaterial, FEMaterial)
-	ADD_PARAMETER2(m_phi, FE_PARAM_DOUBLE, FE_RANGE_RIGHT_OPEN(0.0, 1.0), "solid_volume_fraction");
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FEReactionDiffusionMaterial, FEMaterial)
+	ADD_PARAMETER(m_phi, FE_RANGE_RIGHT_OPEN(0.0, 1.0), "solid_volume_fraction");
+
+	// define the material's properties
+	ADD_PROPERTY(m_species , "species", FEProperty::Optional);
+	ADD_PROPERTY(m_sbs     , "solid_bound_species", FEProperty::Optional);
+	ADD_PROPERTY(m_reaction, "reaction", FEProperty::Optional);
+
+END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
 FEReactionDiffusionMaterial::FEReactionDiffusionMaterial(FEModel* fem) : FEMaterial(fem)
 {
 	// set solid volume fraction to zero
 	m_phi = 0.0;
-
-	// define the material's properties
-	AddProperty(&m_species , "species"            , 0);
-	AddProperty(&m_sbs     , "solid_bound_species", 0);
-	AddProperty(&m_reaction, "reaction"           , 0);
 }
 
 //-----------------------------------------------------------------------------

@@ -22,7 +22,7 @@ void FEReactionMaterial::SetReactionDiffusionParent(FEReactionDiffusionMaterial*
 bool FEReactionMaterial::Init()
 {
 	// make sure a parent material was set
-	if (m_pRDM == 0) return MaterialError("No parent material set for reaction material");
+	if (m_pRDM == 0) return false; //MaterialError("No parent material set for reaction material");
 
 	// base class initialization
 	if (FEMaterial::Init() == false) return false;

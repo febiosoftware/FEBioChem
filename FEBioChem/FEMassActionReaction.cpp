@@ -96,16 +96,15 @@ bool convert(const char* szeq, vector<ReactionTerm>& reactants, vector<ReactionT
 
 //-----------------------------------------------------------------------------
 // Define parameter list
-BEGIN_PARAMETER_LIST(FEMassActionReaction, FEReactionMaterial)
-	ADD_PARAMETER(m_k       , FE_PARAM_DOUBLE, "rate_constant");
-	ADD_PARAMETER(m_equation, FE_PARAM_STRING, "equation");
-	ADD_PARAMETER(m_posOnly , FE_PARAM_BOOL  , "force_positive_concentrations");
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FEMassActionReaction, FEReactionMaterial)
+	ADD_PARAMETER(m_k       , "rate_constant");
+	ADD_PARAMETER(m_equation, "equation");
+	ADD_PARAMETER(m_posOnly , "force_positive_concentrations");
+END_FECORE_CLASS();
 
 FEMassActionReaction::FEMassActionReaction(FEModel* fem) : FEReactionMaterial(fem)
 {
 	m_k = 0.0;
-	m_equation[0] = 0;
 	m_posOnly = false;
 }
 
@@ -117,7 +116,7 @@ bool FEMassActionReaction::Init()
 	// convert the equation string to actual stoichiometric coefficients and species
 	vector<ReactionTerm> reactants;
 	vector<ReactionTerm> products;
-	if (convert(m_equation, reactants, products) == false) return MaterialError("Error in parsing chemical equation");
+	if (convert(m_equation.c_str(), reactants, products) == false) return false;// MaterialError("Error in parsing chemical equation");
 
 	// get the number of species for this material
 	int nsol = m_pRDM->Species();
@@ -139,7 +138,7 @@ bool FEMassActionReaction::Init()
 		if (spec == 0)
 		{
 			// Oh, oh. This shouldn't happen
-			return MaterialError("Invalid reaction equation");
+			return false;// MaterialError("Invalid reaction equation");
 		}
 
 		// set the reactant coefficient
@@ -156,7 +155,7 @@ bool FEMassActionReaction::Init()
 		if (spec == 0)
 		{
 			// Oh, oh. This shouldn't happen
-			return MaterialError("Invalid reaction equation");
+			return false; // MaterialError("Invalid reaction equation");
 		}
 
 		// set the product coefficient

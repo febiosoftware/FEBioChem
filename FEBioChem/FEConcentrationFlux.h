@@ -9,19 +9,19 @@ public:
 	FEConcentrationFlux(FEModel* fem);
 
 	//! unpack LM vector
-	void UnpackLM(FESurfaceElement& el, vector<int>& lm) override;
+	void UnpackLM(FESurfaceElement& el, vector<int>& lm);
 
 	//! calculate stiffness matrix
-	void StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver) override;
+	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
 
 	//! evaluate nodal values
-	void NodalValues(FESurfaceElement& el, vector<double>& v) override;
+	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
 
 private:
 	double	m_flux;	//!< flux value
 	int		m_cid;	//!< concentration degree of freedom 
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 // NOTE: For compatibility issues, let's define a "solute" flux, analogously to FEBioMix' solute flux.
@@ -34,5 +34,5 @@ public:
 
 private:
 	bool	m_blinear;	// not used, but needed for compatibility with the FEBioMix feature
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

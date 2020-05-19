@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //! Effective solute concentration
 //! This is the same as the nodal concentrations but was added for analogy with FEBioMix
-class FEPlotEffectiveConcentration : public FEDomainData
+class FEPlotEffectiveConcentration : public FEPlotDomainData
 {
 public:
 	FEPlotEffectiveConcentration(FEModel* pfem);
@@ -18,7 +18,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Actual solute concentration
-class FEPlotActualConcentration : public FEDomainData
+class FEPlotActualConcentration : public FEPlotDomainData
 {
 public:
 	FEPlotActualConcentration(FEModel* pfem);
@@ -32,7 +32,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Solute concentration flux
-class FEPlotConcentrationFlux : public FEDomainData
+class FEPlotConcentrationFlux : public FEPlotDomainData
 {
 public:
 	FEPlotConcentrationFlux(FEModel* pfem);
@@ -46,7 +46,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! SBS concentration
-class FEPlotSBSConcentration : public FEDomainData
+class FEPlotSBSConcentration : public FEPlotDomainData
 {
 public:
 	FEPlotSBSConcentration(FEModel* pfem);
@@ -60,7 +60,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! SBS apparent density
-class FEPlotSBSApparentDensity : public FEDomainData
+class FEPlotSBSApparentDensity : public FEPlotDomainData
 {
 public:
 	FEPlotSBSApparentDensity(FEModel* pfem);
@@ -74,7 +74,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! solid volume fraction
-class FEPlotSolidVolumeFraction : public FEDomainData
+class FEPlotSolidVolumeFraction : public FEPlotDomainData
 {
 public:
 	FEPlotSolidVolumeFraction(FEModel* pfem);

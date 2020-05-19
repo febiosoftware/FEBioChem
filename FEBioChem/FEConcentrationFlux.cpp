@@ -2,10 +2,10 @@
 #include "FEConcentrationFlux.h"
 #include <FECore/FEMesh.h>
 
-BEGIN_PARAMETER_LIST(FEConcentrationFlux, FESurfaceLoad)
-	ADD_PARAMETER(m_flux, FE_PARAM_DOUBLE, "flux");
-	ADD_PARAMETER(m_cid , FE_PARAM_INT, "solute_id");
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FEConcentrationFlux, FESurfaceLoad)
+	ADD_PARAMETER(m_flux, "flux");
+	ADD_PARAMETER(m_cid , "solute_id");
+END_FECORE_CLASS();
 
 //! Constructor
 FEConcentrationFlux::FEConcentrationFlux(FEModel* fem) : FESurfaceLoad(fem)
@@ -30,22 +30,76 @@ void FEConcentrationFlux::UnpackLM(FESurfaceElement& el, vector<int>& lm)
 	}
 }
 
-//! Evaluate nodal values
-void FEConcentrationFlux::NodalValues(FESurfaceElement& el, vector<double>& v)
+void FEConcentrationFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	int neln = el.Nodes();
-	for (int i=0; i<neln; ++i) v[i] = m_flux;
+	vector<double> fe;
+	vector<int> lm;
+
+	vec3d rt[FEElement::MAX_NODES];
+	vector<double> flux; flux.reserve(FEElement::MAX_NODES);
+
+	FESurface& surf = GetSurface();
+	FEMesh& mesh = *surf.GetMesh();
+	int npr = surf.Elements();
+	for (int i = 0; i<npr; ++i)
+	{
+		FESurfaceElement& el = m_psurf->Element(i);
+
+		// calculate nodal fluxes
+		int neln = el.Nodes();
+
+		// equivalent nodal fluxes
+		fe.resize(neln);
+
+		// get the element's nodal coordinates
+		for (int j = 0; j<neln; ++j) rt[j] = mesh.Node(el.m_node[j]).m_rt;
+
+		// get the nodal values
+		flux.resize(neln, 0.0);
+		for (int i = 0; i<neln; ++i) flux[i] = m_flux;
+
+		// repeat over integration points
+		zero(fe);
+		double* w = el.GaussWeights();
+		int nint = el.GaussPoints();
+		for (int n = 0; n<nint; ++n)
+		{
+			double* N = el.H(n);
+			double* Gr = el.Gr(n);
+			double* Gs = el.Gs(n);
+
+			vec3d dxr(0, 0, 0), dxs(0, 0, 0);
+			for (int j = 0; j<neln; ++j)
+			{
+				dxr += rt[j] * Gr[j];
+				dxs += rt[j] * Gs[j];
+			}
+			vec3d dxt = dxr ^ dxs;
+			double J = dxt.norm();
+
+			for (int j = 0; j<neln; ++j)
+			{
+				fe[j] -= N[j] * flux[j] * w[n] * J;
+			}
+		}
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// add element force vector to global force vector
+		R.Assemble(el.m_node, lm, fe);
+	}
 }
 
 //! calculate stiffness matrix
-void FEConcentrationFlux::StiffnessMatrix(const FETimeInfo& tp, FESolver* psolver)
+void FEConcentrationFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
 {
 	// Nothing to see here! Please move on!
 }
 
 //=================================================================================================
-BEGIN_PARAMETER_LIST(FESoluteFlux, FEConcentrationFlux)
-	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FESoluteFlux, FEConcentrationFlux)
+	ADD_PARAMETER(m_blinear, "linear");
+END_FECORE_CLASS();
 
 FESoluteFlux::FESoluteFlux(FEModel* fem) : FEConcentrationFlux(fem) {}

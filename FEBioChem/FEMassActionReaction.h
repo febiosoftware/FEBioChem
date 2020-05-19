@@ -17,9 +17,9 @@ public:
 	double GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id);
 
 private:
-	double	m_k;				//!< reaction constant 
-	char	m_equation[256];	//!< reaction equation
-	bool	m_posOnly;			//!< only consider nonnegative concentrations (neg. concentrations will be treated as zero)
+	double	m_k;			//!< reaction constant 
+	string	m_equation;		//!< reaction equation
+	bool	m_posOnly;		//!< only consider nonnegative concentrations (neg. concentrations will be treated as zero)
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

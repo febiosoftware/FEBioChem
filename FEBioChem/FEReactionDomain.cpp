@@ -20,9 +20,16 @@ FEDomain* FEReactionDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEM
 }
 
 
-FEReactionDomain::FEReactionDomain(FEModel* fem) : FESolidDomain(fem)
+//-----------------------------------------------------------------------------
+FEReactionDomain::FEReactionDomain(FEModel* fem) : FESolidDomain(fem), m_dofC(fem)
 {
 	m_mat = 0;
+}
+
+//-----------------------------------------------------------------------------
+const FEDofList& FEReactionDomain::GetDOFList() const
+{
+	return m_dofC;
 }
 
 //-----------------------------------------------------------------------------
@@ -50,13 +57,12 @@ bool FEReactionDomain::Init()
 
 	// get all the concentration degrees of freedom that are active in this domain
 	int ns = m_mat->Species();
-	vector<int> dofList(ns);
+	m_dofC.Clear();
 	for (int i = 0; i<ns; ++i)
 	{
 		FEReactiveSpecies* s = m_mat->GetSpecies(i);
-		dofList[i] = c[s->GetID()];
+		m_dofC.AddDof(c[s->GetID()]);
 	}
-	SetDOFList(dofList);
 
 	// for convection problems we'll need the velocity degrees of freedom
 	m_dofV[0] = m_dofV[1] = m_dofV[2];
@@ -94,8 +100,7 @@ void FEReactionDomain::Activate()
 	FESolidDomain::Activate();
 
 	// get the degrees of freedom for this domain
-	const vector<int>& dofs = GetDOFList();
-	int ndof = (int)dofs.size();
+	int ndof = m_dofC.Size();
 
 	// get the mesh
 	FEMesh& mesh = *GetMesh();
@@ -120,7 +125,7 @@ void FEReactionDomain::Activate()
 		for (int i = 0; i<ne; ++i)
 		{
 			FENode& node = mesh.Node(el.m_node[i]);
-			for (int j = 0; j<ndof; ++j) c[j][i] = node.get(dofs[j]);
+			for (int j = 0; j<ndof; ++j) c[j][i] = node.get(m_dofC[j]);
 		}
 
 		// evaluate integration point values
@@ -185,8 +190,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 	double alpha = tp.alpha;
 
 	// get the degrees of freedom for this domain
-	const vector<int>& dofs = GetDOFList();
-	int ndof = (int)dofs.size();
+	int ndof = (int)m_dofC.Size();
 
 	// get the mesh
 	FEMesh& mesh = *GetMesh();
@@ -211,7 +215,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 		for (int i = 0; i<ne; ++i)
 		{
 			FENode& node = mesh.Node(el.m_node[i]);
-			for (int j = 0; j<ndof; ++j) c[j][i] = node.get(dofs[j]);
+			for (int j = 0; j<ndof; ++j) c[j][i] = node.get(m_dofC[j]);
 		}
 
 		// evaluate integration point values
@@ -292,20 +296,18 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::StiffnessMatrix(FENLReactionDiffusionSolver* solver)
+void FEReactionDomain::StiffnessMatrix(FENLReactionDiffusionSolver* solver, FELinearSystem& LS)
 {
 	FEMesh& mesh = *GetMesh();
 
-	FEModel& fem = solver->GetFEModel();
+	FEModel& fem = *solver->GetFEModel();
 	FETimeInfo& tp = fem.GetTime();
 
 	// get the number of concentration variables
-	const vector<int>& dofs = GetDOFList();
-	int ncv = (int)dofs.size();
+	int ncv = (int)m_dofC.Size();
 
 	vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
 	vector<int> lm;
-	matrix ke;
 
 	DOFS& Dofs = fem.GetDOFS();
 	vector<int> velDofs;
@@ -325,6 +327,7 @@ void FEReactionDomain::StiffnessMatrix(FENLReactionDiffusionSolver* solver)
 		UnpackLM(el, lm);
 
 		// allocate element stiffness matrix
+		FEElementMatrix ke;
 		ke.resize(ndof, ndof);
 		ke.zero();
 
@@ -349,8 +352,11 @@ void FEReactionDomain::StiffnessMatrix(FENLReactionDiffusionSolver* solver)
 		// add mass matrix
 		ElementMassMatrix(el, ke);
 
+		ke.SetNodes(el.m_lnode);
+		ke.SetIndices(lm);
+
 		// assemble into global stiffness
-		solver->AssembleStiffness(el.m_node, lm, ke);
+		LS.Assemble(ke);
 	}
 }
 
@@ -358,7 +364,7 @@ void FEReactionDomain::StiffnessMatrix(FENLReactionDiffusionSolver* solver)
 void FEReactionDomain::ForceVector(FEGlobalVector& R)
 {
 	// get the number of degrees of freedom active in this domain
-	int ndof = GetDOFCount();
+	int ndof = m_dofC.Size();
 
 	vector<double> fe;
 	vector<int> lm;
@@ -386,8 +392,7 @@ void FEReactionDomain::ForceVector(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe)
 {
-	const vector<int>& dofs = GetDOFList();
-	int ndof = (int) dofs.size();
+	int ndof = (int) m_dofC.Size();
 	vector<double> R(ndof, 0.0);
 
 	// loop over all integration points
@@ -424,8 +429,7 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 void FEReactionDomain::MassVector(FEGlobalVector& R, const vector<double>& Un)
 {
 	// get the number of concentration variables
-	const vector<int>& dofs = GetDOFList();
-	int ncv = (int)dofs.size();
+	int ncv = (int)m_dofC.Size();
 
 	vector<int> lm;
 	matrix me;
@@ -450,7 +454,7 @@ void FEReactionDomain::MassVector(FEGlobalVector& R, const vector<double>& Un)
 		{
 			for (int j = 0; j<ncv; ++j)
 			{
-				double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
+				double cn = mesh.Node(el.m_node[i]).get(m_dofC[j]);
 				un[i*ncv + j] = cn;
 			}
 		}
@@ -478,7 +482,7 @@ void FEReactionDomain::MassVector(FEGlobalVector& R, const vector<double>& Un)
 //-----------------------------------------------------------------------------
 void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
-	int ncv = GetDOFCount();
+	int ncv = m_dofC.Size();
 	int ne = el.Nodes();
 	int nint = el.GaussPoints();
 	double* gw = el.GaussWeights();
@@ -515,8 +519,7 @@ void FEReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, c
 	double alpha = tp.alpha;
 
 	// get the number of concentration variables
-	const vector<int>& dofs = GetDOFList();
-	int ncv = (int)dofs.size();
+	int ncv = (int)m_dofC.Size();
 
 	vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
 	vector<int> lm;
@@ -551,7 +554,7 @@ void FEReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, c
 		{
 			for (int j = 0; j<ncv; ++j)
 			{
-				double cn = mesh.Node(el.m_node[i]).get(dofs[j]);
+				double cn = mesh.Node(el.m_node[i]).get(m_dofC[j]);
 				un[i*ncv + j] = alpha*cn;
 			}
 		}
@@ -583,8 +586,7 @@ void FEReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, c
 void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 {
 	// get the number of concentration variables
-	const vector<int>& dofs = GetDOFList();
-	int ncv = (int)dofs.size();
+	int ncv = (int)m_dofC.Size();
 
 	// get the diffusion coefficients
 	vector<double> D(ncv);
@@ -643,8 +645,7 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 {
 	// get the number of concentration variables
-	const vector<int>& dofs = GetDOFList();
-	int ncv = (int)dofs.size();
+	int ncv = (int)m_dofC.Size();
 
 	int ne = el.Nodes();
 	double Ji[3][3];
@@ -702,8 +703,7 @@ void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 void FEReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn)
 {
 	// get the number of concentration variables
-	const vector<int>& dofs = GetDOFList();
-	int ncv = (int)dofs.size();
+	int ncv = (int)m_dofC.Size();
 
 	int ne = el.Nodes();
 	int ni = el.GaussPoints();

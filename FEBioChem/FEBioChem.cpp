@@ -20,21 +20,21 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 
 	fecore.CreateModule("reaction-diffusion");
 
-	REGISTER_FECORE_CLASS(FENLReactionDiffusionSolver          , FESOLVER_ID     , "reaction-diffusion");
-	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, FESOLVER_ID     , "reaction-diffusion-convection");
-	REGISTER_FECORE_CLASS(FEReactionDiffusionMaterial          , FEMATERIAL_ID   , "reaction-diffusion");
-	REGISTER_FECORE_CLASS(FEMassActionReaction                 , FEMATERIAL_ID   , "mass action");
-	REGISTER_FECORE_CLASS(FEMichaelisMentenReaction            , FEMATERIAL_ID   , "Michaelis-Menten");
-	REGISTER_FECORE_CLASS(FEReactiveSpecies                    , FEMATERIAL_ID   , "species");
-	REGISTER_FECORE_CLASS(FESolidBoundSpecies                  , FEMATERIAL_ID   , "solid_bound_species");
-	REGISTER_FECORE_CLASS(FEConcentrationFlux                  , FESURFACELOAD_ID, "concentration flux");
-	REGISTER_FECORE_CLASS(FEPlotActualConcentration            , FEPLOTDATA_ID   , "actual concentration");
-	REGISTER_FECORE_CLASS(FEPlotEffectiveConcentration         , FEPLOTDATA_ID   , "effective concentration");
-	REGISTER_FECORE_CLASS(FEPlotConcentrationFlux			   , FEPLOTDATA_ID   , "concentration flux");
-	REGISTER_FECORE_CLASS(FEPlotSBSConcentration               , FEPLOTDATA_ID   , "sbs concentration");
-	REGISTER_FECORE_CLASS(FEPlotSBSApparentDensity             , FEPLOTDATA_ID   , "sbs apparent density");
-	REGISTER_FECORE_CLASS(FEPlotSolidVolumeFraction            , FEPLOTDATA_ID   , "solid volume fraction");
-	REGISTER_FECORE_CLASS(FESoluteFlux                         , FESURFACELOAD_ID, "soluteflux");
+	REGISTER_FECORE_CLASS(FENLReactionDiffusionSolver          , "reaction-diffusion");
+	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
+	REGISTER_FECORE_CLASS(FEReactionDiffusionMaterial          , "reaction-diffusion");
+	REGISTER_FECORE_CLASS(FEMassActionReaction                 , "mass action");
+	REGISTER_FECORE_CLASS(FEMichaelisMentenReaction            , "Michaelis-Menten");
+	REGISTER_FECORE_CLASS(FEReactiveSpecies                    , "species");
+	REGISTER_FECORE_CLASS(FESolidBoundSpecies                  , "solid_bound_species");
+	REGISTER_FECORE_CLASS(FEConcentrationFlux                  , "concentration flux");
+	REGISTER_FECORE_CLASS(FEPlotActualConcentration            , "actual concentration");
+	REGISTER_FECORE_CLASS(FEPlotEffectiveConcentration         , "effective concentration");
+	REGISTER_FECORE_CLASS(FEPlotConcentrationFlux			   , "concentration flux");
+	REGISTER_FECORE_CLASS(FEPlotSBSConcentration               , "sbs concentration");
+	REGISTER_FECORE_CLASS(FEPlotSBSApparentDensity             , "sbs apparent density");
+	REGISTER_FECORE_CLASS(FEPlotSolidVolumeFraction            , "solid volume fraction");
+	REGISTER_FECORE_CLASS(FESoluteFlux                         , "soluteflux");
 }
 
 FECORE_PLUGIN int GetSDKVersion()

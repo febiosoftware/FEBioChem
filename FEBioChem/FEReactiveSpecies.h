@@ -19,12 +19,6 @@ public:
 	void SetLocalID(int lid) { m_lid = lid; }
 	int GetLocalID() const { return m_lid; }
 
-	// get the name of this species
-	const std::string& GetName() const { return m_name; }
-
-	// used for parsing input file
-	bool SetAttribute(const char* szname, const char* szval);
-
 public:
 	// Molar mass
 	double MolarMass() const { return m_M; }
@@ -33,7 +27,6 @@ public:
 	double Density() { return m_rhoT; }
 
 protected:
-	std::string		m_name;		//!< name of species (for convenience only, should be the same as model data variable with this id)
 	int				m_id;		//!< global id of species (must be set by parent material)
 	int				m_lid;		//!< local id in parent's reaction tables
 
@@ -58,7 +51,7 @@ public:
 private:
 	double	m_diffusivity;				//!< diffusion constant
 	
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
 
 //-----------------------------------------------------------------------------
@@ -84,5 +77,5 @@ private:
 	double	m_rho0;	//!< initial apparent density
 	double	m_rhomin, m_rhomax;	//!< min, max range for apparent density
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };

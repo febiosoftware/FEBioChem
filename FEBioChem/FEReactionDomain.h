@@ -25,10 +25,12 @@ public:
 
 	void Activate() override;
 
+	const FEDofList& GetDOFList() const override;
+
 public:
 	void ForceVector(FEGlobalVector& R);
 
-	void StiffnessMatrix(FENLReactionDiffusionSolver* solver);
+	void StiffnessMatrix(FENLReactionDiffusionSolver* solver, FELinearSystem& LS);
 
 	void MassVector(FEGlobalVector& R, const vector<double>& Un);
 
@@ -48,6 +50,7 @@ public:
 
 private:
 	FEReactionDiffusionMaterial*	m_mat;
+	FEDofList	m_dofC;
 	int		m_dofV[3];	// velocity degrees of freedom
 };
 

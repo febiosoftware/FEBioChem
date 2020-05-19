@@ -2,21 +2,20 @@
 #include "FENLReactionDiffusionSolver.h"
 #include "FEReactionDomain.h"
 #include <FECore/FEModel.h>
-#include <FECore/BC.h>
 #include <FECore/log.h>
 #include <FECore/FESurfaceLoad.h>
 #include <FECore/FEGlobalMatrix.h>
+#include <FECore/FEPrescribedDOF.h>
 
-BEGIN_PARAMETER_LIST(FENLReactionDiffusionSolver, FENewtonSolver)
-	ADD_PARAMETER2(m_Ctol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Ctol");
-	ADD_PARAMETER2(m_Stol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Stol");
-	ADD_PARAMETER2(m_Rtol, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtol");
-	ADD_PARAMETER2(m_Rmin, FE_PARAM_DOUBLE, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
-	ADD_PARAMETER(m_bsymm, FE_PARAM_BOOL, "symmetric_stiffness"); 
-	ADD_PARAMETER(m_forcePositive, FE_PARAM_BOOL, "force_positive_concentrations");
-	ADD_PARAMETER(m_convection, FE_PARAM_BOOL, "convection");
-	ADD_PARAMETER2(m_alpha, FE_PARAM_DOUBLE, FE_RANGE_CLOSED(0.0, 1.0), "alpha");
-END_PARAMETER_LIST();
+BEGIN_FECORE_CLASS(FENLReactionDiffusionSolver, FENewtonSolver)
+	ADD_PARAMETER(m_Ctol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Ctol");
+	ADD_PARAMETER(m_Stol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Stol");
+	ADD_PARAMETER(m_Rtol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtol");
+	ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+	ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
+	ADD_PARAMETER(m_convection, "convection");
+	ADD_PARAMETER(m_alpha, FE_RANGE_CLOSED(0.0, 1.0), "alpha");
+END_FECORE_CLASS();
 
 FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewtonSolver(fem)
 {
@@ -34,7 +33,7 @@ FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewto
 	m_alpha = 0.5;
 
 	// we'll need a non-symmetric stiffness matrix
-	m_bsymm = false;
+	m_msymm = REAL_UNSYMMETRIC;
 
 	// Add the concentration variable
 	DOFS& dofs = fem->GetDOFS();
@@ -53,7 +52,7 @@ bool FENLReactionDiffusionSolver::Init()
 	m_F.assign(neq, 0.0);
 
 	// set the time step parameters
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FETimeInfo& tp = fem.GetTime();
 	tp.alpha = m_alpha;
 
@@ -75,7 +74,7 @@ bool FENLReactionDiffusionSolver::Init()
 
 	// evaluate the initial supply
 	vector<double> dummy(neq, 0.0);
-	FEGlobalVector R(GetFEModel(), m_Fp, dummy);
+	FEGlobalVector R(*GetFEModel(), m_Fp, dummy);
 	ForceVector(R);
 
 	return true;
@@ -103,12 +102,12 @@ bool FENLReactionDiffusionSolver::CheckConvergence(int niter, const vector<doubl
 	double normU = m_U*m_U;
 	double normR = m_R1*m_R1;
 
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FETimeInfo& tp = fem.GetTime();
-	felog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-	felog.printf("\t   residual          %15le %15le %15le \n", m_normRi, normR, (m_Rtol*m_Rtol)*m_normRi);
-	felog.printf("\t   concentration     %15le %15le %15le \n", m_normUi, normu, (m_Ctol*m_Ctol)*normU);
-	felog.printf("\t   sbm concentration %15le %15le %15le \n", m_normSi, normS, (m_Stol*m_Stol)*m_normSi);
+	feLog("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+	feLog("\t   residual          %15le %15le %15le \n", m_normRi, normR, (m_Rtol*m_Rtol)*m_normRi);
+	feLog("\t   concentration     %15le %15le %15le \n", m_normUi, normu, (m_Ctol*m_Ctol)*normU);
+	feLog("\t   sbm concentration %15le %15le %15le \n", m_normSi, normS, (m_Stol*m_Stol)*m_normSi);
 
 	// check convergence norms
 	bool bconv = true;
@@ -121,14 +120,14 @@ bool FENLReactionDiffusionSolver::CheckConvergence(int niter, const vector<doubl
 	{
 		// check for almost zero-residual on the first iteration
 		// this might be an indication that there is no load on the system
-		felog.printbox("WARNING", "No load acting on the system.");
+		feLogWarning("No load acting on the system.");
 		bconv = true;
 	}
 
 	if (bconv)
 	{
 		// store the solution
-		DOFS& DOF = GetFEModel().GetDOFS();
+		DOFS& DOF = GetFEModel()->GetDOFS();
 		vector<int> dofs;
 		DOF.GetDOFList("concentration", dofs);
 
@@ -159,7 +158,7 @@ bool FENLReactionDiffusionSolver::CheckConvergence(int niter, const vector<doubl
 
 double FENLReactionDiffusionSolver::CalculateSBMNorm()
 {
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	double normS = 0.0;
 	for (int i = 0; i<mesh.Domains(); ++i)
@@ -188,7 +187,7 @@ double FENLReactionDiffusionSolver::CalculateSBMNorm()
 
 void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 {
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 
@@ -203,14 +202,14 @@ void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 	for (int i = 0; i<fem.SurfaceLoads(); ++i)
 	{
 		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
-		sl.Residual(fem.GetTime(), R);
+		sl.LoadVector(R, fem.GetTime());
 	}
 }
 
 //! calculates the global residual vector
 bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 {
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 
@@ -220,7 +219,7 @@ bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 
 	zero(R);
 	vector<double> dummy(R);
-	FEGlobalVector RHS(GetFEModel(), R, dummy);
+	FEGlobalVector RHS(*GetFEModel(), R, dummy);
 	int neq = RHS.Size();
 
 	// evaluate force vector
@@ -250,7 +249,7 @@ bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 
 void FENLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
 {
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 	for (int n = 0; n<NDOM; ++n)
@@ -262,7 +261,7 @@ void FENLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
 
 void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
-	FEModel& fem = GetFEModel();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 	for (int ndom = 0; ndom<NDOM; ++ndom)
@@ -275,13 +274,16 @@ void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETim
 //! calculates the global stiffness matrix
 bool FENLReactionDiffusionSolver::StiffnessMatrix()
 {
+	// setup the linear system
+	FELinearSystem LS(this, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
+
 	// add contributions from domains
-	FEMesh& mesh = m_fem.GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	int NDOM = mesh.Domains();
 	for (int ndom=0; ndom<NDOM; ++ndom)
 	{
 		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(ndom));
-		if (dom) dom->StiffnessMatrix(this);
+		if (dom) dom->StiffnessMatrix(this, LS);
 	}
 
 	return true;
@@ -289,12 +291,13 @@ bool FENLReactionDiffusionSolver::StiffnessMatrix()
 
 void FENLReactionDiffusionSolver::Update(std::vector<double>& u)
 {
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	FEMesh& mesh = m_fem.GetMesh();
-	FETimeInfo& tp = m_fem.GetTime();
+	FEModel& fem = *GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
+	FEMesh& mesh = fem.GetMesh();
+	FETimeInfo& tp = fem.GetTime();
 	tp.alpha = m_alpha;
 
-	DOFS& DOF = m_fem.GetDOFS();
+	DOFS& DOF = fem.GetDOFS();
 	vector<int> dofs;
 	DOF.GetDOFList("concentration", dofs);
 
@@ -307,32 +310,16 @@ void FENLReactionDiffusionSolver::Update(std::vector<double>& u)
 		{
 			int dofk = dofs[k];
 			int n = node.m_ID[dofk]; 
-			if (n >= 0) node.inc(dofk, u[n]); 
+			if (n >= 0) node.add(dofk, u[n]); 
 		}
 	}
 
-	// enforce prescribed values
-	int nbc = m_fem.PrescribedBCs();
-	for (int i = 0; i<nbc; ++i)
+	// make sure the boundary conditions are fullfilled
+	int nbcs = fem.BoundaryConditions();
+	for (int i = 0; i<nbcs; ++i)
 	{
-		FEPrescribedDOF& dc = dynamic_cast<FEPrescribedDOF&>(*m_fem.PrescribedBC(i));
-		if (dc.IsActive())
-		{
-			int bc = dc.GetDOF();
-			for (int j = 0; j<(int)dc.Items(); ++j)
-			{
-				double D = dc.NodeValue(j);
-				int n = dc.NodeID(j);
-
-				FENode& node = mesh.Node(n);
-
-				for (int k = 0; k<(int)dofs.size(); ++k)
-				{
-					int dofk = dofs[k];
-					if (bc == dofk) { int I = -node.m_ID[bc] - 2; if (I >= 0 && I<m_neq) { node.set(bc, D); } }
-				}
-			}
-		}
+		FEBoundaryCondition& bc = *fem.BoundaryCondition(i);
+		if (bc.IsActive()) bc.Update();
 	}
 
 	// enforce all positive concentrations

@@ -58,12 +58,12 @@ public:
 	double SolidVolumeFraction(FEReactionMaterialPoint& mp);
 
 protected:
-	FEVecPropertyT<FEReactiveSpecies>	m_species;	//!< list of species active for this material
-	FEVecPropertyT<FESolidBoundSpecies> m_sbs;		//!< list of solid-bound species active for this material
-	FEVecPropertyT<FEReactionMaterial>	m_reaction;	//!< list of reactions occuring in this material
+	std::vector<FEReactiveSpecies*>	m_species;	//!< list of species active for this material
+	std::vector<FESolidBoundSpecies*> m_sbs;		//!< list of solid-bound species active for this material
+	std::vector<FEReactionMaterial*>	m_reaction;	//!< list of reactions occuring in this material
 
 private:
 	double	m_phi;		//!< solid volume fraction (of solid not explicitly modeled by SBMs; remains constant throughout analysis)
 
-	DECLARE_PARAMETER_LIST();
+	DECLARE_FECORE_CLASS();
 };
