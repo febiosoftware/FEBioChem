@@ -81,7 +81,7 @@ void FESBSPointSource::Update()
 	int sbms = mat->SolidBoundSpecies();
 	for (int j = 0; j<sbms; ++j)
 	{
-		int sbmj = mat->GetSolidBoundSpecies(j)->GetID();
+		int sbmj = mat->GetSolidBoundSpecies(j)->GetID() + 1;
 		if (sbmj == m_sbm)
 		{
 			sbmid = j;
@@ -129,7 +129,7 @@ void FESBSPointSource::ResetSBM()
 			int sbms = mat->SolidBoundSpecies();
 			for (int j = 0; j<sbms; ++j)
 			{
-				int sbmj = mat->GetSolidBoundSpecies(j)->GetID();
+				int sbmj = mat->GetSolidBoundSpecies(j)->GetID() + 1;
 				if (sbmj == m_sbm)
 				{
 					sbmid = j;

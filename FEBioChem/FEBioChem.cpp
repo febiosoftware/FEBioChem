@@ -11,6 +11,7 @@
 #include "FEMichaelisMentenReaction.h"
 #include "FEReactiveSpecies.h"
 #include "FEConcentrationFlux.h"
+#include "FESBSPointSource.h"
 #include "FEBioChemPlot.h"
 
 FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
@@ -35,6 +36,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEPlotSBSApparentDensity             , "sbs apparent density");
 	REGISTER_FECORE_CLASS(FEPlotSolidVolumeFraction            , "solid volume fraction");
 	REGISTER_FECORE_CLASS(FESoluteFlux                         , "soluteflux");
+	REGISTER_FECORE_CLASS(FESBSPointSource                     , "sbs point source");
 }
 
 FECORE_PLUGIN int GetSDKVersion()
