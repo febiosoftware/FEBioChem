@@ -159,6 +159,7 @@
     <ClInclude Include="..\..\FEBioChem\FEReactionMaterial.h" />
     <ClInclude Include="..\..\FEBioChem\FEReactiveSpecies.h" />
     <ClInclude Include="..\..\FEBioChem\FESBSPointSource.h" />
+    <ClInclude Include="..\..\FEBioChem\FESolutePointSource.h" />
     <ClInclude Include="..\..\FEBioChem\stdafx.h" />
     <ClInclude Include="..\..\FEBioChem\targetver.h" />
   </ItemGroup>
@@ -176,6 +177,7 @@
     <ClCompile Include="..\..\FEBioChem\FEReactionMaterial.cpp" />
     <ClCompile Include="..\..\FEBioChem\FEReactiveSpecies.cpp" />
     <ClCompile Include="..\..\FEBioChem\FESBSPointSource.cpp" />
+    <ClCompile Include="..\..\FEBioChem\FESolutePointSource.cpp" />
     <ClCompile Include="..\..\FEBioChem\stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

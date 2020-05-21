@@ -54,6 +54,9 @@
     <ClInclude Include="..\..\FEBioChem\FESBSPointSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioChem\FESolutePointSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioChem\dllmain.cpp">
@@ -96,6 +99,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioChem\FESBSPointSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioChem\FESolutePointSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

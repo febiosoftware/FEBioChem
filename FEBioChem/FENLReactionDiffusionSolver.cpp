@@ -4,6 +4,7 @@
 #include <FECore/FEModel.h>
 #include <FECore/log.h>
 #include <FECore/FESurfaceLoad.h>
+#include <FECore/FEBodyLoad.h>
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/FEPrescribedDOF.h>
 
@@ -203,6 +204,13 @@ void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 	{
 		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
 		sl.LoadVector(R, fem.GetTime());
+	}
+
+	// do the body loads
+	for (int i = 0; i<fem.BodyLoads(); ++i)
+	{
+		FEBodyLoad& bl = *fem.GetBodyLoad(i);
+		if (bl.IsActive()) bl.LoadVector(R, fem.GetTime());
 	}
 }
 

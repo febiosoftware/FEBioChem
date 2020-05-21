@@ -12,6 +12,7 @@
 #include "FEReactiveSpecies.h"
 #include "FEConcentrationFlux.h"
 #include "FESBSPointSource.h"
+#include "FESolutePointSource.h"
 #include "FEBioChemPlot.h"
 
 FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
@@ -37,6 +38,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEPlotSolidVolumeFraction            , "solid volume fraction");
 	REGISTER_FECORE_CLASS(FESoluteFlux                         , "soluteflux");
 	REGISTER_FECORE_CLASS(FESBSPointSource                     , "sbs point source");
+	REGISTER_FECORE_CLASS(FESolutePointSource                  , "point source");
 }
 
 FECORE_PLUGIN int GetSDKVersion()
