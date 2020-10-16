@@ -27,7 +27,6 @@ public:
 
 protected:
 	int			m_nsol;
-	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------
@@ -54,8 +53,7 @@ public:
 	bool SetFilter(const char* sz);
 
 protected:
-	std::string	m_sbmName;
-	FEModel*	m_pfem;
+	std::vector<std::string>	m_sbmName;
 };
 
 //-----------------------------------------------------------------------------

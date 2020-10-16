@@ -29,9 +29,11 @@ bool FEReactiveSpeciesBase::Init()
 			FEParameterList& pl = d.GetParameterList();
 			FEParam* p = pl.FindFromName("density");
 			if (p) { m_rhoT = p->value<double>(); }
+			if (m_rhoT <= 0.0) return false;
 
 			p = pl.FindFromName("molar_mass");
 			if (p) { m_M = p->value<double>(); }
+			if (m_M <= 0.0) return false;
 		}
 	}
 
@@ -57,8 +59,8 @@ FEReactiveSpecies::FEReactiveSpecies(FEModel* fem) : FEReactiveSpeciesBase(fem)
 //-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FESolidBoundSpecies, FEReactiveSpeciesBase)
 	ADD_PARAMETER(m_rho0, FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0");
-	ADD_PARAMETER(m_M   , FE_RANGE_GREATER(0.0), "molar_mass");
-	ADD_PARAMETER(m_rhoT, FE_RANGE_GREATER(0.0), "density");
+	ADD_PARAMETER(m_M   , "molar_mass");
+	ADD_PARAMETER(m_rhoT, "density");
 	ADD_PARAMETER(m_rhomin, FE_RANGE_GREATER_OR_EQUAL(0.0), "rhomin");
 	ADD_PARAMETER(m_rhomax, FE_RANGE_GREATER_OR_EQUAL(0.0), "rhomax");
 END_FECORE_CLASS();

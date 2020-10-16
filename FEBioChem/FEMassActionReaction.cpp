@@ -33,7 +33,7 @@ bool parseFormula(char* sz, vector<ReactionTerm>& term)
 		else if (isalpha(*ch))
 		{
 			char* ch1 = ch;
-			while (isalnum(*ch1)||(*ch=='_')) ++ch1;
+			while (isalnum(*ch1)||(*ch1=='_')||(*ch1=='-')) ++ch1;
 			char tmp = *ch1; *ch1 = 0;
 			t.second = ch; *ch1 = tmp;
 			ch = ch1;
