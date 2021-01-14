@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<febio_config version="1.0">
-	<linear_solver type="pardiso"/>
-	<import>../build/lib/libfebiochem_osx.dylib</import>
-</febio_config>

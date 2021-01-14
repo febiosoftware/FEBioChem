@@ -29,9 +29,11 @@
 		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex26.feb"/>
 		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex27.feb"/>
 		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex28.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex29.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex30.feb"/>
 	</Files>
 	<Plugins>
-		<import config="Debug">C:\Users\steve\Documents\Visual Studio 2013\Projects\Plugins\FEBioChem\VS2013\x64\Debug Dll\FEBioChem.dll</import>
-		<import config="Release">C:\Users\steve\Documents\Visual Studio 2013\Projects\Plugins\FEBioChem\VS2013\x64\Release Dll\FEBioChem.dll</import>
+		<import config="Debug">C:\Users\Steve\source\repos\FEBioChem\VS2017\FEBioChem\x64\Debug DLL\FEBioChem.dll</import>
+		<import config="Release">C:\Users\Steve\source\repos\FEBioChem\VS2017\FEBioChem\x64\Release DLL\FEBioChem.dll</import>
 	</Plugins>
 </febio_tm_session>
