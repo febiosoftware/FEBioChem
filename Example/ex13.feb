@@ -29,7 +29,7 @@
 				<rate_constant>0.1</rate_constant>
 			</reaction>
 		</material>
-		<material id="2" name="Material1" type="reaction-diffusion">
+		<material id="2" name="Material2" type="reaction-diffusion">
 			<solid_volume_fraction>0.5</solid_volume_fraction>
 			<species name="B">
 				<diffusivity>1</diffusivity>

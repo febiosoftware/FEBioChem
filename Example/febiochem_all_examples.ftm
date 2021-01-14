@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <febio_tm_session>
 	<Files>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex01.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex02.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex03.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex04.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex05.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex06.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex07.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex08.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex09.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex10.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex11.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex12.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex13.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex14.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex15.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex16.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex17.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex18.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex19.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex20.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex21.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex22.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex23.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex24.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex25.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex26.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex27.feb"/>
-		<file name="C:/Users/steve/Documents/Visual Studio 2013/Projects/Plugins/FEBioChem/Example/ex28.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex01.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex02.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex03.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex04.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex05.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex06.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex07.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex08.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex09.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex10.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex11.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex12.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex13.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex14.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex15.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex16.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex17.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex18.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex19.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex20.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex21.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex22.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex23.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex24.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex25.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex26.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex27.feb"/>
+		<file name="C:\Users\Steve\source\repos\FEBioChem\Example\ex28.feb"/>
 	</Files>
 	<Plugins>
 		<import config="Debug">C:\Users\steve\Documents\Visual Studio 2013\Projects\Plugins\FEBioChem\VS2013\x64\Debug Dll\FEBioChem.dll</import>

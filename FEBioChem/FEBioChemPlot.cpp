@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "FEBioChemPlot.h"
 #include <FECore/FEModel.h>
-#include <FEBioMix/FESolute.h>
 #include "FEReactionMaterial.h"
 #include "FEReactionDomain.h"
+#include "FEReactiveSpecies.h"
+#include <FECore/writeplot.h>
 
 //-----------------------------------------------------------------------------
 FEPlotEffectiveConcentration::FEPlotEffectiveConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_NODE)
@@ -47,7 +48,7 @@ FEPlotActualConcentration::FEPlotActualConcentration(FEModel* pfem) : FEPlotDoma
 	vector<string> s;
 	for (int i = 0; i < ndata; ++i)
 	{
-		FESoluteData* ps = dynamic_cast<FESoluteData*>(pfem->GetGlobalData(i));
+		FESpeciesData* ps = dynamic_cast<FESpeciesData*>(pfem->GetGlobalData(i));
 		if (ps)
 		{
 			s.push_back(ps->GetName());
@@ -211,7 +212,7 @@ FEPlotSBSConcentration::FEPlotSBSConcentration(FEModel* pfem) : FEPlotDomainData
 	m_sbmName.clear();
 	for (int i = 0; i < fem->GlobalDataItems(); ++i)
 	{
-		FESBMData* pd = dynamic_cast<FESBMData*>(fem->GetGlobalData(i));
+		FESolidBoundSpeciesData* pd = dynamic_cast<FESolidBoundSpeciesData*>(fem->GetGlobalData(i));
 		if (pd)
 		{
 			nsbm++;
@@ -376,5 +377,19 @@ bool FEPlotSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 
 		a << ew;
 	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotNodalVelocity::Save(FEMesh& m, FEDataStream& a)
+{
+	FEModel* fem = GetFEModel();
+	const int dof_VX = fem->GetDOFIndex("vx");
+	const int dof_VY = fem->GetDOFIndex("vy");
+	const int dof_VZ = fem->GetDOFIndex("vz");
+
+	writeNodalValues<vec3d>(m, a, [=](const FENode& node) {
+		return node.get_vec3d(dof_VX, dof_VY, dof_VZ);
+	});
 	return true;
 }

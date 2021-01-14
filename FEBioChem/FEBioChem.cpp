@@ -20,10 +20,13 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	FECoreKernel::SetInstance(&fecore);
 	fecore.RegisterDomain(new FEReactionDomainFactory);
 
+	// Reaction-diffusion module
 	fecore.CreateModule("reaction-diffusion");
 
+	REGISTER_FECORE_CLASS(FESpeciesData, "solute");
+	REGISTER_FECORE_CLASS(FESolidBoundSpeciesData, "solid_bound");
+
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionSolver          , "reaction-diffusion");
-	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEReactionDiffusionMaterial          , "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FEMassActionReaction                 , "mass action");
 	REGISTER_FECORE_CLASS(FEMichaelisMentenReaction            , "Michaelis-Menten");
@@ -39,6 +42,14 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FESoluteFlux                         , "soluteflux");
 	REGISTER_FECORE_CLASS(FESBSPointSource                     , "sbs point source");
 	REGISTER_FECORE_CLASS(FESolutePointSource                  , "point source");
+
+	// Reaction-diffusion-convection module
+	fecore.CreateModule("reaction-diffusion-convection");
+	fecore.SetModuleDependency("reaction-diffusion");
+	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
+	REGISTER_FECORE_CLASS(FEPlotNodalVelocity, "nodal velocity");
+
+	fecore.SetActiveModule(0);
 }
 
 FECORE_PLUGIN int GetSDKVersion()

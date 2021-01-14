@@ -1,5 +1,42 @@
 #pragma once
 #include <FECore/FEMaterial.h>
+#include <FECore/FEGlobalData.h>
+
+//-----------------------------------------------------------------------------
+//! Global species data
+//! This structure uniquely identifies a solute in multiphasic problems
+class FESpeciesData : public FEGlobalData
+{
+public:
+	FESpeciesData(FEModel* pfem);
+
+	//! initialization
+	bool Init() override;
+
+public:
+	double	m_rhoT;			//!< true solute density
+	double	m_M;			//!< solute molecular weight
+	int		m_z;			//!< solute charge number
+
+	DECLARE_FECORE_CLASS();
+};
+
+
+//-----------------------------------------------------------------------------
+//! Global solid-bound molecule (SBM) data.
+class FESolidBoundSpeciesData : public FEGlobalData
+{
+public:
+	FESolidBoundSpeciesData(FEModel* pfem);
+
+public:
+	double	m_rhoT;			//!< SBM true density
+	double	m_M;			//!< SBM molar mass
+	int		m_z;			//!< SBM charge number
+
+	DECLARE_FECORE_CLASS();
+};
+
 
 //-----------------------------------------------------------------------------
 // Base class for reactive species

@@ -3,6 +3,70 @@
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalData.h>
 
+
+//=============================================================================
+// FESpeciesData
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// Material parameters for FESoluteData
+BEGIN_FECORE_CLASS(FESpeciesData, FEGlobalData)
+	ADD_PARAMETER(m_rhoT, "density");
+	ADD_PARAMETER(m_M, "molar_mass");
+	ADD_PARAMETER(m_z, "charge_number");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FESpeciesData::FESpeciesData(FEModel* pfem) : FEGlobalData(pfem)
+{ 
+	m_rhoT = 1; 
+	m_M = 1; 
+	m_z = 0; 
+}
+
+//-----------------------------------------------------------------------------
+// TODO: Maybe I can use the ID to make sure the dof is not duplicated.
+bool FESpeciesData::Init()
+{
+	// for each solute we have to add a concentration degree of freedom
+	FEModel& fem = *GetFEModel();
+    DOFS& fedofs = fem.GetDOFS();
+	int varC = fedofs.GetVariableIndex("concentration");
+    int varD = fedofs.GetVariableIndex("shell concentration");
+    int varAC = fedofs.GetVariableIndex("concentration tderiv");
+	int cdofs = fedofs.GetVariableSize(varC);
+    int ddofs = fedofs.GetVariableSize(varD);
+	char sz[8] = {0};
+	sprintf(sz, "c%d", cdofs+1);
+	fedofs.AddDOF(varC, sz);
+    sprintf(sz, "d%d", ddofs+1);
+    fedofs.AddDOF(varD, sz);
+    sprintf(sz, "ac%d", cdofs+1);
+    fedofs.AddDOF(varAC, sz);
+
+	return true;
+}
+
+//=============================================================================
+// FESolidBoundSpeciesData
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// Material parameters for FESoluteData
+BEGIN_FECORE_CLASS(FESolidBoundSpeciesData, FEGlobalData)
+	ADD_PARAMETER(m_rhoT, "density"      );
+	ADD_PARAMETER(m_M   , "molar_mass"   );
+	ADD_PARAMETER(m_z   , "charge_number");
+END_FECORE_CLASS();
+
+//-----------------------------------------------------------------------------
+FESolidBoundSpeciesData::FESolidBoundSpeciesData(FEModel* pfem) : FEGlobalData(pfem)
+{ 
+	m_rhoT = 1; 
+	m_M = 1; 
+	m_z = 0; 
+}
+
 //-----------------------------------------------------------------------------
 FEReactiveSpeciesBase::FEReactiveSpeciesBase(FEModel* fem) : FEMaterial(fem)
 {

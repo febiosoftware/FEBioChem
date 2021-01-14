@@ -17,7 +17,7 @@
 				<diffusivity>1</diffusivity>
 			</species>
 		</material>
-		<material id="2" name="Material1" type="reaction-diffusion">
+		<material id="2" name="Material2" type="reaction-diffusion">
 			<solid_volume_fraction>0.5</solid_volume_fraction>
 			<species name="A">
 				<diffusivity>1</diffusivity>

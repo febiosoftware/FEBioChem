@@ -81,3 +81,13 @@ public:
 protected:
 	FEModel*	m_pfem;
 };
+
+//-----------------------------------------------------------------------------
+//! Nodal velocities
+//!
+class FEPlotNodalVelocity : public FEPlotNodeData
+{
+public:
+	FEPlotNodalVelocity(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) {}
+	bool Save(FEMesh& m, FEDataStream& a);
+};
