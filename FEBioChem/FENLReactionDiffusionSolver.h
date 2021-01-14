@@ -44,8 +44,6 @@ private:
 public:
 	double	m_Ctol;				//!< convergence tolerance
 	double	m_Stol;				//!< convergence tolerance for SBMs
-	double	m_Rtol;				//!< residual convergence tolerance
-	double	m_Rmin;				//!< min residual value
 	bool	m_forcePositive;	//!< force concentrations to remain positive
 	bool	m_convection;		//!< do convection as well
 	double	m_alpha;			//!< alpha parameter for generalized trapezoidal rule

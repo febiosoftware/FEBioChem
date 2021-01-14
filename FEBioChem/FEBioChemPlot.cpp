@@ -238,8 +238,8 @@ bool FEPlotSBSConcentration::SetFilter(const char* sz)
 			m_sbmName.push_back(name);
 			break;
 		}
-		SetVarType(PLT_FLOAT);
 	}
+	SetVarType(PLT_FLOAT);
 	return (m_sbmName.empty() == false);
 }
 
@@ -259,6 +259,8 @@ bool FEPlotSBSConcentration::Save(FEDomain &dom, FEDataStream& a)
 		FEReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName[i]);
 		if (rs) lid[i] = rs->GetLocalID();
 	}
+
+	if ((nsbm == 1) && (lid[0] == -1)) return false;
 
 	int N = dom.Elements();
 	for (int i = 0; i<N; ++i)

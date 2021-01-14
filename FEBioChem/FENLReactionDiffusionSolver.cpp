@@ -11,8 +11,7 @@
 BEGIN_FECORE_CLASS(FENLReactionDiffusionSolver, FENewtonSolver)
 	ADD_PARAMETER(m_Ctol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Ctol");
 	ADD_PARAMETER(m_Stol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Stol");
-	ADD_PARAMETER(m_Rtol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtol");
-	ADD_PARAMETER(m_Rmin, FE_RANGE_GREATER_OR_EQUAL(0.0), "min_residual");
+	ADD_PARAMETER(m_Rtol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtol");	// TODO: base class already defines rtol. Remove?
 	ADD_PARAMETER(m_forcePositive, "force_positive_concentrations");
 	ADD_PARAMETER(m_convection, "convection");
 	ADD_PARAMETER(m_alpha, FE_RANGE_CLOSED(0.0, 1.0), "alpha");
