@@ -7,11 +7,13 @@ DEP = $(patsubst $(FCDIR)$(THIS)/%.cpp, %.d, $(SRC))
 SO = lib$(PLGN)_$(PLAT).$(SFX)
 LIB = $(FCDIR)build/lib/$(SO)
 
-FECORE = $(FEBLIB)/libfecore_$(PLAT).a
+FECORE = $(FEBLIB)/libfecore.a
 
-FEBIOMECH = $(FEBLIB)/libfebiomech_$(PLAT).a
+FEBIOMECH = $(FEBLIB)/libfebiomech.a
 
-FEBIOLIBS = $(FEBIOMECH) $(FECORE)
+FEBIOMIX = $(FEBLIB)/libfebiomix.a
+
+FEBIOLIBS = $(FEBIOMIX) $(FEBIOMECH) $(FECORE)
 
 $(LIB): $(OBJ)
 ifeq ($(findstring lnx,$(PLAT)),lnx)
