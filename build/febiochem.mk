@@ -21,7 +21,7 @@ ifeq ($(findstring lnx,$(PLAT)),lnx)
 else ifeq ($(findstring gcc,$(PLAT)),gcc)
 		$(CC) $(LNKFLG) -shared -Wl,-soname,$(SO) -o $(LIB) $(OBJ) $(FEBIOLIBS)
 else ifeq ($(findstring osx,$(PLAT)),osx)
-		$(CC) -install_name @rpath/lib$(PLGN).dylib -dynamiclib $(FLG) -o $(LIB) $(OBJ) $(FEBIOLIBS) $(INTEL_LIB) -liomp5
+		$(CC) -install_name @rpath/lib$(PLGN).dylib -dynamiclib $(FLG) -o $(LIB) $(OBJ) $(FEBIOLIBS) -L/usr/local/opt/libomp/lib -lomp
 else
 		$(CC) -dynamiclib $(FLG) -o $(LIB) $(OBJ) $(FEBIOLIBS) $(INTEL_LIB) -liomp5
 endif
