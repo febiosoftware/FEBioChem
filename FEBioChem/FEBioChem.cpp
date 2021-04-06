@@ -15,6 +15,19 @@
 #include "FESolutePointSource.h"
 #include "FEBioChemPlot.h"
 
+
+FECORE_PLUGIN int GetSDKVersion()
+{
+	return FE_SDK_VERSION;
+}
+
+FECORE_PLUGIN void GetPluginVersion(int& major, int& minor, int& patch)
+{
+	major = 1;
+	minor = 0;
+	patch = 0;
+}
+
 FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 {
 	FECoreKernel::SetInstance(&fecore);
@@ -50,9 +63,4 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEPlotNodalVelocity, "nodal velocity");
 
 	fecore.SetActiveModule(0);
-}
-
-FECORE_PLUGIN int GetSDKVersion()
-{
-	return FE_SDK_VERSION;
 }
