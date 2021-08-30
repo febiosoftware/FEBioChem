@@ -55,8 +55,8 @@ FEMaterialPoint* FEReactionDiffusionMaterial::CreateMaterialPointData()
 	int nsbm = SolidBoundSpecies();
 
 	// initialize species data
-	pt->m_c.assign(nsol, 0.0);
-	pt->m_j.assign(nsol, vec3d(0, 0, 0));
+	pt->m_c.resize(nsol, 0.0);
+	pt->m_j.resize(nsol, vec3d(0, 0, 0));
 
 	// Note that ca includes both the concentration of species and solid-bound species
 	// This variable is used by the chemical reactions so that they don't need to distinguish between solutes and sbms.

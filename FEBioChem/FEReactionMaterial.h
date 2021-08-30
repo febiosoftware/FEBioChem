@@ -14,7 +14,11 @@ class FEReactionDiffusionMaterial;
 class FEReactionMaterialPoint : public FEMaterialPoint
 {
 public:
-	FEReactionMaterialPoint() {}
+	FEReactionMaterialPoint() 
+	{
+		m_pNext = nullptr;
+		m_pPrev = nullptr;
+	}
 
 	FEMaterialPoint* Copy()
 	{
