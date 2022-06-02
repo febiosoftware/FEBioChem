@@ -68,7 +68,7 @@ public:
 // variable (not only the ones active in this reaction).
 // The reaction rate is evaluated according to the law of mass action for forward reactions.
 // (NOTE: I don't think this does dimerization correctly)
-class FEReactionMaterial : public FEMaterial
+class FEReactionMaterial : public FEMaterialProperty
 {
 public:
 

@@ -34,7 +34,15 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	fecore.RegisterDomain(new FEReactionDomainFactory);
 
 	// Reaction-diffusion module
-	fecore.CreateModule("reaction-diffusion");
+	const char* info = \
+		"{ "
+		"   \"title\" : \"Reaction-Diffusion\","
+		"   \"info\"  : \"Transient reaction-diffusion analysis.\","
+		"   \"author\": \"Steve Maas\","
+		"   \"version\": \"1.0\""
+		"}";
+
+	fecore.CreateModule("reaction-diffusion", info);
 
 	REGISTER_FECORE_CLASS(FESpeciesData, "solute");
 	REGISTER_FECORE_CLASS(FESolidBoundSpeciesData, "solid_bound");

@@ -40,7 +40,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // Base class for reactive species
-class FEReactiveSpeciesBase : public FEMaterial
+class FEReactiveSpeciesBase : public FEMaterialProperty
 {
 public:
 	FEReactiveSpeciesBase(FEModel* fem);
