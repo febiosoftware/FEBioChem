@@ -42,6 +42,8 @@ public:
 // Base class for reactive species
 class FEReactiveSpeciesBase : public FEMaterialProperty
 {
+	FECORE_BASE_CLASS(FEReactiveSpeciesBase)
+
 public:
 	FEReactiveSpeciesBase(FEModel* fem);
 

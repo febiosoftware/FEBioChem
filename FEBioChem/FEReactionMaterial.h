@@ -70,6 +70,8 @@ public:
 // (NOTE: I don't think this does dimerization correctly)
 class FEReactionMaterial : public FEMaterialProperty
 {
+	FECORE_BASE_CLASS(FEReactionMaterial)
+
 public:
 
 public:

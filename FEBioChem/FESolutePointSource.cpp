@@ -90,7 +90,7 @@ void FESolutePointSource::Update()
 }
 
 //! Evaluate force vector
-void FESolutePointSource::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FESolutePointSource::LoadVector(FEGlobalVector& R)
 {
 	if (m_el == nullptr) return;
 
@@ -124,11 +124,12 @@ void FESolutePointSource::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //! evaluate stiffness matrix
-void FESolutePointSource::StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp)
+void FESolutePointSource::StiffnessMatrix(FELinearSystem& S)
 {
 	return;
 
 	// get time increment
+	const FETimeInfo& tp = GetTimeInfo();
 	double dt = tp.timeIncrement;
 
 	// get the domain in which this element resides

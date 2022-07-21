@@ -12,10 +12,10 @@ public:
 	void UnpackLM(FESurfaceElement& el, vector<int>& lm);
 
 	//! calculate stiffness matrix
-	void StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp) override;
+	void StiffnessMatrix(FELinearSystem& LS) override;
 
 	//! evaluate nodal values
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
+	void LoadVector(FEGlobalVector& R) override;
 
 private:
 	double	m_flux;	//!< flux value

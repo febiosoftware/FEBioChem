@@ -199,17 +199,10 @@ void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 	}
 
 	// do the surface loads
-	for (int i = 0; i<fem.SurfaceLoads(); ++i)
+	for (int i = 0; i<fem.ModelLoads(); ++i)
 	{
-		FESurfaceLoad& sl = *fem.SurfaceLoad(i);
-		sl.LoadVector(R, fem.GetTime());
-	}
-
-	// do the body loads
-	for (int i = 0; i<fem.BodyLoads(); ++i)
-	{
-		FEBodyLoad& bl = *fem.GetBodyLoad(i);
-		if (bl.IsActive()) bl.LoadVector(R, fem.GetTime());
+		FEModelLoad& ml = *fem.ModelLoad(i);
+		if (ml.IsActive()) ml.LoadVector(R);
 	}
 }
 

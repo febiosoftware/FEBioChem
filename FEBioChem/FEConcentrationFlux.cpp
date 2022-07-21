@@ -30,7 +30,7 @@ void FEConcentrationFlux::UnpackLM(FESurfaceElement& el, vector<int>& lm)
 	}
 }
 
-void FEConcentrationFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEConcentrationFlux::LoadVector(FEGlobalVector& R)
 {
 	vector<double> fe;
 	vector<int> lm;
@@ -92,7 +92,7 @@ void FEConcentrationFlux::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 }
 
 //! calculate stiffness matrix
-void FEConcentrationFlux::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
+void FEConcentrationFlux::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Nothing to see here! Please move on!
 }

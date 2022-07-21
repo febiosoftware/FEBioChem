@@ -14,7 +14,33 @@
 #include "FESBSPointSource.h"
 #include "FESolutePointSource.h"
 #include "FEBioChemPlot.h"
+#include <FECore/FEModule.h>
+#include <FECore/FEModel.h>
+#include "FEBioChemAnalysis.h"
 
+class FEBioChemModule : public FEModule
+{
+public:
+	FEBioChemModule() {}
+	void InitModel(FEModel* fem)
+	{
+		DOFS& dofs = fem->GetDOFS();
+		int var = dofs.AddVariable("concentration");
+		dofs.SetDOFName(var, 0, "c");
+	}
+};
+
+class FEBioChemReactModule : public FEModule
+{
+public:
+	FEBioChemReactModule() {}
+	void InitModel(FEModel* fem)
+	{
+		DOFS& dofs = fem->GetDOFS();
+		int var = dofs.AddVariable("concentration");
+		dofs.SetDOFName(var, 0, "c");
+	}
+};
 
 FECORE_PLUGIN int GetSDKVersion()
 {
@@ -42,7 +68,11 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 		"   \"version\": \"1.0\""
 		"}";
 
-	fecore.CreateModule("reaction-diffusion", info);
+	fecore.CreateModule(new FEBioChemModule, "reaction-diffusion", info);
+
+	//-----------------------------------------------------------------------------
+	// analyis classes (default type must match module name!)
+	REGISTER_FECORE_CLASS(FEBioChemAnalysis, "reaction-diffusion");
 
 	REGISTER_FECORE_CLASS(FESpeciesData, "solute");
 	REGISTER_FECORE_CLASS(FESolidBoundSpeciesData, "solid_bound");
@@ -65,7 +95,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FESolutePointSource                  , "point source");
 
 	// Reaction-diffusion-convection module
-	fecore.CreateModule("reaction-diffusion-convection");
+	fecore.CreateModule(new FEBioChemReactModule, "reaction-diffusion-convection");
 	fecore.SetModuleDependency("reaction-diffusion");
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEPlotNodalVelocity, "nodal velocity");
