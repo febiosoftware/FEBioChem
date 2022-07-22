@@ -25,20 +25,18 @@ public:
 	void InitModel(FEModel* fem)
 	{
 		DOFS& dofs = fem->GetDOFS();
-		int var = dofs.AddVariable("concentration");
-		dofs.SetDOFName(var, 0, "c");
+		int var = dofs.AddVariable("concentration", VAR_ARRAY);
 	}
 };
 
-class FEBioChemReactModule : public FEModule
+class FEBioChemConvModule : public FEModule
 {
 public:
-	FEBioChemReactModule() {}
+	FEBioChemConvModule() {}
 	void InitModel(FEModel* fem)
 	{
 		DOFS& dofs = fem->GetDOFS();
-		int var = dofs.AddVariable("concentration");
-		dofs.SetDOFName(var, 0, "c");
+		int var = dofs.AddVariable("concentration", VAR_ARRAY);
 	}
 };
 
@@ -73,6 +71,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	//-----------------------------------------------------------------------------
 	// analyis classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FEBioChemAnalysis, "reaction-diffusion");
+	REGISTER_FECORE_CLASS(FEBioChemConvAnalysis, "reaction-diffusion-convection");
 
 	REGISTER_FECORE_CLASS(FESpeciesData, "solute");
 	REGISTER_FECORE_CLASS(FESolidBoundSpeciesData, "solid_bound");
@@ -95,8 +94,11 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FESolutePointSource                  , "point source");
 
 	// Reaction-diffusion-convection module
-	fecore.CreateModule(new FEBioChemReactModule, "reaction-diffusion-convection");
+	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection");
 	fecore.SetModuleDependency("reaction-diffusion");
+
+	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection", info);
+
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEPlotNodalVelocity, "nodal velocity");
 
