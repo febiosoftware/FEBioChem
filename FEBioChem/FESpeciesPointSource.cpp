@@ -29,7 +29,7 @@ SOFTWARE.*/
 #include <FECore/FESolidDomain.h>
 
 BEGIN_FECORE_CLASS(FESpeciesPointSource, FEBodyLoad)
-	ADD_PARAMETER(m_soluteId, "species");
+	ADD_PARAMETER(m_soluteId, "species")->setEnums("$(solutes)");
 	ADD_PARAMETER(m_rate, "rate");
 	ADD_PARAMETER(m_pos.x, "x");
 	ADD_PARAMETER(m_pos.y, "y");
