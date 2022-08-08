@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 
 BEGIN_FECORE_CLASS(FESBSPointSource, FEBodyLoad)
-	ADD_PARAMETER(m_sbm, "sbs2");
+	ADD_PARAMETER(m_sbm, "sbs");
 	ADD_PARAMETER(m_pos.x, "x");
 	ADD_PARAMETER(m_pos.y, "y");
 	ADD_PARAMETER(m_pos.z, "z");
