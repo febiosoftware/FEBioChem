@@ -12,7 +12,7 @@
 #include "FEReactiveSpecies.h"
 #include "FEConcentrationFlux.h"
 #include "FESBSPointSource.h"
-#include "FESolutePointSource.h"
+#include "FESpeciesPointSource.h"
 #include "FEBioChemPlot.h"
 #include <FECore/FEModule.h>
 #include <FECore/FEModel.h>
@@ -91,7 +91,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEPlotSolidVolumeFraction            , "solid volume fraction");
 	REGISTER_FECORE_CLASS(FESoluteFlux                         , "soluteflux");
 	REGISTER_FECORE_CLASS(FESBSPointSource                     , "sbs point source");
-	REGISTER_FECORE_CLASS(FESolutePointSource                  , "point source");
+	REGISTER_FECORE_CLASS(FESpeciesPointSource                 , "point source");
 
 	// Reaction-diffusion-convection module
 	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection");

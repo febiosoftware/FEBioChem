@@ -23,12 +23,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "stdafx.h"
-#include "FESolutePointSource.h"
+#include "FESpeciesPointSource.h"
 #include "FEReactionDiffusionMaterial.h"
 #include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 
-BEGIN_FECORE_CLASS(FESolutePointSource, FEBodyLoad)
+BEGIN_FECORE_CLASS(FESpeciesPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_soluteId, "species");
 	ADD_PARAMETER(m_rate, "rate");
 	ADD_PARAMETER(m_pos.x, "x");
@@ -36,7 +36,7 @@ BEGIN_FECORE_CLASS(FESolutePointSource, FEBodyLoad)
 	ADD_PARAMETER(m_pos.z, "z");
 END_FECORE_CLASS();
 
-FESolutePointSource::FESolutePointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
+FESpeciesPointSource::FESpeciesPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
 {
 	m_dofC = -1;
 	m_soluteId = -1;
@@ -45,7 +45,7 @@ FESolutePointSource::FESolutePointSource(FEModel* fem) : FEBodyLoad(fem), m_sear
 	m_el = nullptr;
 }
 
-bool FESolutePointSource::Init()
+bool FESpeciesPointSource::Init()
 {
 	// see if the solute exists
 	FEModel* fem = GetFEModel();
@@ -62,7 +62,7 @@ bool FESolutePointSource::Init()
 	return FEBodyLoad::Init();
 }
 
-void FESolutePointSource::Update()
+void FESpeciesPointSource::Update()
 {
 	// find the element in which the point lies
 	m_q[0] = m_q[1] = m_q[2] = 0.0;
@@ -90,7 +90,7 @@ void FESolutePointSource::Update()
 }
 
 //! Evaluate force vector
-void FESolutePointSource::LoadVector(FEGlobalVector& R)
+void FESpeciesPointSource::LoadVector(FEGlobalVector& R)
 {
 	if (m_el == nullptr) return;
 
@@ -124,7 +124,7 @@ void FESolutePointSource::LoadVector(FEGlobalVector& R)
 }
 
 //! evaluate stiffness matrix
-void FESolutePointSource::StiffnessMatrix(FELinearSystem& S)
+void FESpeciesPointSource::StiffnessMatrix(FELinearSystem& S)
 {
 	return;
 
