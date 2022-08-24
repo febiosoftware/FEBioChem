@@ -17,6 +17,7 @@
 #include <FECore/FEModule.h>
 #include <FECore/FEModel.h>
 #include "FEBioChemAnalysis.h"
+#include <FECore/FEModelUpdate.h>
 
 class FEBioChemModule : public FEModule
 {
@@ -101,6 +102,10 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 
 	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEPlotNodalVelocity, "nodal velocity");
+
+	// model update requests
+	fecore.OnCreateEvent(AddPlotVariableWhenCreating<FEBioChemAnalysis>("concentration"));
+	fecore.OnCreateEvent(AddPlotVariableWhenCreating<FEBioChemConvAnalysis>("concentration"));
 
 	fecore.SetActiveModule(0);
 }
