@@ -4,7 +4,7 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FEReactionMaterial::FEReactionMaterial(FEModel* fem) : FEMaterial(fem)
+FEReactionMaterial::FEReactionMaterial(FEModel* fem) : FEMaterialProperty(fem)
 {
 	m_pRDM = 0;
 }
@@ -25,7 +25,7 @@ bool FEReactionMaterial::Init()
 	if (m_pRDM == 0) return false; //MaterialError("No parent material set for reaction material");
 
 	// base class initialization
-	if (FEMaterial::Init() == false) return false;
+	if (FEMaterialProperty::Init() == false) return false;
 
 	return true;
 }

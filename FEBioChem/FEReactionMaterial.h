@@ -11,7 +11,7 @@ class FEReactionDiffusionMaterial;
 // The reaction material point stores the current concentration values at the integration point. 
 // Note that it stores the values of all concentration degrees of freedom, not only
 // the dofs that are active in the domain that this material point belongs to.
-class FEReactionMaterialPoint : public FEMaterialPoint
+class FEReactionMaterialPoint : public FEMaterialPointData
 {
 public:
 	FEReactionMaterialPoint() 
@@ -20,7 +20,7 @@ public:
 		m_pPrev = nullptr;
 	}
 
-	FEMaterialPoint* Copy()
+	FEMaterialPointData* Copy()
 	{
 		FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;
 		pt->m_c = m_c;
@@ -72,8 +72,10 @@ public:
 // variable (not only the ones active in this reaction).
 // The reaction rate is evaluated according to the law of mass action for forward reactions.
 // (NOTE: I don't think this does dimerization correctly)
-class FEReactionMaterial : public FEMaterial
+class FEReactionMaterial : public FEMaterialProperty
 {
+	FECORE_BASE_CLASS(FEReactionMaterial)
+
 public:
 
 public:

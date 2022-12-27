@@ -3,7 +3,8 @@ listed below.
 
 See Copyright-FEBio.txt for details.
 
-Copyright (c) 2019 University of Utah, Columbia University, and others.
+Copyright (c) 2020 University of Utah, The Trustees of Columbia University in
+the City of New York, and others.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,37 +23,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
-#pragma once
-#include <FECore/FEBodyLoad.h>
-#include <FECore/FEOctreeSearch.h>
+#include "FEInitialConcentration.h"
 
-class FESolidElement;
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialConcentration, FEInitialCondition)
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)")->setLongName("Species");
+	ADD_PARAMETER(m_data, "value");
+END_FECORE_CLASS();
 
-class FESolutePointSource : public FEBodyLoad
+FEInitialConcentration::FEInitialConcentration(FEModel* fem) : FEInitialDOF(fem)
 {
-public:
-	FESolutePointSource(FEModel* fem);
-
-	bool Init() override;
-
-	void Update() override;
-
-	//! Evaluate force vector
-	void LoadVector(FEGlobalVector& R, const FETimeInfo& tp) override;
-
-	//! evaluate stiffness matrix
-	void StiffnessMatrix(FELinearSystem& S, const FETimeInfo& tp) override;
-
-private:
-	int		m_soluteId;	//!< solute ID
-	double	m_rate;		//!< production rate
-	vec3d	m_pos;		//!< position of source
-
-private:
-	FEOctreeSearch		m_search;
-	FESolidElement*		m_el;
-	double				m_q[3];
-	int					m_dofC;
-
-	DECLARE_FECORE_CLASS();
-};
+}

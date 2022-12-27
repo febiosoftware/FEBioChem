@@ -68,7 +68,7 @@ FESolidBoundSpeciesData::FESolidBoundSpeciesData(FEModel* pfem) : FEGlobalData(p
 }
 
 //-----------------------------------------------------------------------------
-FEReactiveSpeciesBase::FEReactiveSpeciesBase(FEModel* fem) : FEMaterial(fem)
+FEReactiveSpeciesBase::FEReactiveSpeciesBase(FEModel* fem) : FEMaterialProperty(fem)
 {
 	// set to invalid ID
 	m_id = -1;
@@ -102,7 +102,7 @@ bool FEReactiveSpeciesBase::Init()
 	}
 
 	if (m_id < 0) return false;// MaterialError("Invalid species ID");
-	return FEMaterial::Init();
+	return FEMaterialProperty::Init();
 }
 
 //=================================================================================================

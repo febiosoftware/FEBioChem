@@ -45,7 +45,7 @@ bool FEReactionDiffusionMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPoint* FEReactionDiffusionMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEReactionDiffusionMaterial::CreateMaterialPointData()
 {
 	// create a new reaction material point
 	FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;

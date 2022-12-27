@@ -31,7 +31,7 @@ public:
 	double GetReactionRateStiffness(FEReactionMaterialPoint& mp, int idA, int idB);
 
 	// create a material point
-	FEMaterialPoint* CreateMaterialPointData();
+	FEMaterialPointData* CreateMaterialPointData() override;
 
 	// number of species active in this domain
 	int Species() const { return (int) m_species.size(); }
