@@ -100,7 +100,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 
 	// Reaction-diffusion-convection module
 	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection");
-	fecore.SetModuleDependency("reaction-diffusion");
+	fecore.AddModuleDependency("reaction-diffusion");
 
 	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection", info);
 
