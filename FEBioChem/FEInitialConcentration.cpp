@@ -24,6 +24,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 #include "FEInitialConcentration.h"
+#include <FECore/FEMaterialPoint.h>
+#include <FECore/FENode.h>
 
 //=============================================================================
 BEGIN_FECORE_CLASS(FEInitialConcentration, FEInitialCondition)
@@ -32,5 +34,15 @@ BEGIN_FECORE_CLASS(FEInitialConcentration, FEInitialCondition)
 END_FECORE_CLASS();
 
 FEInitialConcentration::FEInitialConcentration(FEModel* fem) : FEInitialDOF(fem)
+{
+}
+
+//=============================================================================
+BEGIN_FECORE_CLASS(FEInitialVelocity, FEInitialCondition)
+	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:velocity)")->setLongName("velocity");
+	ADD_PARAMETER(m_data, "value");
+END_FECORE_CLASS();
+
+FEInitialVelocity::FEInitialVelocity(FEModel* fem) : FEInitialDOF(fem)
 {
 }

@@ -32,3 +32,10 @@ public:
 	FEInitialConcentration(FEModel* fem);
 	DECLARE_FECORE_CLASS();
 };
+
+class FEInitialVelocity : public FEInitialDOF
+{
+public:
+	FEInitialVelocity(FEModel* fem);
+	DECLARE_FECORE_CLASS();
+};

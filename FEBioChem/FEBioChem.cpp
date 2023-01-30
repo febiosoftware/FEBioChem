@@ -19,6 +19,7 @@
 #include "FEBioChemAnalysis.h"
 #include <FECore/FEModelUpdate.h>
 #include "FEInitialConcentration.h"
+#include "FEConcentrationBC.h"
 
 class FEBioChemModule : public FEModule
 {
@@ -85,6 +86,8 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEReactiveSpecies                    , "species");
 	REGISTER_FECORE_CLASS(FESolidBoundSpecies                  , "solid_bound_species");
 	REGISTER_FECORE_CLASS(FEConcentrationFlux                  , "concentration flux");
+	REGISTER_FECORE_CLASS(FEFixedConcentration                 , "zero concentration");
+	REGISTER_FECORE_CLASS(FEPrescribedConcentration            , "prescribed concentration");
 	REGISTER_FECORE_CLASS(FEPlotActualConcentration            , "actual concentration");
 	REGISTER_FECORE_CLASS(FEPlotEffectiveConcentration         , "effective concentration");
 	REGISTER_FECORE_CLASS(FEPlotConcentrationFlux			   , "concentration flux");
@@ -96,6 +99,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FESpeciesPointSource                 , "point source");
 
 	REGISTER_FECORE_CLASS(FEInitialConcentration, "initial concentration");
+	REGISTER_FECORE_CLASS(FEInitialVelocity     , "initial velocity");
 
 
 	// Reaction-diffusion-convection module
