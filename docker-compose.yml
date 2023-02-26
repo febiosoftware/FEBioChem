@@ -1,0 +1,18 @@
+version: "3"
+services:
+  febiochem: &default
+    image: febiosoftware/febio:ubuntu-22.04
+    working_dir: /FEBioChem
+    volumes:
+      - ../febio-sdk:/febio-sdk
+      - ./:/FEBioChem
+
+  febiochem-dev:
+    <<: *default
+    container_name: febiochem-dev
+    command: sleep infinity
+
+  febiochem-build:
+    <<: *default
+    container_name: febiochem-build
+    command: bash -c "ci/linux/git-safe.sh && ci/linux/build.sh"
