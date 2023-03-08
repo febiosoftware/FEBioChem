@@ -10,14 +10,14 @@
 
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
-BEGIN_FECORE_CLASS(FESpeciesData, FEGlobalData)
+BEGIN_FECORE_CLASS(FEChemSpeciesData, FEGlobalData)
 	ADD_PARAMETER(m_rhoT, "density");
 	ADD_PARAMETER(m_M, "molar_mass");
 	ADD_PARAMETER(m_z, "charge_number");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESpeciesData::FESpeciesData(FEModel* pfem) : FEGlobalData(pfem)
+FEChemSpeciesData::FEChemSpeciesData(FEModel* pfem) : FEGlobalData(pfem)
 { 
 	m_rhoT = 1; 
 	m_M = 1; 
@@ -26,7 +26,7 @@ FESpeciesData::FESpeciesData(FEModel* pfem) : FEGlobalData(pfem)
 
 //-----------------------------------------------------------------------------
 // TODO: Maybe I can use the ID to make sure the dof is not duplicated.
-bool FESpeciesData::Init()
+bool FEChemSpeciesData::Init()
 {
 	// for each solute we have to add a concentration degree of freedom
 	FEModel& fem = *GetFEModel();
@@ -53,14 +53,14 @@ bool FESpeciesData::Init()
 
 //-----------------------------------------------------------------------------
 // Material parameters for FESoluteData
-BEGIN_FECORE_CLASS(FESolidBoundSpeciesData, FEGlobalData)
+BEGIN_FECORE_CLASS(FEChemSolidBoundSpeciesData, FEGlobalData)
 	ADD_PARAMETER(m_rhoT, "density"      );
 	ADD_PARAMETER(m_M   , "molar_mass"   );
 	ADD_PARAMETER(m_z   , "charge_number");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESolidBoundSpeciesData::FESolidBoundSpeciesData(FEModel* pfem) : FEGlobalData(pfem)
+FEChemSolidBoundSpeciesData::FEChemSolidBoundSpeciesData(FEModel* pfem) : FEGlobalData(pfem)
 { 
 	m_rhoT = 1; 
 	m_M = 1; 
@@ -68,7 +68,7 @@ FESolidBoundSpeciesData::FESolidBoundSpeciesData(FEModel* pfem) : FEGlobalData(p
 }
 
 //-----------------------------------------------------------------------------
-FEReactiveSpeciesBase::FEReactiveSpeciesBase(FEModel* fem) : FEMaterialProperty(fem)
+FEChemReactiveSpeciesBase::FEChemReactiveSpeciesBase(FEModel* fem) : FEMaterialProperty(fem)
 {
 	// set to invalid ID
 	m_id = -1;
@@ -76,7 +76,7 @@ FEReactiveSpeciesBase::FEReactiveSpeciesBase(FEModel* fem) : FEMaterialProperty(
 }
 
 //-----------------------------------------------------------------------------
-bool FEReactiveSpeciesBase::Init()
+bool FEChemReactiveSpeciesBase::Init()
 {
 	// find the species with this name
 	FEModel& fem = *GetFEModel();
@@ -108,12 +108,12 @@ bool FEReactiveSpeciesBase::Init()
 //=================================================================================================
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEReactiveSpecies, FEReactiveSpeciesBase)
+BEGIN_FECORE_CLASS(FEChemReactiveSpecies, FEChemReactiveSpeciesBase)
 	ADD_PARAMETER(m_diffusivity, FE_RANGE_GREATER_OR_EQUAL(0.0), "diffusivity");
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEReactiveSpecies::FEReactiveSpecies(FEModel* fem) : FEReactiveSpeciesBase(fem)
+FEChemReactiveSpecies::FEChemReactiveSpecies(FEModel* fem) : FEChemReactiveSpeciesBase(fem)
 {
 	m_diffusivity = 0.0;
 }
@@ -121,7 +121,7 @@ FEReactiveSpecies::FEReactiveSpecies(FEModel* fem) : FEReactiveSpeciesBase(fem)
 //=================================================================================================
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FESolidBoundSpecies, FEReactiveSpeciesBase)
+BEGIN_FECORE_CLASS(FEChemSolidBoundSpecies, FEChemReactiveSpeciesBase)
 	ADD_PARAMETER(m_rho0, FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0");
 	ADD_PARAMETER(m_M   , "molar_mass");
 	ADD_PARAMETER(m_rhoT, "density");
@@ -130,7 +130,7 @@ BEGIN_FECORE_CLASS(FESolidBoundSpecies, FEReactiveSpeciesBase)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FESolidBoundSpecies::FESolidBoundSpecies(FEModel* fem) : FEReactiveSpeciesBase(fem)
+FEChemSolidBoundSpecies::FEChemSolidBoundSpecies(FEModel* fem) : FEChemReactiveSpeciesBase(fem)
 {
 	m_rho0 = 0.0;
 	m_M = 0.0;

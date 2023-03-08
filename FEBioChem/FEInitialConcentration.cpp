@@ -28,21 +28,21 @@ SOFTWARE.*/
 #include <FECore/FENode.h>
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEInitialConcentration, FEInitialCondition)
+BEGIN_FECORE_CLASS(FEChemInitialConcentration, FEInitialCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)")->setLongName("Species");
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FEInitialConcentration::FEInitialConcentration(FEModel* fem) : FEInitialDOF(fem)
+FEChemInitialConcentration::FEChemInitialConcentration(FEModel* fem) : FEInitialDOF(fem)
 {
 }
 
 //=============================================================================
-BEGIN_FECORE_CLASS(FEInitialVelocity, FEInitialCondition)
+BEGIN_FECORE_CLASS(FEChemInitialVelocity, FEInitialCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:velocity)")->setLongName("velocity");
 	ADD_PARAMETER(m_data, "value");
 END_FECORE_CLASS();
 
-FEInitialVelocity::FEInitialVelocity(FEModel* fem) : FEInitialDOF(fem)
+FEChemInitialVelocity::FEChemInitialVelocity(FEModel* fem) : FEInitialDOF(fem)
 {
 }

@@ -5,14 +5,14 @@
 
 //-----------------------------------------------------------------------------
 // Define parameter list
-BEGIN_FECORE_CLASS(FEMichaelisMentenReaction, FEReactionMaterial)
+BEGIN_FECORE_CLASS(FEChemMichaelisMentenReaction, FEChemReactionMaterial)
 	ADD_PARAMETER(m_Rmax, FE_RANGE_GREATER_OR_EQUAL(0.0), "max_rate");
 	ADD_PARAMETER(m_Km  , FE_RANGE_GREATER(0.0), "Km");
 	ADD_PARAMETER(m_sub , "substrate");
 	ADD_PARAMETER(m_prd, "product");
 END_FECORE_CLASS();
 
-FEMichaelisMentenReaction::FEMichaelisMentenReaction(FEModel* fem) : FEReactionMaterial(fem)
+FEChemMichaelisMentenReaction::FEChemMichaelisMentenReaction(FEModel* fem) : FEChemReactionMaterial(fem)
 {
 	m_Rmax = 0.0;
 	m_Km = 0.0; // invalid!
@@ -23,17 +23,17 @@ FEMichaelisMentenReaction::FEMichaelisMentenReaction(FEModel* fem) : FEReactionM
 	m_prdID = -1;
 }
 
-bool FEMichaelisMentenReaction::Init()
+bool FEChemMichaelisMentenReaction::Init()
 {
 	// check base class first
-	if (FEReactionMaterial::Init() == false) return false;
+	if (FEChemReactionMaterial::Init() == false) return false;
 
 	// Find the subtrate
-	FEReactiveSpeciesBase* sub = m_pRDM->FindSpecies(m_sub);
+	FEChemReactiveSpeciesBase* sub = m_pRDM->FindSpecies(m_sub);
 	if (sub == 0) return false; // MaterialError("Cannot find substrate. Check the name.");
 
 	// find the product
-	FEReactiveSpeciesBase* prd = m_pRDM->FindSpecies(m_prd);
+	FEChemReactiveSpeciesBase* prd = m_pRDM->FindSpecies(m_prd);
 	if (prd == 0) return false; // MaterialError("Cannot find product. Check the name.");
 
 	// get the number of species for this material
@@ -62,7 +62,7 @@ bool FEMichaelisMentenReaction::Init()
 }
 
 //! Evaluate the reaction rate at this integration point
-double FEMichaelisMentenReaction::GetReactionRate(FEReactionMaterialPoint& pt)
+double FEChemMichaelisMentenReaction::GetReactionRate(FEChemReactionMaterialPoint& pt)
 {
 	// concentration values at integration points
 	vector<double>& c = pt.m_ca;
@@ -77,7 +77,7 @@ double FEMichaelisMentenReaction::GetReactionRate(FEReactionMaterialPoint& pt)
 }
 
 //! Evaluate derivative of reaction rate wrt to species Id
-double FEMichaelisMentenReaction::GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id)
+double FEChemMichaelisMentenReaction::GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id)
 {
 	// NOTE: I don't think I need to do anything special, but we should not calculate a derivative if id is an sbm
 	if (id != m_subID) return 0.0;

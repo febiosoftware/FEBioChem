@@ -28,10 +28,10 @@ SOFTWARE.*/
 
 class FESolidElement;
 
-class FESpeciesPointSource : public FEBodyLoad
+class FEChemSpeciesPointSource : public FEBodyLoad
 {
 public:
-	FESpeciesPointSource(FEModel* fem);
+	FEChemSpeciesPointSource(FEModel* fem);
 
 	bool Init() override;
 

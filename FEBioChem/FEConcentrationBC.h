@@ -2,10 +2,10 @@
 #include <FECore/FEFixedBC.h>
 #include <FECore/FEPrescribedDOF.h>
 
-class FEFixedConcentration : public FEFixedBC
+class FEChemFixedConcentration : public FEFixedBC
 {
 public:
-	FEFixedConcentration(FEModel* fem);
+	FEChemFixedConcentration(FEModel* fem);
 	bool Init() override;
 
 private:
@@ -14,10 +14,10 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEPrescribedConcentration : public FEPrescribedDOF
+class FEChemPrescribedConcentration : public FEPrescribedDOF
 {
 public:
-	FEPrescribedConcentration(FEModel* fem);
+	FEChemPrescribedConcentration(FEModel* fem);
 
 	DECLARE_FECORE_CLASS();
 };

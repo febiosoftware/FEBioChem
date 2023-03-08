@@ -6,10 +6,10 @@ class FEGlobalVector;
 //-----------------------------------------------------------------------------
 // A reaction-diffusion solver that uses the Newton method for dealing with
 // the nonlinearities of the problem.
-class FENLReactionDiffusionSolver : public FENewtonSolver
+class FEChemNLReactionDiffusionSolver : public FENewtonSolver
 {
 public:
-	FENLReactionDiffusionSolver(FEModel* fem);
+	FEChemNLReactionDiffusionSolver(FEModel* fem);
 
 	//! initialization
 	bool Init();

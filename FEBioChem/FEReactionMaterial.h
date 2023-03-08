@@ -5,16 +5,16 @@
 #include <string>
 using namespace std;
 
-class FEReactionDiffusionMaterial;
+class FEChemReactionDiffusionMaterial;
 
 //-----------------------------------------------------------------------------
 // The reaction material point stores the current concentration values at the integration point. 
 // Note that it stores the values of all concentration degrees of freedom, not only
 // the dofs that are active in the domain that this material point belongs to.
-class FEReactionMaterialPoint : public FEMaterialPointData
+class FEChemReactionMaterialPoint : public FEMaterialPointData
 {
 public:
-	FEReactionMaterialPoint() 
+	FEChemReactionMaterialPoint()
 	{
 		m_pNext = nullptr;
 		m_pPrev = nullptr;
@@ -22,7 +22,7 @@ public:
 
 	FEMaterialPointData* Copy()
 	{
-		FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;
+		FEChemReactionMaterialPoint* pt = new FEChemReactionMaterialPoint;
 		pt->m_c = m_c;
 		pt->m_ca = m_ca;
 		pt->m_j = m_j;
@@ -72,28 +72,28 @@ public:
 // variable (not only the ones active in this reaction).
 // The reaction rate is evaluated according to the law of mass action for forward reactions.
 // (NOTE: I don't think this does dimerization correctly)
-class FEReactionMaterial : public FEMaterialProperty
+class FEChemReactionMaterial : public FEMaterialProperty
 {
-	FECORE_BASE_CLASS(FEReactionMaterial)
+	FECORE_BASE_CLASS(FEChemReactionMaterial)
 
 public:
 
 public:
-	FEReactionMaterial(FEModel* fem);
+	FEChemReactionMaterial(FEModel* fem);
 
 	//! one-time initialization
 	bool Init();
 
 	//! set the parent material
-	void SetReactionDiffusionParent(FEReactionDiffusionMaterial* mat);
+	void SetReactionDiffusionParent(FEChemReactionDiffusionMaterial* mat);
 
 public:
 
 	//! Evaluate the reaction rate at this integration point
-	virtual double GetReactionRate(FEReactionMaterialPoint& pt) = 0;
+	virtual double GetReactionRate(FEChemReactionMaterialPoint& pt) = 0;
 
 	//! Evaluate derivative of reaction rate wrt to species Id
-	virtual double GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id) = 0;
+	virtual double GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id) = 0;
 
 public:
 	vector<int>	m_vR;	//!< stoichiometric coefficients for reactants
@@ -101,5 +101,5 @@ public:
 	vector<int>	m_v;	//!< net stoichiometric coefficients (vP - vR)
 
 protected:
-	FEReactionDiffusionMaterial*	m_pRDM;	//!< parent reaction-diffusion material (will be set by parent during Init)
+	FEChemReactionDiffusionMaterial*	m_pRDM;	//!< parent reaction-diffusion material (will be set by parent during Init)
 };

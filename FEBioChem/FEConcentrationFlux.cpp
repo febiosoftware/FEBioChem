@@ -2,20 +2,20 @@
 #include "FEConcentrationFlux.h"
 #include <FECore/FEMesh.h>
 
-BEGIN_FECORE_CLASS(FEConcentrationFlux, FESurfaceLoad)
+BEGIN_FECORE_CLASS(FEChemConcentrationFlux, FESurfaceLoad)
 	ADD_PARAMETER(m_flux, "flux");
 	ADD_PARAMETER(m_cid , "solute_id");
 END_FECORE_CLASS();
 
 //! Constructor
-FEConcentrationFlux::FEConcentrationFlux(FEModel* fem) : FESurfaceLoad(fem)
+FEChemConcentrationFlux::FEChemConcentrationFlux(FEModel* fem) : FESurfaceLoad(fem)
 {
 	m_flux = 0.0;
 	m_cid = -1;
 }
 
 //! unpack LM vector
-void FEConcentrationFlux::UnpackLM(FESurfaceElement& el, vector<int>& lm)
+void FEChemConcentrationFlux::UnpackLM(FESurfaceElement& el, vector<int>& lm)
 {
 	FEMesh& mesh = *GetSurface().GetMesh();
 	int neln = el.Nodes();
@@ -30,7 +30,7 @@ void FEConcentrationFlux::UnpackLM(FESurfaceElement& el, vector<int>& lm)
 	}
 }
 
-void FEConcentrationFlux::LoadVector(FEGlobalVector& R)
+void FEChemConcentrationFlux::LoadVector(FEGlobalVector& R)
 {
 	vector<double> fe;
 	vector<int> lm;
@@ -92,14 +92,14 @@ void FEConcentrationFlux::LoadVector(FEGlobalVector& R)
 }
 
 //! calculate stiffness matrix
-void FEConcentrationFlux::StiffnessMatrix(FELinearSystem& LS)
+void FEChemConcentrationFlux::StiffnessMatrix(FELinearSystem& LS)
 {
 	// Nothing to see here! Please move on!
 }
 
 //=================================================================================================
-BEGIN_FECORE_CLASS(FESoluteFlux, FEConcentrationFlux)
+BEGIN_FECORE_CLASS(FEChemSoluteFlux, FEChemConcentrationFlux)
 	ADD_PARAMETER(m_blinear, "linear");
 END_FECORE_CLASS();
 
-FESoluteFlux::FESoluteFlux(FEModel* fem) : FEConcentrationFlux(fem) {}
+FEChemSoluteFlux::FEChemSoluteFlux(FEModel* fem) : FEChemConcentrationFlux(fem) {}

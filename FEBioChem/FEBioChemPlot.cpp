@@ -7,7 +7,7 @@
 #include <FECore/writeplot.h>
 
 //-----------------------------------------------------------------------------
-FEPlotEffectiveConcentration::FEPlotEffectiveConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_NODE)
+FEChemPlotEffectiveConcentration::FEChemPlotEffectiveConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_NODE)
 {
 	m_pfem = pfem;
 	m_nsol = -1;
@@ -15,14 +15,14 @@ FEPlotEffectiveConcentration::FEPlotEffectiveConcentration(FEModel* pfem) : FEPl
 
 //-----------------------------------------------------------------------------
 // Resolve solute by solute ID
-bool FEPlotEffectiveConcentration::SetFilter(const char* sz)
+bool FEChemPlotEffectiveConcentration::SetFilter(const char* sz)
 {
 	m_nsol = m_pfem->GetDOFIndex(sz);
 	return (m_nsol != -1);
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveConcentration::Save(FEDomain &dom, FEDataStream& a)
+bool FEChemPlotEffectiveConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	// make sure we have a valid index
 	if (m_nsol == -1) return false;
@@ -37,7 +37,7 @@ bool FEPlotEffectiveConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotActualConcentration::FEPlotActualConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
+FEChemPlotActualConcentration::FEChemPlotActualConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
 	DOFS& dofs = pfem->GetDOFS();
 	int nsol = dofs.GetVariableSize("concentration");
@@ -48,7 +48,7 @@ FEPlotActualConcentration::FEPlotActualConcentration(FEModel* pfem) : FEPlotDoma
 	vector<string> s;
 	for (int i = 0; i < ndata; ++i)
 	{
-		FESpeciesData* ps = dynamic_cast<FESpeciesData*>(pfem->GetGlobalData(i));
+		FEChemSpeciesData* ps = dynamic_cast<FEChemSpeciesData*>(pfem->GetGlobalData(i));
 		if (ps)
 		{
 			s.push_back(ps->GetName());
@@ -62,7 +62,7 @@ FEPlotActualConcentration::FEPlotActualConcentration(FEModel* pfem) : FEPlotDoma
 
 //-----------------------------------------------------------------------------
 // Resolve solute by solute ID
-bool FEPlotActualConcentration::SetFilter(const char* sz)
+bool FEChemPlotActualConcentration::SetFilter(const char* sz)
 {
 	m_nsol = GetFEModel()->GetDOFIndex(sz);
 	if (m_nsol >= 0)
@@ -73,15 +73,15 @@ bool FEPlotActualConcentration::SetFilter(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotActualConcentration::Save(FEDomain &dom, FEDataStream& a)
+bool FEChemPlotActualConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
-	FEReactionDomain& rdom = static_cast<FEReactionDomain&>(dom);
+	FEChemReactionDomain& rdom = static_cast<FEChemReactionDomain&>(dom);
 
-	FEReactionDiffusionMaterial* mat = dynamic_cast<FEReactionDiffusionMaterial*>(rdom.GetMaterial());
+	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(rdom.GetMaterial());
 
 	if (m_nsol >= 0)
 	{
-		FEReactiveSpecies* rs = mat->FindSpeciesFromGlobalID(m_nsol);
+		FEChemReactiveSpecies* rs = mat->FindSpeciesFromGlobalID(m_nsol);
 		if (rs == 0) return false;
 
 		int nsol = rs->GetLocalID();
@@ -96,7 +96,7 @@ bool FEPlotActualConcentration::Save(FEDomain &dom, FEDataStream& a)
 			for (int j = 0; j < el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-				FEReactionMaterialPoint* pt = (mp.ExtractData<FEReactionMaterialPoint>());
+				FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
 
 				if (pt) ew += pt->m_ca[nsol];
 			}
@@ -115,7 +115,7 @@ bool FEPlotActualConcentration::Save(FEDomain &dom, FEDataStream& a)
 		int negs = 0;
 		for (int i = 0; i < nsols; ++i)
 		{
-			FEReactiveSpecies* rs = mat->FindSpeciesFromGlobalID(i);
+			FEChemReactiveSpecies* rs = mat->FindSpeciesFromGlobalID(i);
 			if (rs) lid[i] = rs->GetLocalID();
 			if (lid[i] < 0) negs++;
 		}
@@ -138,7 +138,7 @@ bool FEPlotActualConcentration::Save(FEDomain &dom, FEDataStream& a)
 					for (int j = 0; j < el.GaussPoints(); ++j)
 					{
 						FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-						FEReactionMaterialPoint* pt = (mp.ExtractData<FEReactionMaterialPoint>());
+						FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
 
 						if (pt) ew += pt->m_ca[nsid];
 					}
@@ -153,7 +153,7 @@ bool FEPlotActualConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotConcentrationFlux::FEPlotConcentrationFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM)
+FEChemPlotConcentrationFlux::FEChemPlotConcentrationFlux(FEModel* pfem) : FEPlotDomainData(pfem, PLT_VEC3F, FMT_ITEM)
 {
 	m_pfem = pfem;
 	m_nsol = -1;
@@ -161,22 +161,22 @@ FEPlotConcentrationFlux::FEPlotConcentrationFlux(FEModel* pfem) : FEPlotDomainDa
 
 //-----------------------------------------------------------------------------
 // Resolve solute by solute ID
-bool FEPlotConcentrationFlux::SetFilter(const char* sz)
+bool FEChemPlotConcentrationFlux::SetFilter(const char* sz)
 {
 	m_nsol = m_pfem->GetDOFIndex(sz);
 	return (m_nsol != -1);
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotConcentrationFlux::Save(FEDomain &dom, FEDataStream& a)
+bool FEChemPlotConcentrationFlux::Save(FEDomain &dom, FEDataStream& a)
 {
 	// make sure we have a valid index
 	if (m_nsol == -1) return false;
 
-	FEReactionDomain& rdom = static_cast<FEReactionDomain&>(dom);
+	FEChemReactionDomain& rdom = static_cast<FEChemReactionDomain&>(dom);
 
-	FEReactionDiffusionMaterial* mat = dynamic_cast<FEReactionDiffusionMaterial*>(rdom.GetMaterial());
-	FEReactiveSpecies* rs = mat->FindSpeciesFromGlobalID(m_nsol);
+	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(rdom.GetMaterial());
+	FEChemReactiveSpecies* rs = mat->FindSpeciesFromGlobalID(m_nsol);
 	if (rs == 0) return false;
 
 	int nsol = rs->GetLocalID();
@@ -191,7 +191,7 @@ bool FEPlotConcentrationFlux::Save(FEDomain &dom, FEDataStream& a)
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			FEReactionMaterialPoint* pt = (mp.ExtractData<FEReactionMaterialPoint>());
+			FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
 
 			if (pt) ew += pt->m_j[nsol];
 		}
@@ -204,7 +204,7 @@ bool FEPlotConcentrationFlux::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotSBSConcentration::FEPlotSBSConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
+FEChemPlotSBSConcentration::FEChemPlotSBSConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
 	FEModel* fem = pfem;
 
@@ -212,7 +212,7 @@ FEPlotSBSConcentration::FEPlotSBSConcentration(FEModel* pfem) : FEPlotDomainData
 	m_sbmName.clear();
 	for (int i = 0; i < fem->GlobalDataItems(); ++i)
 	{
-		FESolidBoundSpeciesData* pd = dynamic_cast<FESolidBoundSpeciesData*>(fem->GetGlobalData(i));
+		FEChemSolidBoundSpeciesData* pd = dynamic_cast<FEChemSolidBoundSpeciesData*>(fem->GetGlobalData(i));
 		if (pd)
 		{
 			nsbm++;
@@ -225,7 +225,7 @@ FEPlotSBSConcentration::FEPlotSBSConcentration(FEModel* pfem) : FEPlotDomainData
 
 //-----------------------------------------------------------------------------
 // Resolve sbm by name
-bool FEPlotSBSConcentration::SetFilter(const char* sz)
+bool FEChemPlotSBSConcentration::SetFilter(const char* sz)
 {
 	FEModel* fem = GetFEModel();
 	string name(sz);
@@ -244,19 +244,19 @@ bool FEPlotSBSConcentration::SetFilter(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSBSConcentration::Save(FEDomain &dom, FEDataStream& a)
+bool FEChemPlotSBSConcentration::Save(FEDomain &dom, FEDataStream& a)
 {
 	// make sure we have a valid index
 	if (m_sbmName.empty()) return false;
 	int nsbm = m_sbmName.size();
 
-	FEReactionDomain& rdom = static_cast<FEReactionDomain&>(dom);
+	FEChemReactionDomain& rdom = static_cast<FEChemReactionDomain&>(dom);
 
-	FEReactionDiffusionMaterial* mat = dynamic_cast<FEReactionDiffusionMaterial*>(rdom.GetMaterial());
+	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(rdom.GetMaterial());
 	vector<int> lid(nsbm, -1);
 	for (int i = 0; i < nsbm; ++i)
 	{
-		FEReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName[i]);
+		FEChemReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName[i]);
 		if (rs) lid[i] = rs->GetLocalID();
 	}
 
@@ -278,7 +278,7 @@ bool FEPlotSBSConcentration::Save(FEDomain &dom, FEDataStream& a)
 				for (int j = 0; j < el.GaussPoints(); ++j)
 				{
 					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-					FEReactionMaterialPoint* pt = (mp.ExtractData<FEReactionMaterialPoint>());
+					FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
 
 					if (pt) ew += pt->m_ca[id];
 				}
@@ -292,14 +292,14 @@ bool FEPlotSBSConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotSBSApparentDensity::FEPlotSBSApparentDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+FEChemPlotSBSApparentDensity::FEChemPlotSBSApparentDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 }
 
 //-----------------------------------------------------------------------------
 // Resolve sbm by name
-bool FEPlotSBSApparentDensity::SetFilter(const char* sz)
+bool FEChemPlotSBSApparentDensity::SetFilter(const char* sz)
 {
 	string name(sz);
 	m_sbmName.clear();
@@ -316,15 +316,15 @@ bool FEPlotSBSApparentDensity::SetFilter(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSBSApparentDensity::Save(FEDomain &dom, FEDataStream& a)
+bool FEChemPlotSBSApparentDensity::Save(FEDomain &dom, FEDataStream& a)
 {
 	// make sure we have a valid index
 	if (m_sbmName.empty()) return false;
 
-	FEReactionDomain& rdom = static_cast<FEReactionDomain&>(dom);
+	FEChemReactionDomain& rdom = static_cast<FEChemReactionDomain&>(dom);
 
-	FEReactionDiffusionMaterial* mat = dynamic_cast<FEReactionDiffusionMaterial*>(rdom.GetMaterial());
-	FEReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName);
+	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(rdom.GetMaterial());
+	FEChemReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName);
 	if (rs == 0) return false;
 
 	int nsbm = rs->GetID();
@@ -339,7 +339,7 @@ bool FEPlotSBSApparentDensity::Save(FEDomain &dom, FEDataStream& a)
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			FEReactionMaterialPoint* pt = (mp.ExtractData<FEReactionMaterialPoint>());
+			FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
 
 			if (pt) ew += pt->m_sbmr[nsbm];
 		}
@@ -352,13 +352,13 @@ bool FEPlotSBSApparentDensity::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEPlotSolidVolumeFraction::FEPlotSolidVolumeFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+FEChemPlotSolidVolumeFraction::FEChemPlotSolidVolumeFraction(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
 {
 	m_pfem = pfem;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
+bool FEChemPlotSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 {
 	int N = dom.Elements();
 	for (int i = 0; i<N; ++i)
@@ -370,7 +370,7 @@ bool FEPlotSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 		for (int j = 0; j<el.GaussPoints(); ++j)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			FEReactionMaterialPoint* pt = (mp.ExtractData<FEReactionMaterialPoint>());
+			FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
 
 			if (pt) ew += pt->m_phi;
 		}
@@ -383,7 +383,7 @@ bool FEPlotSolidVolumeFraction::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotNodalVelocity::Save(FEMesh& m, FEDataStream& a)
+bool FEChemPlotNodalVelocity::Save(FEMesh& m, FEDataStream& a)
 {
 	FEModel* fem = GetFEModel();
 	const int dof_VX = fem->GetDOFIndex("vx");

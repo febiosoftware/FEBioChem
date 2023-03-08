@@ -28,7 +28,7 @@ SOFTWARE.*/
 #include <FECore/FEModel.h>
 #include <FECore/FESolidDomain.h>
 
-BEGIN_FECORE_CLASS(FESpeciesPointSource, FEBodyLoad)
+BEGIN_FECORE_CLASS(FEChemSpeciesPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_soluteId, "species")->setEnums("$(solutes)");
 	ADD_PARAMETER(m_rate, "rate");
 	ADD_PARAMETER(m_pos.x, "x");
@@ -36,7 +36,7 @@ BEGIN_FECORE_CLASS(FESpeciesPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_pos.z, "z");
 END_FECORE_CLASS();
 
-FESpeciesPointSource::FESpeciesPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
+FEChemSpeciesPointSource::FEChemSpeciesPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
 {
 	m_dofC = -1;
 	m_soluteId = -1;
@@ -45,7 +45,7 @@ FESpeciesPointSource::FESpeciesPointSource(FEModel* fem) : FEBodyLoad(fem), m_se
 	m_el = nullptr;
 }
 
-bool FESpeciesPointSource::Init()
+bool FEChemSpeciesPointSource::Init()
 {
 	// see if the solute exists
 	FEModel* fem = GetFEModel();
@@ -62,7 +62,7 @@ bool FESpeciesPointSource::Init()
 	return FEBodyLoad::Init();
 }
 
-void FESpeciesPointSource::Update()
+void FEChemSpeciesPointSource::Update()
 {
 	// find the element in which the point lies
 	m_q[0] = m_q[1] = m_q[2] = 0.0;
@@ -71,7 +71,7 @@ void FESpeciesPointSource::Update()
 
 	// make sure this element is part of a reaction-diffusion domain
 	FEDomain* dom = dynamic_cast<FEDomain*>(m_el->GetMeshPartition());
-	FEReactionDiffusionMaterial* mat = dynamic_cast<FEReactionDiffusionMaterial*>(dom->GetMaterial());
+	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(dom->GetMaterial());
 	if (mat == nullptr) return;
 
 	// Make sure the material has the correct solute
@@ -90,7 +90,7 @@ void FESpeciesPointSource::Update()
 }
 
 //! Evaluate force vector
-void FESpeciesPointSource::LoadVector(FEGlobalVector& R)
+void FEChemSpeciesPointSource::LoadVector(FEGlobalVector& R)
 {
 	if (m_el == nullptr) return;
 
@@ -124,7 +124,7 @@ void FESpeciesPointSource::LoadVector(FEGlobalVector& R)
 }
 
 //! evaluate stiffness matrix
-void FESpeciesPointSource::StiffnessMatrix(FELinearSystem& S)
+void FEChemSpeciesPointSource::StiffnessMatrix(FELinearSystem& S)
 {
 	return;
 

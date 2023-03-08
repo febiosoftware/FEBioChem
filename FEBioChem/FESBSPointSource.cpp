@@ -27,7 +27,7 @@ SOFTWARE.*/
 #include "FEReactionDiffusionMaterial.h"
 #include <FECore/FEModel.h>
 
-BEGIN_FECORE_CLASS(FESBSPointSource, FEBodyLoad)
+BEGIN_FECORE_CLASS(FEChemSBSPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_sbm, "sbs");
 	ADD_PARAMETER(m_pos.x, "x");
 	ADD_PARAMETER(m_pos.y, "y");
@@ -36,7 +36,7 @@ BEGIN_FECORE_CLASS(FESBSPointSource, FEBodyLoad)
 	ADD_PARAMETER(m_weighVolume, "weigh_volume");
 END_FECORE_CLASS();
 
-FESBSPointSource::FESBSPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
+FEChemSBSPointSource::FEChemSBSPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fem->GetMesh())
 {
 	static bool bfirst = true;
 	m_sbm = -1;
@@ -47,14 +47,14 @@ FESBSPointSource::FESBSPointSource(FEModel* fem) : FEBodyLoad(fem), m_search(&fe
 	bfirst = false;
 }
 
-bool FESBSPointSource::Init()
+bool FEChemSBSPointSource::Init()
 {
 	if (m_sbm == -1) return false;
 	if (m_search.Init() == false) return false;
 	return FEBodyLoad::Init();
 }
 
-void FESBSPointSource::Update()
+void FEChemSBSPointSource::Update()
 {
 	if (m_reset) ResetSBM();
 
@@ -65,7 +65,7 @@ void FESBSPointSource::Update()
 
 	// make sure this element is part of a multiphasic domain
 	FEDomain* dom = dynamic_cast<FEDomain*>(el->GetMeshPartition());
-	FEReactionDiffusionMaterial* mat = dynamic_cast<FEReactionDiffusionMaterial*>(dom->GetMaterial());
+	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(dom->GetMaterial());
 	if (mat == nullptr) return;
 
 	// calculate the element volume
@@ -94,24 +94,24 @@ void FESBSPointSource::Update()
 	for (int i=0; i<nint; ++i)
 	{
 		FEMaterialPoint* mp = el->GetMaterialPoint(i);
-		FEReactionMaterialPoint& pd = *(mp->ExtractData<FEReactionMaterialPoint>());
+		FEChemReactionMaterialPoint& pd = *(mp->ExtractData<FEChemReactionMaterialPoint>());
 		pd.m_sbmr[sbmid] = val;
 		pd.m_sbmrp[sbmid] = val;
 	}
 }
 
-void FESBSPointSource::SetPosition(const vec3d& pos)
+void FEChemSBSPointSource::SetPosition(const vec3d& pos)
 {
 	m_pos = pos;
 }
 
-void FESBSPointSource::SetSBM(int id, double val)
+void FEChemSBSPointSource::SetSBM(int id, double val)
 {
 	m_sbm = id;	
 	m_val = val;
 }
 
-void FESBSPointSource::ResetSBM()
+void FEChemSBSPointSource::ResetSBM()
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -121,7 +121,7 @@ void FESBSPointSource::ResetSBM()
 		FEDomain& dom = mesh.Domain(i);
 		int NE = dom.Elements();
 
-		FEReactionDiffusionMaterial* mat = dynamic_cast<FEReactionDiffusionMaterial*>(dom.GetMaterial());
+		FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(dom.GetMaterial());
 		if (mat)
 		{
 			// Make sure the material has the correct sbm
@@ -148,7 +148,7 @@ void FESBSPointSource::ResetSBM()
 					for (int k = 0; k < nint; ++k)
 					{
 						FEMaterialPoint* mp = el.GetMaterialPoint(k);
-						FEReactionMaterialPoint& pd = *(mp->ExtractData<FEReactionMaterialPoint>());
+						FEChemReactionMaterialPoint& pd = *(mp->ExtractData<FEChemReactionMaterialPoint>());
 						pd.m_sbmr[sbmid] = 0.0;
 						pd.m_sbmrp[sbmid] = 0.0;
 					}

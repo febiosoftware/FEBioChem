@@ -26,16 +26,16 @@ SOFTWARE.*/
 #pragma once
 #include <FECore/FEInitialCondition.h>
 
-class FEInitialConcentration : public FEInitialDOF
+class FEChemInitialConcentration : public FEInitialDOF
 {
 public:
-	FEInitialConcentration(FEModel* fem);
+	FEChemInitialConcentration(FEModel* fem);
 	DECLARE_FECORE_CLASS();
 };
 
-class FEInitialVelocity : public FEInitialDOF
+class FEChemInitialVelocity : public FEInitialDOF
 {
 public:
-	FEInitialVelocity(FEModel* fem);
+	FEChemInitialVelocity(FEModel* fem);
 	DECLARE_FECORE_CLASS();
 };

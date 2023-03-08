@@ -26,10 +26,10 @@ SOFTWARE.*/
 #include <FECore/FEBodyLoad.h>
 #include <FECore/FEOctreeSearch.h>
 
-class FESBSPointSource : public FEBodyLoad
+class FEChemSBSPointSource : public FEBodyLoad
 {
 public:
-	FESBSPointSource(FEModel* fem);
+	FEChemSBSPointSource(FEModel* fem);
 
 	bool Init() override;
 

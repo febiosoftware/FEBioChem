@@ -4,10 +4,10 @@
 //-----------------------------------------------------------------------------
 //! Effective solute concentration
 //! This is the same as the nodal concentrations but was added for analogy with FEBioMix
-class FEPlotEffectiveConcentration : public FEPlotDomainData
+class FEChemPlotEffectiveConcentration : public FEPlotDomainData
 {
 public:
-	FEPlotEffectiveConcentration(FEModel* pfem);
+	FEChemPlotEffectiveConcentration(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 
@@ -18,10 +18,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Actual solute concentration
-class FEPlotActualConcentration : public FEPlotDomainData
+class FEChemPlotActualConcentration : public FEPlotDomainData
 {
 public:
-	FEPlotActualConcentration(FEModel* pfem);
+	FEChemPlotActualConcentration(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 
@@ -31,10 +31,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Solute concentration flux
-class FEPlotConcentrationFlux : public FEPlotDomainData
+class FEChemPlotConcentrationFlux : public FEPlotDomainData
 {
 public:
-	FEPlotConcentrationFlux(FEModel* pfem);
+	FEChemPlotConcentrationFlux(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 
@@ -45,10 +45,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! SBS concentration
-class FEPlotSBSConcentration : public FEPlotDomainData
+class FEChemPlotSBSConcentration : public FEPlotDomainData
 {
 public:
-	FEPlotSBSConcentration(FEModel* pfem);
+	FEChemPlotSBSConcentration(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 
@@ -58,10 +58,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! SBS apparent density
-class FEPlotSBSApparentDensity : public FEPlotDomainData
+class FEChemPlotSBSApparentDensity : public FEPlotDomainData
 {
 public:
-	FEPlotSBSApparentDensity(FEModel* pfem);
+	FEChemPlotSBSApparentDensity(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 	bool SetFilter(const char* sz);
 
@@ -72,10 +72,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! solid volume fraction
-class FEPlotSolidVolumeFraction : public FEPlotDomainData
+class FEChemPlotSolidVolumeFraction : public FEPlotDomainData
 {
 public:
-	FEPlotSolidVolumeFraction(FEModel* pfem);
+	FEChemPlotSolidVolumeFraction(FEModel* pfem);
 	bool Save(FEDomain& dom, FEDataStream& a);
 
 protected:
@@ -85,9 +85,9 @@ protected:
 //-----------------------------------------------------------------------------
 //! Nodal velocities
 //!
-class FEPlotNodalVelocity : public FEPlotNodeData
+class FEChemPlotNodalVelocity : public FEPlotNodeData
 {
 public:
-	FEPlotNodalVelocity(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) {}
+	FEChemPlotNodalVelocity(FEModel* pfem) : FEPlotNodeData(pfem, PLT_VEC3F, FMT_NODE) {}
 	bool Save(FEMesh& m, FEDataStream& a);
 };

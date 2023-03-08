@@ -1,19 +1,19 @@
 #pragma once
 #include "FEReactionMaterial.h"
 
-class FEMichaelisMentenReaction : public FEReactionMaterial
+class FEChemMichaelisMentenReaction : public FEChemReactionMaterial
 {
 public:
-	FEMichaelisMentenReaction(FEModel* fem);
+	FEChemMichaelisMentenReaction(FEModel* fem);
 
 	//! initialization
 	bool Init();
 
 	//! Evaluate the reaction rate at this integration point
-	double GetReactionRate(FEReactionMaterialPoint& pt);
+	double GetReactionRate(FEChemReactionMaterialPoint& pt);
 
 	//! Evaluate derivative of reaction rate wrt to species Id
-	double GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id);
+	double GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id);
 
 private:
 	double	m_Rmax;		//!< maximum reaction rate

@@ -2,16 +2,16 @@
 #include <FECore/FEModel.h>
 #include <FECore/DOFS.h>
 
-BEGIN_FECORE_CLASS(FEFixedConcentration, FEFixedBC)
+BEGIN_FECORE_CLASS(FEChemFixedConcentration, FEFixedBC)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)")->setLongName("species");
 END_FECORE_CLASS();
 
-FEFixedConcentration::FEFixedConcentration(FEModel* fem) : FEFixedBC(fem)
+FEChemFixedConcentration::FEChemFixedConcentration(FEModel* fem) : FEFixedBC(fem)
 {
 	m_dof = -1;
 }
 
-bool FEFixedConcentration::Init()
+bool FEChemFixedConcentration::Init()
 {
 	if (m_dof == -1) return false;
 	SetDOFList(m_dof);
@@ -21,13 +21,13 @@ bool FEFixedConcentration::Init()
 //=======================================================================================
 // NOTE: I'm setting FEBoundaryCondition is the base class since I don't want to pull
 //       in the parameters of FEPrescribedDOF. 
-BEGIN_FECORE_CLASS(FEPrescribedConcentration, FEBoundaryCondition)
+BEGIN_FECORE_CLASS(FEChemPrescribedConcentration, FEBoundaryCondition)
 	ADD_PARAMETER(m_dof, "dof", 0, "$(dof_list:concentration)");
 	ADD_PARAMETER(m_scale, "value")->SetFlags(FE_PARAM_ADDLC | FE_PARAM_VOLATILE);
 	ADD_PARAMETER(m_brelative, "relative");
 END_FECORE_CLASS();
 
-FEPrescribedConcentration::FEPrescribedConcentration(FEModel* fem) : FEPrescribedDOF(fem)
+FEChemPrescribedConcentration::FEChemPrescribedConcentration(FEModel* fem) : FEPrescribedDOF(fem)
 {
 
 }

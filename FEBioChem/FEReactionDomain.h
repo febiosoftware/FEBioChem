@@ -3,12 +3,12 @@
 #include <FECore/FECoreKernel.h>
 #include "FEReactionDiffusionMaterial.h"
 
-class FENLReactionDiffusionSolver;
+class FEChemNLReactionDiffusionSolver;
 
-class FEReactionDomain : public FESolidDomain
+class FEChemReactionDomain : public FESolidDomain
 {
 public:
-	FEReactionDomain(FEModel* fem);
+	FEChemReactionDomain(FEModel* fem);
 
 	//! set the material
 	void SetMaterial(FEMaterial* pmat);
@@ -30,7 +30,7 @@ public:
 public:
 	void ForceVector(FEGlobalVector& R);
 
-	void StiffnessMatrix(FENLReactionDiffusionSolver* solver, FELinearSystem& LS);
+	void StiffnessMatrix(FEChemNLReactionDiffusionSolver* solver, FELinearSystem& LS);
 
 	void MassVector(FEGlobalVector& R, const vector<double>& Un);
 
@@ -49,12 +49,12 @@ public:
 	void ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn);
 
 private:
-	FEReactionDiffusionMaterial*	m_mat;
+	FEChemReactionDiffusionMaterial*	m_mat;
 	FEDofList	m_dofC;
 	int		m_dofV[3];	// velocity degrees of freedom
 };
 
-class FEReactionDomainFactory : public FEDomainFactory
+class FEChemReactionDomainFactory : public FEDomainFactory
 {
 public:
 	FEDomain* CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat);

@@ -8,7 +8,7 @@
 #include <FECore/FEGlobalMatrix.h>
 #include <FECore/FEPrescribedDOF.h>
 
-BEGIN_FECORE_CLASS(FENLReactionDiffusionSolver, FENewtonSolver)
+BEGIN_FECORE_CLASS(FEChemNLReactionDiffusionSolver, FENewtonSolver)
 	ADD_PARAMETER(m_Ctol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Ctol");
 	ADD_PARAMETER(m_Stol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Stol");
 	ADD_PARAMETER(m_Rtol, FE_RANGE_GREATER_OR_EQUAL(0.0), "Rtol");	// TODO: base class already defines rtol. Remove?
@@ -17,7 +17,7 @@ BEGIN_FECORE_CLASS(FENLReactionDiffusionSolver, FENewtonSolver)
 	ADD_PARAMETER(m_alpha, FE_RANGE_CLOSED(0.0, 1.0), "alpha");
 END_FECORE_CLASS();
 
-FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewtonSolver(fem)
+FEChemNLReactionDiffusionSolver::FEChemNLReactionDiffusionSolver(FEModel* fem) : FENewtonSolver(fem)
 {
 	m_Ctol = 0.001;
 	m_Rtol = 0.01;
@@ -41,7 +41,7 @@ FENLReactionDiffusionSolver::FENLReactionDiffusionSolver(FEModel* fem) : FENewto
 }
 
 //! initialization
-bool FENLReactionDiffusionSolver::Init()
+bool FEChemNLReactionDiffusionSolver::Init()
 {
 	if (FENewtonSolver::Init() == false) return false;
 
@@ -80,7 +80,7 @@ bool FENLReactionDiffusionSolver::Init()
 	return true;
 }
 
-bool FENLReactionDiffusionSolver::CheckConvergence(int niter, const vector<double>& ui, double ls)
+bool FEChemNLReactionDiffusionSolver::CheckConvergence(int niter, const vector<double>& ui, double ls)
 {
 	// update solution
 	if (niter == 0) m_U = m_ui;
@@ -156,7 +156,7 @@ bool FENLReactionDiffusionSolver::CheckConvergence(int niter, const vector<doubl
 	return bconv;
 }
 
-double FENLReactionDiffusionSolver::CalculateSBMNorm()
+double FEChemNLReactionDiffusionSolver::CalculateSBMNorm()
 {
 	FEMesh& mesh = GetFEModel()->GetMesh();
 
@@ -171,7 +171,7 @@ double FENLReactionDiffusionSolver::CalculateSBMNorm()
 			for (int n = 0; n<el.GaussPoints(); ++n)
 			{
 				FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-				FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
+				FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
 				int m = (int)rp.m_sbmri.size();
 				for (int k = 0; k<m; ++k) si += (rp.m_sbmri[k] * rp.m_sbmri[k]) / m;
@@ -185,7 +185,7 @@ double FENLReactionDiffusionSolver::CalculateSBMNorm()
 	return normS;
 }
 
-void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
+void FEChemNLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -194,7 +194,7 @@ void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 	// loop over all domains
 	for (int n = 0; n<NDOM; ++n)
 	{
-		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(n));
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(n));
 		if (dom) dom->ForceVector(R);
 	}
 
@@ -207,7 +207,7 @@ void FENLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 }
 
 //! calculates the global residual vector
-bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
+bool FEChemNLReactionDiffusionSolver::Residual(vector<double>& R)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -247,32 +247,32 @@ bool FENLReactionDiffusionSolver::Residual(vector<double>& R)
 	return true;
 }
 
-void FENLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
+void FEChemNLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 	for (int n = 0; n<NDOM; ++n)
 	{
-		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(n));
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(n));
 		if (dom) dom->MassVector(R, m_Un);
 	}
 }
 
-void FENLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEChemNLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 	for (int ndom = 0; ndom<NDOM; ++ndom)
 	{
-		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(ndom));
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
 		if (dom) dom->DiffusionVector(R, tp, m_Un, m_convection);
 	}
 }
 
 //! calculates the global stiffness matrix
-bool FENLReactionDiffusionSolver::StiffnessMatrix()
+bool FEChemNLReactionDiffusionSolver::StiffnessMatrix()
 {
 	// setup the linear system
 	FELinearSystem LS(this, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
@@ -282,14 +282,14 @@ bool FENLReactionDiffusionSolver::StiffnessMatrix()
 	int NDOM = mesh.Domains();
 	for (int ndom=0; ndom<NDOM; ++ndom)
 	{
-		FEReactionDomain* dom = dynamic_cast<FEReactionDomain*>(&mesh.Domain(ndom));
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
 		if (dom) dom->StiffnessMatrix(this, LS);
 	}
 
 	return true;
 }
 
-void FENLReactionDiffusionSolver::Update(std::vector<double>& u)
+void FEChemNLReactionDiffusionSolver::Update(std::vector<double>& u)
 {
 	FEModel& fem = *GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();

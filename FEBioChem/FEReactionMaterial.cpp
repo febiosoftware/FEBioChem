@@ -4,14 +4,14 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-FEReactionMaterial::FEReactionMaterial(FEModel* fem) : FEMaterialProperty(fem)
+FEChemReactionMaterial::FEChemReactionMaterial(FEModel* fem) : FEMaterialProperty(fem)
 {
 	m_pRDM = 0;
 }
 
 //-----------------------------------------------------------------------------
 //! set the parent material
-void FEReactionMaterial::SetReactionDiffusionParent(FEReactionDiffusionMaterial* mat)
+void FEChemReactionMaterial::SetReactionDiffusionParent(FEChemReactionDiffusionMaterial* mat)
 {
 	m_pRDM = mat;
 }
@@ -19,7 +19,7 @@ void FEReactionMaterial::SetReactionDiffusionParent(FEReactionDiffusionMaterial*
 //-----------------------------------------------------------------------------
 // One time initialization.
 // Parses the chemical equation and builds the stoichiometric tables.
-bool FEReactionMaterial::Init()
+bool FEChemReactionMaterial::Init()
 {
 	// make sure a parent material was set
 	if (m_pRDM == 0) return false; //MaterialError("No parent material set for reaction material");

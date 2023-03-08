@@ -96,22 +96,22 @@ bool convert(const char* szeq, vector<ReactionTerm>& reactants, vector<ReactionT
 
 //-----------------------------------------------------------------------------
 // Define parameter list
-BEGIN_FECORE_CLASS(FEMassActionReaction, FEReactionMaterial)
+BEGIN_FECORE_CLASS(FEChemMassActionReaction, FEChemReactionMaterial)
 	ADD_PARAMETER(m_k       , "rate_constant");
 	ADD_PARAMETER(m_equation, "equation");
 	ADD_PARAMETER(m_posOnly , "force_positive_concentrations");
 END_FECORE_CLASS();
 
-FEMassActionReaction::FEMassActionReaction(FEModel* fem) : FEReactionMaterial(fem)
+FEChemMassActionReaction::FEChemMassActionReaction(FEModel* fem) : FEChemReactionMaterial(fem)
 {
 	m_k = 0.0;
 	m_posOnly = false;
 }
 
-bool FEMassActionReaction::Init()
+bool FEChemMassActionReaction::Init()
 {
 	// initialize base class first
-	if (FEReactionMaterial::Init() == false) return false;
+	if (FEChemReactionMaterial::Init() == false) return false;
 
 	// convert the equation string to actual stoichiometric coefficients and species
 	vector<ReactionTerm> reactants;
@@ -134,7 +134,7 @@ bool FEMassActionReaction::Init()
 		ReactionTerm& reactant_i = reactants[i];
 
 		// try to find the reactive species
-		FEReactiveSpeciesBase* spec = m_pRDM->FindSpecies(reactant_i.second);
+		FEChemReactiveSpeciesBase* spec = m_pRDM->FindSpecies(reactant_i.second);
 		if (spec == 0)
 		{
 			// Oh, oh. This shouldn't happen
@@ -151,7 +151,7 @@ bool FEMassActionReaction::Init()
 		ReactionTerm& prod_i = products[i];
 
 		// try to find the reactive species
-		FEReactiveSpeciesBase* spec = m_pRDM->FindSpecies(prod_i.second);
+		FEChemReactiveSpeciesBase* spec = m_pRDM->FindSpecies(prod_i.second);
 		if (spec == 0)
 		{
 			// Oh, oh. This shouldn't happen
@@ -175,7 +175,7 @@ bool FEMassActionReaction::Init()
 // Evaluate the reaction rate
 // Assumes forward mass action.
 // I don't think this does dimerization correctly.
-double FEMassActionReaction::GetReactionRate(FEReactionMaterialPoint& pt)
+double FEChemMassActionReaction::GetReactionRate(FEChemReactionMaterialPoint& pt)
 {
 	// concentration values at integration points
 	vector<double>& c = pt.m_ca;
@@ -198,7 +198,7 @@ double FEMassActionReaction::GetReactionRate(FEReactionMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! Evaluate derivative of reaction rate wrt to species with local id
-double FEMassActionReaction::GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id)
+double FEChemMassActionReaction::GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id)
 {
 	// concentration values at integration points
 	vector<double>& c = pt.m_ca;

@@ -2,11 +2,11 @@
 #include <FECore/FESurfaceLoad.h>
 
 // class describing a Neumann boundar for concentration degrees of freedom
-class FEConcentrationFlux : public FESurfaceLoad
+class FEChemConcentrationFlux : public FESurfaceLoad
 {
 public:
 	//! Constructor
-	FEConcentrationFlux(FEModel* fem);
+	FEChemConcentrationFlux(FEModel* fem);
 
 	//! unpack LM vector
 	void UnpackLM(FESurfaceElement& el, vector<int>& lm);
@@ -27,10 +27,10 @@ private:
 // NOTE: For compatibility issues, let's define a "solute" flux, analogously to FEBioMix' solute flux.
 // This allows users to create Reaction-diffusion problems in PreView, without complicating PreView too much.
 // This is probably a temporary feature until a more elegant solution can be found.
-class FESoluteFlux : public FEConcentrationFlux
+class FEChemSoluteFlux : public FEChemConcentrationFlux
 {
 public:
-	FESoluteFlux(FEModel* fem);
+	FEChemSoluteFlux(FEModel* fem);
 
 private:
 	bool	m_blinear;	// not used, but needed for compatibility with the FEBioMix feature

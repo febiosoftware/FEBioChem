@@ -5,10 +5,10 @@
 //-----------------------------------------------------------------------------
 //! Global species data
 //! This structure uniquely identifies a solute in multiphasic problems
-class FESpeciesData : public FEGlobalData
+class FEChemSpeciesData : public FEGlobalData
 {
 public:
-	FESpeciesData(FEModel* pfem);
+	FEChemSpeciesData(FEModel* pfem);
 
 	//! initialization
 	bool Init() override;
@@ -24,10 +24,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Global solid-bound molecule (SBM) data.
-class FESolidBoundSpeciesData : public FEGlobalData
+class FEChemSolidBoundSpeciesData : public FEGlobalData
 {
 public:
-	FESolidBoundSpeciesData(FEModel* pfem);
+	FEChemSolidBoundSpeciesData(FEModel* pfem);
 
 public:
 	double	m_rhoT;			//!< SBM true density
@@ -40,12 +40,12 @@ public:
 
 //-----------------------------------------------------------------------------
 // Base class for reactive species
-class FEReactiveSpeciesBase : public FEMaterialProperty
+class FEChemReactiveSpeciesBase : public FEMaterialProperty
 {
-	FECORE_BASE_CLASS(FEReactiveSpeciesBase)
+	FECORE_BASE_CLASS(FEChemReactiveSpeciesBase)
 
 public:
-	FEReactiveSpeciesBase(FEModel* fem);
+	FEChemReactiveSpeciesBase(FEModel* fem);
 
 	// initialization (checks the ID)
 	bool Init();
@@ -78,11 +78,11 @@ protected:
 // A species that is active in a reaction-diffusion domain
 // Defines the diffusivity of this species inside this domain
 // Also stores the global ID of the species that it references.
-class FEReactiveSpecies : public FEReactiveSpeciesBase
+class FEChemReactiveSpecies : public FEChemReactiveSpeciesBase
 {
 public:
 	// constructor
-	FEReactiveSpecies(FEModel* fem);
+	FEChemReactiveSpecies(FEModel* fem);
 
 	// evaluate diffusivity
 	double Diffusivity() { return m_diffusivity; }
@@ -97,11 +97,11 @@ private:
 // This class describes a solid-bound species (or solid-bound molecules), i.e. a chemical species that is bound
 // to the solid phase and that does not diffuse. For SBSs the apparent density is tracked
 // throughout the analysis and needs to be initialize by the user. 
-class FESolidBoundSpecies : public FEReactiveSpeciesBase
+class FEChemSolidBoundSpecies : public FEChemReactiveSpeciesBase
 {
 public:
 	// constructor
-	FESolidBoundSpecies(FEModel* fem);
+	FEChemSolidBoundSpecies(FEModel* fem);
 
 	// initial apparent density
 	double InitialApparentDensity() const { return m_rho0; }

@@ -2,19 +2,19 @@
 #include "FEReactionMaterial.h"
 
 // Reactions that follow the law of mass action
-class FEMassActionReaction : public FEReactionMaterial
+class FEChemMassActionReaction : public FEChemReactionMaterial
 {
 public:
-	FEMassActionReaction(FEModel* fem);
+	FEChemMassActionReaction(FEModel* fem);
 
 	// one-time initialization
 	bool Init();
 
 	//! Evaluate the reaction rate at this integration point
-	double GetReactionRate(FEReactionMaterialPoint& pt);
+	double GetReactionRate(FEChemReactionMaterialPoint& pt);
 
 	//! Evaluate derivative of reaction rate wrt to species Id
-	double GetReactionRateDeriv(FEReactionMaterialPoint& pt, int id);
+	double GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id);
 
 private:
 	double	m_k;			//!< reaction constant 

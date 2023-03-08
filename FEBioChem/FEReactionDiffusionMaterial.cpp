@@ -3,7 +3,7 @@
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
-BEGIN_FECORE_CLASS(FEReactionDiffusionMaterial, FEMaterial)
+BEGIN_FECORE_CLASS(FEChemReactionDiffusionMaterial, FEMaterial)
 	ADD_PARAMETER(m_phi, FE_RANGE_RIGHT_OPEN(0.0, 1.0), "solid_volume_fraction");
 
 	// define the material's properties
@@ -14,7 +14,7 @@ BEGIN_FECORE_CLASS(FEReactionDiffusionMaterial, FEMaterial)
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
-FEReactionDiffusionMaterial::FEReactionDiffusionMaterial(FEModel* fem) : FEMaterial(fem)
+FEChemReactionDiffusionMaterial::FEChemReactionDiffusionMaterial(FEModel* fem) : FEMaterial(fem)
 {
 	// set solid volume fraction to zero
 	m_phi = 0.0;
@@ -22,7 +22,7 @@ FEReactionDiffusionMaterial::FEReactionDiffusionMaterial(FEModel* fem) : FEMater
 
 //-----------------------------------------------------------------------------
 // initialization
-bool FEReactionDiffusionMaterial::Init()
+bool FEChemReactionDiffusionMaterial::Init()
 {
 	// set the parent for all reaction materials
 	for (int i=0; i<Reactions(); ++i)
@@ -45,10 +45,10 @@ bool FEReactionDiffusionMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
-FEMaterialPointData* FEReactionDiffusionMaterial::CreateMaterialPointData()
+FEMaterialPointData* FEChemReactionDiffusionMaterial::CreateMaterialPointData()
 {
 	// create a new reaction material point
-	FEReactionMaterialPoint* pt = new FEReactionMaterialPoint;
+	FEChemReactionMaterialPoint* pt = new FEChemReactionMaterialPoint;
 
 	// total number of concentration variables needed
 	int nsol = Species();
@@ -69,7 +69,7 @@ FEMaterialPointData* FEReactionDiffusionMaterial::CreateMaterialPointData()
 	pt->m_sbmri.resize(nsbm, 0.0);
 	for (int i=0; i<nsbm; ++i)
 	{
-		FESolidBoundSpecies* sbs = GetSolidBoundSpecies(i);
+		FEChemSolidBoundSpecies* sbs = GetSolidBoundSpecies(i);
 		pt->m_sbmr[i] = pt->m_sbmrp[i] = sbs->InitialApparentDensity();
 	}
 
@@ -84,7 +84,7 @@ FEMaterialPointData* FEReactionDiffusionMaterial::CreateMaterialPointData()
 
 //-----------------------------------------------------------------------------
 // Find a species by name
-FEReactiveSpeciesBase* FEReactionDiffusionMaterial::FindSpecies(const string& name)
+FEChemReactiveSpeciesBase* FEChemReactionDiffusionMaterial::FindSpecies(const string& name)
 {
 	// try the free species first
 	for (int i=0; i<Species(); ++i)
@@ -104,7 +104,7 @@ FEReactiveSpeciesBase* FEReactionDiffusionMaterial::FindSpecies(const string& na
 
 //-----------------------------------------------------------------------------
 // Find a species form a global ID
-FEReactiveSpecies* FEReactionDiffusionMaterial::FindSpeciesFromGlobalID(int id)
+FEChemReactiveSpecies* FEChemReactionDiffusionMaterial::FindSpeciesFromGlobalID(int id)
 {
 	for (int i=0; i<Species(); ++i)
 	{
@@ -116,13 +116,13 @@ FEReactiveSpecies* FEReactionDiffusionMaterial::FindSpeciesFromGlobalID(int id)
 
 //-----------------------------------------------------------------------------
 // evaluate the current solid volume fraction
-double FEReactionDiffusionMaterial::SolidVolumeFraction(FEReactionMaterialPoint& mp)
+double FEChemReactionDiffusionMaterial::SolidVolumeFraction(FEChemReactionMaterialPoint& mp)
 {
 	double phi = m_phi;
 	int nsbm = SolidBoundSpecies();
 	for (int i=0; i<nsbm; ++i)
 	{
-		FESolidBoundSpecies* sbm = GetSolidBoundSpecies(i);
+		FEChemSolidBoundSpecies* sbm = GetSolidBoundSpecies(i);
 		phi += mp.m_sbmr[i] / sbm->Density();
 	}
 
@@ -131,7 +131,7 @@ double FEReactionDiffusionMaterial::SolidVolumeFraction(FEReactionMaterialPoint&
 
 //-----------------------------------------------------------------------------
 // Evaluates the reaction rate for this reaction. The id is the local ID of the species
-double FEReactionDiffusionMaterial::GetReactionRate(FEReactionMaterialPoint& mp, int id)
+double FEChemReactionDiffusionMaterial::GetReactionRate(FEChemReactionMaterialPoint& mp, int id)
 {
 	// initialize rate to zero
 	double Ri = 0.0;
@@ -141,7 +141,7 @@ double FEReactionDiffusionMaterial::GetReactionRate(FEReactionMaterialPoint& mp,
 	for (int j = 0; j<nreact; ++j)
 	{
 		// get next reaction
-		FEReactionMaterial* reaction = GetReaction(j);
+		FEChemReactionMaterial* reaction = GetReaction(j);
 
 		// net stoichiometric coefficient for this species
 		int vij = reaction->m_v[id];
@@ -161,7 +161,7 @@ double FEReactionDiffusionMaterial::GetReactionRate(FEReactionMaterialPoint& mp,
 }
 
 //-----------------------------------------------------------------------------
-double FEReactionDiffusionMaterial::GetReactionRateStiffness(FEReactionMaterialPoint& mp, int idA, int idB)
+double FEChemReactionDiffusionMaterial::GetReactionRateStiffness(FEChemReactionMaterialPoint& mp, int idA, int idB)
 {
 	double G = 0.0;
 
@@ -170,7 +170,7 @@ double FEReactionDiffusionMaterial::GetReactionRateStiffness(FEReactionMaterialP
 	for (int k=0; k<nreact; ++k)
 	{
 		// get next reaction
-		FEReactionMaterial* reaction = GetReaction(k);
+		FEChemReactionMaterial* reaction = GetReaction(k);
 
 		// net stoichiometric coefficient for this species
 		int vik = reaction->m_v[idA];

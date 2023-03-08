@@ -2,7 +2,7 @@
 #include "FEReactionDiffusionConvection.h"
 #include <FECore/FEModel.h>
 
-FENLReactionDiffusionConvectionSolver::FENLReactionDiffusionConvectionSolver(FEModel* fem) : FENLReactionDiffusionSolver(fem)
+FEChemNLReactionDiffusionConvectionSolver::FEChemNLReactionDiffusionConvectionSolver(FEModel* fem) : FEChemNLReactionDiffusionSolver(fem)
 {
 	// Add the velocity field
 	DOFS& dofs = fem->GetDOFS();

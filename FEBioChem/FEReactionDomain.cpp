@@ -4,14 +4,14 @@
 #include <FECore/FEModel.h>
 #include <FECore/Integrate.h>
 
-FEDomain* FEReactionDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
+FEDomain* FEChemReactionDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEMesh* pm, FEMaterial* pmat)
 {
 	FE_Element_Class eclass = spec.eclass;
-	if (dynamic_cast<FEReactionDiffusionMaterial*>(pmat))
+	if (dynamic_cast<FEChemReactionDiffusionMaterial*>(pmat))
 	{
 		if (eclass == FE_ELEM_SOLID)
 		{
-			FEReactionDomain* dom = new FEReactionDomain(pmat->GetFEModel());
+			FEChemReactionDomain* dom = new FEChemReactionDomain(pmat->GetFEModel());
 			dom->SetMaterial(pmat);
 			return dom;
 		}
@@ -21,28 +21,28 @@ FEDomain* FEReactionDomainFactory::CreateDomain(const FE_Element_Spec& spec, FEM
 
 
 //-----------------------------------------------------------------------------
-FEReactionDomain::FEReactionDomain(FEModel* fem) : FESolidDomain(fem), m_dofC(fem)
+FEChemReactionDomain::FEChemReactionDomain(FEModel* fem) : FESolidDomain(fem), m_dofC(fem)
 {
 	m_mat = 0;
 }
 
 //-----------------------------------------------------------------------------
-const FEDofList& FEReactionDomain::GetDOFList() const
+const FEDofList& FEChemReactionDomain::GetDOFList() const
 {
 	return m_dofC;
 }
 
 //-----------------------------------------------------------------------------
 // Assigns material to domain
-void FEReactionDomain::SetMaterial(FEMaterial* pmat)
+void FEChemReactionDomain::SetMaterial(FEMaterial* pmat)
 {
-	m_mat = dynamic_cast<FEReactionDiffusionMaterial*>(pmat);
+	m_mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(pmat);
 }
 
 //-----------------------------------------------------------------------------
 // Initializes domain data.
 // This creates a list of active degrees of freedom in this domain
-bool FEReactionDomain::Init()
+bool FEChemReactionDomain::Init()
 {
 	// do base class first
 	if (FESolidDomain::Init() == false) return false;
@@ -60,7 +60,7 @@ bool FEReactionDomain::Init()
 	m_dofC.Clear();
 	for (int i = 0; i<ns; ++i)
 	{
-		FEReactiveSpecies* s = m_mat->GetSpecies(i);
+		FEChemReactiveSpecies* s = m_mat->GetSpecies(i);
 		m_dofC.AddDof(c[s->GetID()]);
 	}
 
@@ -78,7 +78,7 @@ bool FEReactionDomain::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
+void FEChemReactionDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 {
 	for (size_t i = 0; i<m_Elem.size(); ++i)
 	{
@@ -95,7 +95,7 @@ void FEReactionDomain::PreSolveUpdate(const FETimeInfo& timeInfo)
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::Activate()
+void FEChemReactionDomain::Activate()
 {
 	FESolidDomain::Activate();
 
@@ -133,7 +133,7 @@ void FEReactionDomain::Activate()
 		for (int n = 0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-			FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
+			FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
 			// fluid volume fraction
 			double f = m_mat->Porosity(rp);
@@ -141,7 +141,7 @@ void FEReactionDomain::Activate()
 			// evaluate concentrations at integration points
 			for (int i = 0; i<nsol; ++i)
 			{
-				FEReactiveSpecies* s = m_mat->GetSpecies(i);
+				FEChemReactiveSpecies* s = m_mat->GetSpecies(i);
 
 				// evaluate gradient at this integration point
 				vec3d grad_c = gradient(el, &c[i][0], n);
@@ -165,7 +165,7 @@ void FEReactionDomain::Activate()
 			// evaluate the solid-bound species concentrations
 			for (int i = 0; i<nsbm; ++i)
 			{
-				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
+				FEChemSolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
 
 				// evaluate the equivalent concentration (per fluid volume)
 				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
@@ -184,7 +184,7 @@ void FEReactionDomain::Activate()
 
 //-----------------------------------------------------------------------------
 // Update domain data. Called after the model's solution vectors have changed.
-void FEReactionDomain::Update(const FETimeInfo& tp)
+void FEChemReactionDomain::Update(const FETimeInfo& tp)
 {
 	double dt = tp.timeIncrement;
 	double alpha = tp.alpha;
@@ -223,7 +223,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 		for (int n = 0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-			FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
+			FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
 			// fluid volume fraction
 			double f = m_mat->Porosity(rp);
@@ -231,7 +231,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 			// evaluate concentrations at integration points
 			for (int i = 0; i<nsol; ++i)
 			{
-				FEReactiveSpecies* s = m_mat->GetSpecies(i);
+				FEChemReactiveSpecies* s = m_mat->GetSpecies(i);
 
 				// evaluate gradient at this integration point
 				vec3d grad_c = gradient(el, &c[i][0], n);
@@ -250,7 +250,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 			// evaluate the solid-bound species concentrations
 			for (int i = 0; i<nsbm; ++i)
 			{
-				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
+				FEChemSolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
 
 				double tmp = rp.m_sbmr[i];
 
@@ -285,7 +285,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 			// evaluate the solid-bound species concentrations
 			for (int i = 0; i<nsbm; ++i)
 			{
-				FESolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
+				FEChemSolidBoundSpecies* s = m_mat->GetSolidBoundSpecies(i);
 
 				// evaluate the equivalent concentration (per fluid volume)
 				double ci = rp.m_sbmr[i] / (f*s->MolarMass());
@@ -296,7 +296,7 @@ void FEReactionDomain::Update(const FETimeInfo& tp)
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::StiffnessMatrix(FENLReactionDiffusionSolver* solver, FELinearSystem& LS)
+void FEChemReactionDomain::StiffnessMatrix(FEChemNLReactionDiffusionSolver* solver, FELinearSystem& LS)
 {
 	FEMesh& mesh = *GetMesh();
 
@@ -361,7 +361,7 @@ void FEReactionDomain::StiffnessMatrix(FENLReactionDiffusionSolver* solver, FELi
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::ForceVector(FEGlobalVector& R)
+void FEChemReactionDomain::ForceVector(FEGlobalVector& R)
 {
 	// get the number of degrees of freedom active in this domain
 	int ndof = m_dofC.Size();
@@ -390,7 +390,7 @@ void FEReactionDomain::ForceVector(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe)
+void FEChemReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe)
 {
 	int ndof = (int) m_dofC.Size();
 	vector<double> R(ndof, 0.0);
@@ -402,7 +402,7 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 	for (int n=0; n<ni; ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEReactionMaterialPoint& pt = *mp.ExtractData<FEReactionMaterialPoint>();
+		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
 		// fluid volume fraction
 		double phi = m_mat->Porosity(pt);
@@ -426,7 +426,7 @@ void FEReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::MassVector(FEGlobalVector& R, const vector<double>& Un)
+void FEChemReactionDomain::MassVector(FEGlobalVector& R, const vector<double>& Un)
 {
 	// get the number of concentration variables
 	int ncv = (int)m_dofC.Size();
@@ -480,7 +480,7 @@ void FEReactionDomain::MassVector(FEGlobalVector& R, const vector<double>& Un)
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
+void FEChemReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 {
 	int ncv = m_dofC.Size();
 	int ne = el.Nodes();
@@ -489,7 +489,7 @@ void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 	for (int n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEReactionMaterialPoint& pt = *mp.ExtractData<FEReactionMaterialPoint>();
+		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
 		// fluid volume fraction
 		double phi = m_mat->Porosity(pt);
@@ -513,7 +513,7 @@ void FEReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un, bool bconvection)
+void FEChemReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un, bool bconvection)
 {
 	double dt = tp.timeIncrement;
 	double alpha = tp.alpha;
@@ -583,7 +583,7 @@ void FEReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, c
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
+void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 {
 	// get the number of concentration variables
 	int ncv = (int)m_dofC.Size();
@@ -609,7 +609,7 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 
 		// evaluate the conductivity
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEReactionMaterialPoint& pt = *mp.ExtractData<FEReactionMaterialPoint>();
+		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
 		// fluid volume fraction
 		double phi = m_mat->Porosity(pt);
@@ -642,7 +642,7 @@ void FEReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
+void FEChemReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 {
 	// get the number of concentration variables
 	int ncv = (int)m_dofC.Size();
@@ -666,7 +666,7 @@ void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 
 		// get the material point data
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
-		FEReactionMaterialPoint& rp = *mp.ExtractData<FEReactionMaterialPoint>();
+		FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
 		// fluid volume fraction
 		double phi = m_mat->Porosity(rp);
@@ -700,7 +700,7 @@ void FEReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
 	}
 }
 
-void FEReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn)
+void FEChemReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn)
 {
 	// get the number of concentration variables
 	int ncv = (int)m_dofC.Size();

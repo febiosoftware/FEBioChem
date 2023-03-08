@@ -58,7 +58,7 @@ FECORE_PLUGIN void GetPluginVersion(int& major, int& minor, int& patch)
 FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 {
 	FECoreKernel::SetInstance(&fecore);
-	fecore.RegisterDomain(new FEReactionDomainFactory);
+	fecore.RegisterDomain(new FEChemReactionDomainFactory);
 
 	// Reaction-diffusion module
 	const char* info = \
@@ -76,30 +76,30 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEBioChemAnalysis, "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FEBioChemConvAnalysis, "reaction-diffusion-convection");
 
-	REGISTER_FECORE_CLASS(FESpeciesData, "solute");
-	REGISTER_FECORE_CLASS(FESolidBoundSpeciesData, "solid_bound");
+	REGISTER_FECORE_CLASS(FEChemSpeciesData, "solute");
+	REGISTER_FECORE_CLASS(FEChemSolidBoundSpeciesData, "solid_bound");
 
-	REGISTER_FECORE_CLASS(FENLReactionDiffusionSolver          , "reaction-diffusion");
-	REGISTER_FECORE_CLASS(FEReactionDiffusionMaterial          , "reaction-diffusion");
-	REGISTER_FECORE_CLASS(FEMassActionReaction                 , "mass action");
-	REGISTER_FECORE_CLASS(FEMichaelisMentenReaction            , "Michaelis-Menten");
-	REGISTER_FECORE_CLASS(FEReactiveSpecies                    , "species");
-	REGISTER_FECORE_CLASS(FESolidBoundSpecies                  , "solid_bound_species");
-	REGISTER_FECORE_CLASS(FEConcentrationFlux                  , "concentration flux");
-	REGISTER_FECORE_CLASS(FEFixedConcentration                 , "zero concentration");
-	REGISTER_FECORE_CLASS(FEPrescribedConcentration            , "prescribed concentration");
-	REGISTER_FECORE_CLASS(FEPlotActualConcentration            , "actual concentration");
-	REGISTER_FECORE_CLASS(FEPlotEffectiveConcentration         , "effective concentration");
-	REGISTER_FECORE_CLASS(FEPlotConcentrationFlux			   , "concentration flux");
-	REGISTER_FECORE_CLASS(FEPlotSBSConcentration               , "sbs concentration");
-	REGISTER_FECORE_CLASS(FEPlotSBSApparentDensity             , "sbs apparent density");
-	REGISTER_FECORE_CLASS(FEPlotSolidVolumeFraction            , "solid volume fraction");
-	REGISTER_FECORE_CLASS(FESoluteFlux                         , "soluteflux");
-	REGISTER_FECORE_CLASS(FESBSPointSource                     , "sbs point source");
-	REGISTER_FECORE_CLASS(FESpeciesPointSource                 , "point source");
+	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionSolver          , "reaction-diffusion");
+	REGISTER_FECORE_CLASS(FEChemReactionDiffusionMaterial          , "reaction-diffusion");
+	REGISTER_FECORE_CLASS(FEChemMassActionReaction                 , "mass action");
+	REGISTER_FECORE_CLASS(FEChemMichaelisMentenReaction            , "Michaelis-Menten");
+	REGISTER_FECORE_CLASS(FEChemReactiveSpecies                    , "species");
+	REGISTER_FECORE_CLASS(FEChemSolidBoundSpecies                  , "solid_bound_species");
+	REGISTER_FECORE_CLASS(FEChemConcentrationFlux                  , "concentration flux");
+	REGISTER_FECORE_CLASS(FEChemFixedConcentration                 , "zero concentration");
+	REGISTER_FECORE_CLASS(FEChemPrescribedConcentration            , "prescribed concentration");
+	REGISTER_FECORE_CLASS(FEChemPlotActualConcentration            , "actual concentration");
+	REGISTER_FECORE_CLASS(FEChemPlotEffectiveConcentration         , "effective concentration");
+	REGISTER_FECORE_CLASS(FEChemPlotConcentrationFlux			   , "concentration flux");
+	REGISTER_FECORE_CLASS(FEChemPlotSBSConcentration               , "sbs concentration");
+	REGISTER_FECORE_CLASS(FEChemPlotSBSApparentDensity             , "sbs apparent density");
+	REGISTER_FECORE_CLASS(FEChemPlotSolidVolumeFraction            , "solid volume fraction");
+	REGISTER_FECORE_CLASS(FEChemSoluteFlux                         , "soluteflux");
+	REGISTER_FECORE_CLASS(FEChemSBSPointSource                     , "sbs point source");
+	REGISTER_FECORE_CLASS(FEChemSpeciesPointSource                 , "point source");
 
-	REGISTER_FECORE_CLASS(FEInitialConcentration, "initial concentration");
-	REGISTER_FECORE_CLASS(FEInitialVelocity     , "initial velocity");
+	REGISTER_FECORE_CLASS(FEChemInitialConcentration, "initial concentration");
+	REGISTER_FECORE_CLASS(FEChemInitialVelocity     , "initial velocity");
 
 
 	// Reaction-diffusion-convection module
@@ -108,8 +108,8 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 
 	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection", info);
 
-	REGISTER_FECORE_CLASS(FENLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
-	REGISTER_FECORE_CLASS(FEPlotNodalVelocity, "nodal velocity");
+	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
+	REGISTER_FECORE_CLASS(FEChemPlotNodalVelocity, "nodal velocity");
 
 	// model update requests
 	fecore.OnCreateEvent(AddPlotVariableWhenCreating<FEBioChemAnalysis>("concentration"));
