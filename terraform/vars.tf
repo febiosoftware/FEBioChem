@@ -32,3 +32,8 @@ variable "repo_key" {
   type      = string
   sensitive = true
 }
+
+variable "repo_action_permissions" {
+  type    = list(string)
+  default = ["aws/*", "tundranerd/*"]
+}
