@@ -1,16 +1,11 @@
+variable "group_name" {
+  type    = string
+  default = "github-ci-group"
+}
+
 variable "repo_name" {
   type    = string
   default = "FEBioChem"
-}
-
-variable "aws_access_key_id" {
-  type      = string
-  sensitive = true
-}
-
-variable "aws_secret_access_key" {
-  type      = string
-  sensitive = true
 }
 
 variable "gh_token" {
