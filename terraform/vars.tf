@@ -1,6 +1,6 @@
-variable "group_name" {
+variable "username" {
   type    = string
-  default = "github-ci-group"
+  default = "tf-gh-actions-febio-chem"
 }
 
 variable "repo_name" {
