@@ -7,6 +7,5 @@ jobs:
     with:
       runTests: ${{ inputs.runTests && true || false }}
       package-name: febiochem
-      package-sdk: true
       requires-sdk: true
     secrets: inherit
