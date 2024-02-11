@@ -1,17 +1,20 @@
 on:
   push:
-    branches: [ ci/* ]
+    branches:
+      - ci/develop
+      - ci/develop-verify
 jobs:
   call_workflow:
     uses: febiosoftware/febio-workflows/.github/workflows/linux-reusable.yml@develop
     with:
-      aws-ami-id: ami-0b0e38d12eb5ff011
+      aws-ami-id: ami-098154f774f68e105
       aws-sg-id: sg-0ca7912782cf1538b
-      package-name: febiochem
+      runTests: false
+      package-name: febio-studio
       requires-sdk: true
       sdk-config: |
         {
           "sdk_path": "ci/develop",
-          "version": "v4.3",
+          "version": "v4.5",
         }
     secrets: inherit

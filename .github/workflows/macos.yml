@@ -1,15 +1,18 @@
 on:
   push:
-    branches: [ ci/* ]
+    branches:
+      - ci/develop
+      - ci/develop-verify
 jobs:
   call_workflow:
     uses: febiosoftware/febio-workflows/.github/workflows/macos-reusable.yml@develop
     with:
-      package-name: febiochem
+      runTests: false
+      package-name: febio-studio
       requires-sdk: true
       sdk-config: |
         {
           "sdk_path": "ci/develop",
-          "version": "v4.3",
+          "version": "v4.5",
         }
     secrets: inherit
