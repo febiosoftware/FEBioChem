@@ -10,7 +10,7 @@ jobs:
       aws-ami-id: ami-0590ebdb5afffb782
       aws-sg-id: sg-0ca7912782cf1538b
       runTests: false
-      package-name: febio-studio
+      package-name: febiochem
       requires-sdk: true
       sdk-config: |
         {
