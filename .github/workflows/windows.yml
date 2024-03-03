@@ -11,7 +11,7 @@ jobs:
       aws-sg-id: sg-0ca7912782cf1538b
       aws-instance-type: c5a.8xlarge
       runTests: false
-      package-name: febio-studio
+      package-name: febiochem
       requires-sdk: true
       sdk-config: |
         {
