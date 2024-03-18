@@ -84,11 +84,14 @@ public:
 	// constructor
 	FEChemReactiveSpecies(FEModel* fem);
 
+	bool Init();
+
 	// evaluate diffusivity
 	double Diffusivity() { return m_diffusivity; }
 
 private:
-	double	m_diffusivity;				//!< diffusion constant
+	int		m_speciesId;
+	double	m_diffusivity; //!< diffusion constant
 	
 	DECLARE_FECORE_CLASS();
 };
@@ -103,6 +106,8 @@ public:
 	// constructor
 	FEChemSolidBoundSpecies(FEModel* fem);
 
+	bool Init() override;
+
 	// initial apparent density
 	double InitialApparentDensity() const { return m_rho0; }
 
@@ -113,6 +118,7 @@ public:
 	double MaxApparentDensity() const { return m_rhomax; }
 
 private:
+	int		m_speciesId;
 	double	m_rho0;	//!< initial apparent density
 	double	m_rhomin, m_rhomax;	//!< min, max range for apparent density
 
