@@ -20,6 +20,7 @@
 #include <FECore/FEModelUpdate.h>
 #include "FEInitialConcentration.h"
 #include "FEConcentrationBC.h"
+#include "FEBioChemLog.h"
 
 class FEBioChemModule : public FEModule
 {
@@ -101,6 +102,30 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemInitialConcentration, "initial concentration");
 	REGISTER_FECORE_CLASS(FEChemInitialVelocity     , "initial velocity");
 
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 0, "j1x");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 0, "j1y");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 0, "j1z");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 1, "j2x");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 1, "j2y");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 1, "j2z");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 2, "j3x");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 2, "j3y");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 2, "j3z");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 3, "j4x");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 3, "j4y");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 3, "j4z");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 4, "j5x");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 4, "j5y");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 4, "j5z");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 5, "j6x");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 5, "j6y");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 5, "j6z");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 6, "j7x");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 6, "j7y");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 6, "j7z");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 7, "j8x");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 7, "j8y");
+	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 7, "j8z");
 
 	// Reaction-diffusion-convection module
 	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection");

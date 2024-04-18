@@ -78,50 +78,50 @@ FEChemReactiveSpeciesBase::FEChemReactiveSpeciesBase(FEModel* fem) : FEMaterialP
 //-----------------------------------------------------------------------------
 bool FEChemReactiveSpeciesBase::Init()
 {
-	// find the species with this name
 	FEModel& fem = *GetFEModel();
 	string name = GetName();
 	int nvar = fem.GlobalDataItems();
-	for (int i = 0; i<nvar; ++i)
-	{
-		FEGlobalData& d = *fem.GetGlobalData(i);
-		if (d.GetName() == name)
-		{
-			SetID(d.GetID() - 1);
+	if ((m_id < 0) || (m_id >= nvar)) return false;
+	FEGlobalData& d = *fem.GetGlobalData(m_id);
 
-			// copy the parameters
-			FEParameterList& pl = d.GetParameterList();
-			FEParam* p = pl.FindFromName("density");
-			if (p) { m_rhoT = p->value<double>(); }
-			if (m_rhoT <= 0.0) return false;
+	m_id = d.GetID() - 1;
+	SetName(d.GetName());
 
-			p = pl.FindFromName("molar_mass");
-			if (p) { m_M = p->value<double>(); }
-			if (m_M <= 0.0) return false;
-		}
-	}
+	// copy the parameters
+	FEParameterList& pl = d.GetParameterList();
+	FEParam* p = pl.FindFromName("density");
+	if (p) { m_rhoT = p->value<double>(); }
+	if (m_rhoT <= 0.0) return false;
 
-	if (m_id < 0) return false;// MaterialError("Invalid species ID");
+	p = pl.FindFromName("molar_mass");
+	if (p) { m_M = p->value<double>(); }
+	if (m_M <= 0.0) return false;
+
 	return FEMaterialProperty::Init();
 }
 
 //=================================================================================================
-
-//-----------------------------------------------------------------------------
 BEGIN_FECORE_CLASS(FEChemReactiveSpecies, FEChemReactiveSpeciesBase)
+	ADD_PARAMETER(m_speciesId, "name", FE_PARAM_ATTRIBUTE, "$(species)");
 	ADD_PARAMETER(m_diffusivity, FE_RANGE_GREATER_OR_EQUAL(0.0), "diffusivity");
 END_FECORE_CLASS();
 
-//-----------------------------------------------------------------------------
 FEChemReactiveSpecies::FEChemReactiveSpecies(FEModel* fem) : FEChemReactiveSpeciesBase(fem)
 {
+	m_speciesId = -1;
 	m_diffusivity = 0.0;
 }
 
-//=================================================================================================
+bool FEChemReactiveSpecies::Init()
+{
+	if (m_speciesId == -1) return false;
+	SetID(m_speciesId - 1); // ID has to be zero-based
+	return FEChemReactiveSpeciesBase::Init();
+}
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 BEGIN_FECORE_CLASS(FEChemSolidBoundSpecies, FEChemReactiveSpeciesBase)
+	ADD_PARAMETER(m_speciesId, "name", FE_PARAM_ATTRIBUTE, "$(species)");
 	ADD_PARAMETER(m_rho0, FE_RANGE_GREATER_OR_EQUAL(0.0), "rho0");
 	ADD_PARAMETER(m_M   , "molar_mass");
 	ADD_PARAMETER(m_rhoT, "density");
@@ -129,13 +129,23 @@ BEGIN_FECORE_CLASS(FEChemSolidBoundSpecies, FEChemReactiveSpeciesBase)
 	ADD_PARAMETER(m_rhomax, FE_RANGE_GREATER_OR_EQUAL(0.0), "rhomax");
 END_FECORE_CLASS();
 
-//-----------------------------------------------------------------------------
 FEChemSolidBoundSpecies::FEChemSolidBoundSpecies(FEModel* fem) : FEChemReactiveSpeciesBase(fem)
 {
+	m_speciesId = -1;
+
 	m_rho0 = 0.0;
 	m_M = 0.0;
 	m_rhoT = 0.0;
 
 	m_rhomin = 0.0;
 	m_rhomax = 0.0;
+}
+
+bool FEChemSolidBoundSpecies::Init()
+{
+	if (m_speciesId == -1) return false;
+	FEModel& fem = *GetFEModel();
+	if (m_speciesId < 0) return false;
+	SetID(m_speciesId - 1);
+	return FEChemReactiveSpeciesBase::Init();
 }
