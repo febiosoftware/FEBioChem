@@ -35,6 +35,8 @@ FEChemNLReactionDiffusionSolver::FEChemNLReactionDiffusionSolver(FEModel* fem) :
 	// we'll need a non-symmetric stiffness matrix
 	m_msymm = REAL_UNSYMMETRIC;
 
+	m_solutionNorm.push_back(ConvergenceInfo());
+
 	// Add the concentration variable
 	DOFS& dofs = fem->GetDOFS();
 	dofs.AddVariable("concentration", VAR_ARRAY);	// we start with zero concentrations
@@ -91,6 +93,10 @@ bool FEChemNLReactionDiffusionSolver::CheckConvergence(int niter, const vector<d
 	{
 		m_normRi = m_R0*m_R0;
 		m_normUi = m_U*m_U;
+
+		m_residuNorm.norm = m_normRi;
+		m_energyNorm.norm = m_U * m_R0;
+		m_solutionNorm[0].norm0 = m_normUi;
 	}
 
 	// calculate SBM norm
@@ -101,6 +107,10 @@ bool FEChemNLReactionDiffusionSolver::CheckConvergence(int niter, const vector<d
 	double normu = m_ui*m_ui;
 	double normU = m_U*m_U;
 	double normR = m_R1*m_R1;
+
+	m_residuNorm.norm = normR;
+	m_energyNorm.norm = m_U*m_R1;
+	m_solutionNorm[0].norm = normU;
 
 	FEModel& fem = *GetFEModel();
 	FETimeInfo& tp = fem.GetTime();
