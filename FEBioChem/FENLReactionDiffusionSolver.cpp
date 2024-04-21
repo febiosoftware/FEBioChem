@@ -37,6 +37,9 @@ FEChemNLReactionDiffusionSolver::FEChemNLReactionDiffusionSolver(FEModel* fem) :
 
 	m_solutionNorm.push_back(ConvergenceInfo());
 
+	// Need to turn this off by default for backward compatibility
+	m_bdivreform = false;
+
 	// Add the concentration variable
 	DOFS& dofs = fem->GetDOFS();
 	dofs.AddVariable("concentration", VAR_ARRAY);	// we start with zero concentrations
