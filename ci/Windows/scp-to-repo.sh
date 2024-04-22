@@ -1,2 +1,2 @@
 #! /bin/bash
-scp cmbuild/Release/* repo:~/update2/FEBioStudio2Dev/Windows/stage/bin
+scp cmbuild/Release/*.dll repo:~/update2/FEBioStudio2Dev/Windows/stage/bin
