@@ -17,7 +17,6 @@
 #include <FECore/FEModule.h>
 #include <FECore/FEModel.h>
 #include "FEBioChemAnalysis.h"
-#include <FECore/FEModelUpdate.h>
 #include "FEInitialConcentration.h"
 #include "FEConcentrationBC.h"
 #include "FEBioChemLog.h"
@@ -135,10 +134,6 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 
 	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEChemPlotNodalVelocity, "nodal velocity");
-
-	// model update requests
-	fecore.OnCreateEvent(AddPlotVariableWhenCreating<FEBioChemAnalysis>("concentration"));
-	fecore.OnCreateEvent(AddPlotVariableWhenCreating<FEBioChemConvAnalysis>("concentration"));
 
 	fecore.SetActiveModule(0);
 }
