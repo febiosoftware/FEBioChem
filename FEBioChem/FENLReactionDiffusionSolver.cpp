@@ -288,7 +288,7 @@ void FEChemNLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const F
 bool FEChemNLReactionDiffusionSolver::StiffnessMatrix()
 {
 	// setup the linear system
-	FELinearSystem LS(this, *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
+	FELinearSystem LS(GetFEModel(), *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
 
 	// add contributions from domains
 	FEMesh& mesh = GetFEModel()->GetMesh();
