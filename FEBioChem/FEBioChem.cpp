@@ -127,10 +127,8 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 7, "j8z");
 
 	// Reaction-diffusion-convection module
-	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection");
-	fecore.AddModuleDependency("reaction-diffusion");
-
 	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection", info);
+	fecore.AddModuleDependency("reaction-diffusion");
 
 	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEChemPlotNodalVelocity, "nodal velocity");
