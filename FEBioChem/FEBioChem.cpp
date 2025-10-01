@@ -39,7 +39,12 @@ public:
 	void InitModel(FEModel* fem)
 	{
 		DOFS& dofs = fem->GetDOFS();
-		int var = dofs.AddVariable("concentration", VAR_ARRAY);
+		int varC = dofs.AddVariable("concentration", VAR_ARRAY);
+
+		int varV = dofs.AddVariable("velocity", VAR_VEC3);
+		dofs.SetDOFName(varV, 0, "vx");
+		dofs.SetDOFName(varV, 1, "vy");
+		dofs.SetDOFName(varV, 2, "vz");
 	}
 };
 
