@@ -23,30 +23,6 @@ endif()
 
 find_package(FEBio REQUIRED)
 
-#### Check if paths are valid and find libs ####
-function(findLib libName libDir libOut)
-    string(TOLOWER ${libName} lname)
-
-    find_library(TEMP 
-        NAMES ${libName} ${lname} ${lname}_gcc64 ${lname}_lnx64 
-        PATHS ${${libDir}} 
-        NO_DEFAULT_PATH)
-
-    if(TEMP)
-        set(${libOut} ${TEMP} PARENT_SCOPE)
-        unset(TEMP CACHE)
-    else()
-        if(WIN32)
-            message(SEND_ERROR "Could not find ${libName}.lib. Check ${libName}.")
-        elseif(APPLE)
-            message(SEND_ERROR "Could not find ${libName}.so, ${libName}.a, or ${libName}.dylib Check ${libDir}.")
-        else()
-            message(SEND_ERROR "Could not find ${libName}.so, or ${libName}.a. Check ${libDir}")
-        endif()
-        unset(TEMP CACHE)
-    endif()
-endfunction()
-
 ##### Set appropriate defines and includes #####
 
 if(WIN32)
