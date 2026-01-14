@@ -90,10 +90,10 @@ public:
 public:
 
 	//! Evaluate the reaction rate at this integration point
-	virtual double GetReactionRate(FEChemReactionMaterialPoint& pt) = 0;
+	virtual double GetReactionRate(FEMaterialPoint& pt) = 0;
 
 	//! Evaluate derivative of reaction rate wrt to species Id
-	virtual double GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id) = 0;
+	virtual double GetReactionRateDeriv(FEMaterialPoint& pt, int id) = 0;
 
 public:
 	vector<int>	m_vR;	//!< stoichiometric coefficients for reactants

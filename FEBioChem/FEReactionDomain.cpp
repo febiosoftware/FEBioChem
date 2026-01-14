@@ -172,7 +172,7 @@ void FEChemReactionDomain::Activate()
 				rp.m_ca[s->GetLocalID()] = ci;
 
 				// evaluate the mass supply for this SBM
-				double rhohati = m_mat->GetReactionRate(rp, s->GetLocalID());
+				double rhohati = m_mat->GetReactionRate(mp, s->GetLocalID());
 
 				// convert from molar supply to mass supply
 				rhohati *= f*s->MolarMass();
@@ -255,7 +255,7 @@ void FEChemReactionDomain::Update(const FETimeInfo& tp)
 				double tmp = rp.m_sbmr[i];
 
 				// evaluate the mass supply for this SBM
-				double rhohati = m_mat->GetReactionRate(rp, s->GetLocalID());
+				double rhohati = m_mat->GetReactionRate(mp, s->GetLocalID());
 
 				// convert from molar supply to mass supply
 				rhohati *= f*s->MolarMass();
@@ -410,7 +410,7 @@ void FEChemReactionDomain::ElementForceVector(FESolidElement& el, vector<double>
 		// evaluate the reaction rates
 		for (int i=0; i<ndof; ++i)
 		{
-			R[i] = phi * m_mat->GetReactionRate(pt, m_mat->GetSpecies(i)->GetLocalID());
+			R[i] = phi * m_mat->GetReactionRate(mp, m_mat->GetSpecies(i)->GetLocalID());
 		}
 
 		double detJ = detJt(el, n);
@@ -675,7 +675,7 @@ void FEChemReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& 
 		for (int i=0; i<ncv; ++i)
 			for (int j=0; j<ncv; ++j)
 				{
-					Gamma[i][j] = phi*m_mat->GetReactionRateStiffness(rp, m_mat->GetSpecies(i)->GetLocalID(), m_mat->GetSpecies(j)->GetLocalID());
+					Gamma[i][j] = phi*m_mat->GetReactionRateStiffness(mp, m_mat->GetSpecies(i)->GetLocalID(), m_mat->GetSpecies(j)->GetLocalID());
 				}
 
 		// evaluate element matrix

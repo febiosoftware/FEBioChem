@@ -24,11 +24,11 @@ public:
 
 	// evaluate the reaction rate at this material point
 	// The id parameter is the index in the global species list (not the local species list)
-	double GetReactionRate(FEChemReactionMaterialPoint& mp, int id);
+	double GetReactionRate(FEMaterialPoint& mp, int id);
 
 	// evaluate the reaction rate stiffness at this material point
 	// The id parameters are the indices in the global species list (not the local species list)
-	double GetReactionRateStiffness(FEChemReactionMaterialPoint& mp, int idA, int idB);
+	double GetReactionRateStiffness(FEMaterialPoint& mp, int idA, int idB);
 
 	// create a material point
 	FEMaterialPointData* CreateMaterialPointData() override;

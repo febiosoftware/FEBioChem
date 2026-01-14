@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<FEBioStudioProject version="1.0">
+	<file path="ex01.feb"/>
+	<file path="ex02.feb"/>
+	<file path="ex03.feb"/>
+	<file path="ex04.feb"/>
+	<file path="ex05.feb"/>
+	<file path="ex06.feb"/>
+	<file path="ex07.feb"/>
+	<file path="ex08.feb"/>
+	<file path="ex09.feb"/>
+	<file path="ex10.feb"/>
+	<file path="ex11.feb"/>
+	<file path="ex12.feb"/>
+	<file path="ex13.feb"/>
+	<file path="ex14.feb"/>
+	<file path="ex15.feb"/>
+	<file path="ex16.feb"/>
+	<file path="ex17.feb"/>
+	<file path="ex18.feb"/>
+	<file path="ex19.feb"/>
+	<file path="ex20.feb"/>
+	<file path="ex21.feb"/>
+	<file path="ex22.feb"/>
+	<file path="ex23.feb"/>
+	<file path="ex24.feb"/>
+	<file path="ex25.feb"/>
+	<file path="ex26.feb"/>
+	<file path="ex27.feb"/>
+	<file path="ex28.feb"/>
+	<file path="ex29.feb"/>
+	<file path="ex30.feb"/>
+	<file path="Batch1.fsbatch"/>
+</FEBioStudioProject>

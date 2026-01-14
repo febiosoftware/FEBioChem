@@ -131,7 +131,7 @@ double FEChemReactionDiffusionMaterial::SolidVolumeFraction(FEChemReactionMateri
 
 //-----------------------------------------------------------------------------
 // Evaluates the reaction rate for this reaction. The id is the local ID of the species
-double FEChemReactionDiffusionMaterial::GetReactionRate(FEChemReactionMaterialPoint& mp, int id)
+double FEChemReactionDiffusionMaterial::GetReactionRate(FEMaterialPoint& mp, int id)
 {
 	// initialize rate to zero
 	double Ri = 0.0;
@@ -161,7 +161,7 @@ double FEChemReactionDiffusionMaterial::GetReactionRate(FEChemReactionMaterialPo
 }
 
 //-----------------------------------------------------------------------------
-double FEChemReactionDiffusionMaterial::GetReactionRateStiffness(FEChemReactionMaterialPoint& mp, int idA, int idB)
+double FEChemReactionDiffusionMaterial::GetReactionRateStiffness(FEMaterialPoint& mp, int idA, int idB)
 {
 	double G = 0.0;
 

@@ -8,16 +8,16 @@ public:
 	FEChemMassActionReaction(FEModel* fem);
 
 	// one-time initialization
-	bool Init();
+	bool Init() override;
 
 	//! Evaluate the reaction rate at this integration point
-	double GetReactionRate(FEChemReactionMaterialPoint& pt);
+	double GetReactionRate(FEMaterialPoint& mp) override;
 
 	//! Evaluate derivative of reaction rate wrt to species Id
-	double GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id);
+	double GetReactionRateDeriv(FEMaterialPoint& mp, int id) override;
 
 private:
-	double	m_k;			//!< reaction constant 
+	FEParamDouble	m_k;	//!< reaction constant 
 	string	m_equation;		//!< reaction equation
 	bool	m_posOnly;		//!< only consider nonnegative concentrations (neg. concentrations will be treated as zero)
 

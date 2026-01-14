@@ -62,8 +62,10 @@ bool FEChemMichaelisMentenReaction::Init()
 }
 
 //! Evaluate the reaction rate at this integration point
-double FEChemMichaelisMentenReaction::GetReactionRate(FEChemReactionMaterialPoint& pt)
+double FEChemMichaelisMentenReaction::GetReactionRate(FEMaterialPoint& mp)
 {
+	FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
 	// concentration values at integration points
 	vector<double>& c = pt.m_ca;
 
@@ -77,8 +79,10 @@ double FEChemMichaelisMentenReaction::GetReactionRate(FEChemReactionMaterialPoin
 }
 
 //! Evaluate derivative of reaction rate wrt to species Id
-double FEChemMichaelisMentenReaction::GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id)
+double FEChemMichaelisMentenReaction::GetReactionRateDeriv(FEMaterialPoint& mp, int id)
 {
+	FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
 	// NOTE: I don't think I need to do anything special, but we should not calculate a derivative if id is an sbm
 	if (id != m_subID) return 0.0;
 

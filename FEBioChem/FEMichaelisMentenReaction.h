@@ -7,13 +7,13 @@ public:
 	FEChemMichaelisMentenReaction(FEModel* fem);
 
 	//! initialization
-	bool Init();
+	bool Init() override;
 
 	//! Evaluate the reaction rate at this integration point
-	double GetReactionRate(FEChemReactionMaterialPoint& pt);
+	double GetReactionRate(FEMaterialPoint& mp) override;
 
 	//! Evaluate derivative of reaction rate wrt to species Id
-	double GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id);
+	double GetReactionRateDeriv(FEMaterialPoint& mp, int id) override;
 
 private:
 	double	m_Rmax;		//!< maximum reaction rate

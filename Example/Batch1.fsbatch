@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<fbs_batch>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex01.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>2.67497</norm>
+		<runtime>0.359554</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex02.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>11.1464</norm>
+		<runtime>15.5166</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex03.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>9.36544</norm>
+		<runtime>1.95658</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex04.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>7.52348</norm>
+		<runtime>1.76474</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex05.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>115.042</norm>
+		<runtime>0.861004</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex06.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>12.3238</norm>
+		<runtime>2.55682</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex07.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>4.61505</norm>
+		<runtime>2.60838</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex08.feb">
+		<timesteps>10</timesteps>
+		<iters>10</iters>
+		<nrhs>20</nrhs>
+		<reforms>10</reforms>
+		<norm>3.19412</norm>
+		<runtime>0.262897</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex09.feb">
+		<timesteps>10</timesteps>
+		<iters>10</iters>
+		<nrhs>20</nrhs>
+		<reforms>10</reforms>
+		<norm>3.16885</norm>
+		<runtime>0.28434</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex10.feb">
+		<timesteps>10</timesteps>
+		<iters>10</iters>
+		<nrhs>20</nrhs>
+		<reforms>10</reforms>
+		<norm>3.2053</norm>
+		<runtime>0.338543</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex11.feb">
+		<timesteps>10</timesteps>
+		<iters>10</iters>
+		<nrhs>20</nrhs>
+		<reforms>10</reforms>
+		<norm>3.17676</norm>
+		<runtime>0.360357</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex12.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>13.7163</norm>
+		<runtime>7.99327</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex13.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>15.3322</norm>
+		<runtime>8.31066</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex14.feb">
+		<timesteps>100</timesteps>
+		<iters>164</iters>
+		<nrhs>264</nrhs>
+		<reforms>100</reforms>
+		<norm>7.75099</norm>
+		<runtime>6.32733</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex15.feb">
+		<timesteps>100</timesteps>
+		<iters>164</iters>
+		<nrhs>264</nrhs>
+		<reforms>100</reforms>
+		<norm>7.73277</norm>
+		<runtime>6.34158</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex16.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>20.6759</norm>
+		<runtime>7.09396</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex17.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>20.6755</norm>
+		<runtime>7.06109</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex18.feb">
+		<timesteps>88</timesteps>
+		<iters>88</iters>
+		<nrhs>176</nrhs>
+		<reforms>88</reforms>
+		<norm>0</norm>
+		<runtime>0.923989</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex19.feb">
+		<timesteps>88</timesteps>
+		<iters>88</iters>
+		<nrhs>176</nrhs>
+		<reforms>88</reforms>
+		<norm>0</norm>
+		<runtime>0.967665</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex20.feb">
+		<timesteps>10</timesteps>
+		<iters>10</iters>
+		<nrhs>20</nrhs>
+		<reforms>10</reforms>
+		<norm>0.00111353</norm>
+		<runtime>0.204365</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex21.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>0</norm>
+		<runtime>0.146408</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex22.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>1.91423</norm>
+		<runtime>0.298945</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex23.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>1.76769</norm>
+		<runtime>0.311531</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex24.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>6.32424</norm>
+		<runtime>0.300455</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex25.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>8.94405</norm>
+		<runtime>0.320525</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex26.feb">
+		<timesteps>100</timesteps>
+		<iters>100</iters>
+		<nrhs>200</nrhs>
+		<reforms>100</reforms>
+		<norm>5.93191</norm>
+		<runtime>0.290605</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex27.feb">
+		<timesteps>210</timesteps>
+		<iters>210</iters>
+		<nrhs>420</nrhs>
+		<reforms>210</reforms>
+		<norm>4.09868e-09</norm>
+		<runtime>11.7601</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex28.feb">
+		<timesteps>100</timesteps>
+		<iters>150</iters>
+		<nrhs>250</nrhs>
+		<reforms>100</reforms>
+		<norm>0.578258</norm>
+		<runtime>6.73402</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex29.feb">
+		<timesteps>80</timesteps>
+		<iters>80</iters>
+		<nrhs>160</nrhs>
+		<reforms>80</reforms>
+		<norm>1.85317e-07</norm>
+		<runtime>7.74806</runtime>
+	</file>
+	<file path="C:\Users\Steve\source\repos\FEBioChem\Example\ex30.feb">
+		<timesteps>10</timesteps>
+		<iters>10</iters>
+		<nrhs>20</nrhs>
+		<reforms>10</reforms>
+		<norm>0.106468</norm>
+		<runtime>0.419893</runtime>
+	</file>
+</fbs_batch>

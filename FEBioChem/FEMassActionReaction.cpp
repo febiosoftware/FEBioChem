@@ -175,13 +175,15 @@ bool FEChemMassActionReaction::Init()
 // Evaluate the reaction rate
 // Assumes forward mass action.
 // I don't think this does dimerization correctly.
-double FEChemMassActionReaction::GetReactionRate(FEChemReactionMaterialPoint& pt)
+double FEChemMassActionReaction::GetReactionRate(FEMaterialPoint& mp)
 {
+	FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
 	// concentration values at integration points
 	vector<double>& c = pt.m_ca;
 
 	// calculate reaction rate
-	double rj = m_k;
+	double rj = m_k(mp);
 	for (int i = 0; i<(int)m_vR.size(); ++i)
 	{
 		double ci = c[i];
@@ -198,8 +200,10 @@ double FEChemMassActionReaction::GetReactionRate(FEChemReactionMaterialPoint& pt
 
 //-----------------------------------------------------------------------------
 //! Evaluate derivative of reaction rate wrt to species with local id
-double FEChemMassActionReaction::GetReactionRateDeriv(FEChemReactionMaterialPoint& pt, int id)
+double FEChemMassActionReaction::GetReactionRateDeriv(FEMaterialPoint& mp, int id)
 {
+	FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
 	// concentration values at integration points
 	vector<double>& c = pt.m_ca;
 
@@ -207,7 +211,7 @@ double FEChemMassActionReaction::GetReactionRateDeriv(FEChemReactionMaterialPoin
 	// otherwise derivative will be zero
 	if (m_vR[id] == 0.0) return 0.0;
 
-	double drj = m_k;
+	double drj = m_k(mp);
 	for (int i = 0; i<(int)m_vR.size(); ++i)
 	{
 		double ci = c[i];
