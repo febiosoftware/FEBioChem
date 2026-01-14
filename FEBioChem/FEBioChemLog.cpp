@@ -49,3 +49,20 @@ double FEChemLogElemSoluteFlux_::value(FEElement& el)
 	}
 	return val / (double)nint;
 }
+
+double FEChemLogConcentration_::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
+		if (pt)
+		{
+			double c = pt->m_c[m_nsol];
+			val += c;
+		}
+	}
+	return val / (double)nint;
+}
