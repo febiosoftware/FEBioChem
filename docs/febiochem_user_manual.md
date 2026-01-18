@@ -114,6 +114,15 @@ The chemical species that are used in the model are defined in the `Globals` sec
 * A **solute** defines a chemical species that is not bound to the solid phase of a mixture. If a model doesn’t represent a mixture, each solute defines a chemical species. No child properties need to be defined for a solute.
 * A **solid_bound** defines a chemical species that is bound to the solid-phase of a mixture. Again, no child properties need to be defined for a solid bound species.
 
+## Solver
+Make sure to set the solver type to the same name as the module. For instance, for a reaction-diffusion model, set
+
+```xml
+<solver type="reaction-diffusion">
+...
+</solver>
+```
+
 ### Material
 The material type needed by this plugin is `reaction-diffusion`. It needs the following material properties. Note that not all are required.
 
@@ -174,25 +183,29 @@ Again, it is emphasized that all species involved in a reaction must be defined 
 For each species (but not solid-bound species), an initial value can be set in the `Initial` section of the FEBio input file via the `init` tag.
 
 ```xml
-<init bc="c1" node_set="set1">
+<ic type="initial concentration" node_set="set1">
+	<dof>c1</dof>
 	<value>1.0</value>
 </init>
 ```
 
-The `bc` attribute references the particular species (or solute). In this case, `c1` references the solute with ID equal to 1. The `node_set` references a node set that needs to be defined in the `Geometry` section of the input file.
+The `dof` parameter references the particular species (or solute). In this case, `c1` references the solute with ID equal to 1. The `node_set` references a node set that needs to be defined in the `Mesh` section of the input file.
 
 ### Boundary conditions
 The syntax for defining fixed or prescribed is identical for any FEBio model. Use `c[n]` to reference a particular species (or solute, again no solid-bound species). Thus, for example, `c1` references solute with ID one, `c2` is the solute with ID 2, and so forth. 
 An example of a fixed boundary condition looks like this.
 
 ```xml
-<fix bc="c1" node_set="FixedSet1"/>
+<bc type="zero concentration" node_set="FixedSet1">
+	<dof>c1</dof>
+</bc>
 ```
 An example of a prescribed boundary condition looks like this.
 
 ```xml
-<prescribe bc="c1" node_set="PrescribedSet1">
-	<scale lc="1">1.0</scale>
+<bc type="prescribed concentration" node_set="PrescribedSet1">
+	<dof>c1</dof>
+	<value lc="1">1.0</value>
 </prescribe>
 ```
 
@@ -240,7 +253,8 @@ For reaction-diffusion-convection problems, the fluid velocity needs to be initi
 The following example sets the x-component of the velocity vector to 1.0.
 
 ```xml
-<init bc="vx" node_set="SomeNodeSet">
+<ic type="initial velocity" node_set="SomeNodeSet">
+	<dof>vx</dof>
 	<value>1.0</value>
 </init>
 ```
@@ -248,9 +262,18 @@ The following example sets the x-component of the velocity vector to 1.0.
 You can also define a heterogeneous field. For instance,
 
 ```xml
-<init bc="vx" node_set="SomeNodeSet">
-	<value node_data="init_vel"/>
+<ic type="initial velocity" node_set="SomeNodeSet">
+	<dof>vx</dof>
+	<value type="map">init_vel<value/>
 </init>
 ```
-Here, `init_vel` is a node data field that is defined in the MeshData section.
+Here, `init_vel` is a node data field that is defined in the `MeshData` section.
 
+You can also use a mathematical expression to set the initial velocity field. 
+
+```xml
+<ic type="initial velocity" node_set="SomeNodeSet">
+	<dof>vx</dof>
+	<value type="math">4*(0.5 - Y)*(Y + 0.5)<value/>
+</init>
+```
