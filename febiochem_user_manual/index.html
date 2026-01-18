@@ -1,0 +1,869 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation site for FEBioChem">
+      
+      
+        <meta name="author" content="Steve Maas">
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>User Manual - FEBioChem</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#introduction" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="FEBioChem" class="md-header__button md-logo" aria-label="FEBioChem" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FEBioChem
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              User Manual
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  User Manual
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="FEBioChem" class="md-nav__button md-logo" aria-label="FEBioChem" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    FEBioChem
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Manual
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mixtures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mixtures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-febiochem-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using the FEBioChem plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-an-febiochem-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defining an FEBioChem model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Defining an FEBioChem model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#globals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Globals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#material" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Material
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Material">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#species-property" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        species property
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solid_bound_species-property" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        solid_bound_species property
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reaction-property" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        reaction property
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initial-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boundary-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boundary conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prescribing-a-concentration-flux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prescribing a concentration flux
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plot Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initial-velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial velocity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>User Manual</h1>
+
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>The FEBioChem plugin was designed for solving the reaction-diffusion equation in the context of a (non-deformable) mixture with multiple chemical species. The species can be solutes that flow with the solvent, or can be bound to the solid phase of the mixture. In this regard, this plugin offers similar capabilities as the FEBioMix module in FEBio (at least for non-deformable mixtures). However, since the mixture is assumed non-deformable, the calculations are optimized and the performance improved.</p>
+<p>The basic set of equations that FEBioChem solves are the nonlinear reaction-diffusion equations, which can be stated in the following form.</p>
+<div class="arithmatex">\[
+\begin{equation}
+{{\partial }_{t}}{{u}^{\left( i \right)}}=\nabla \cdot \left( {{\mathbf{D}}^{\left( i \right)}}\nabla {{u}^{\left( i \right)}} \right)-\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)+{{R}^{\left( i \right)}}\left( \mathbf{u} \right),i=1\ldots N
+\end{equation}
+\]</div>
+<p>Here, <span class="arithmatex">\({{u}^{\left( i \right)}}\)</span> represents the concentration of chemical species <span class="arithmatex">\(i\)</span>, <span class="arithmatex">\({{\mathbf{D}}^{\left( i \right)}}\)</span> the diffusion constant of species <span class="arithmatex">\(i\)</span>, and <span class="arithmatex">\({{R}^{\left( i \right)}}\)</span> accounts for all local reactions that contribute to the concentration of species <span class="arithmatex">\(i\)</span>. The vector <span class="arithmatex">\({{\mathbf{u}}^{T}}=\left[ {{u}^{\left( 1 \right)}},...,{{u}^{\left( N \right)}} \right]\)</span> represents all the concentrations, and <span class="arithmatex">\(v\)</span> represents a velocity field in which the solutes can flow. </p>
+<p>A general (forward) chemical reaction is notated as follows.</p>
+<div class="arithmatex">\[
+\begin{equation}
+\sum\limits_{i}{{{{{v}'}}_{ij}}}{{M}_{i}}\overset{{{k}_{j}}}{\mathop{\to }}\,\sum\limits_{i}{{{{{v}''}}_{ij}}{{M}_{i}}}
+\end{equation}
+\]</div>
+<p>Here, <span class="arithmatex">\(M_i\)</span> identifies the chemical species, <span class="arithmatex">\({{{v}'}_{ij}}\)</span> and <span class="arithmatex">\({{{v}''}_{ij}}\)</span> are the stoichiometric coefficients of the reactants and products, respectively, <span class="arithmatex">\(k_j\)</span> is the rate coefficient of the j-th reaction.</p>
+<p>The source term <span class="arithmatex">\({{R}^{\left( i \right)}}=\sum\limits_{j=1}^{J}{{{v}_{ij}}{{r}_{j}}}\)</span> takes on the following form,</p>
+<p>Here, the sum is over <span class="arithmatex">\(J\)</span> reactions and <span class="arithmatex">\({{v}_{ij}}={{{v}''}_{ij}}-{{{v}'}_{ij}}\)</span> and,</p>
+<div class="arithmatex">\[
+\begin{equation}
+{{r}_{j}}={{k}_{j}}\prod\limits_{i=1}^{I}{{{\left[ {{u}^{\left( i \right)}} \right]}^{{{\mu }_{ij}}}}}
+\end{equation}
+\]</div>
+<p>the reaction rate of reaction <span class="arithmatex">\(j\)</span>. Usually, the exponent is taken to be <span class="arithmatex">\({{\mu }_{ij}}={{{\nu }'}_{ij}}\)</span> ,as according to the law of mass action.</p>
+<h3 id="mixtures">Mixtures<a class="headerlink" href="#mixtures" title="Permanent link">&para;</a></h3>
+<p>Thus far, we considered the case where the solute is free, i.e. not inside a porous material. In the case if the solutes are contained inside a porous material, then the equations above remain valid, except now that the concentrations are with respect to the mixture volume. The ‘true’ concentration <span class="arithmatex">\({{c}^{\left( i \right)}}\)</span>, i.e. the concentration w.r.t. to the solvent is related to the ‘bulk’ concentration via,</p>
+<div class="arithmatex">\[
+\begin{equation}
+{{u}^{\left( i \right)}}=\varphi\,{{c}^{\left( i \right)}}
+\end{equation}
+\]</div>
+<p>where <span class="arithmatex">\(\varphi\)</span> is the fluid volume fraction, i.e. the fraction of the volume that is accessible to the fluid (and therefore to the solvents). The FEBioChem plugin will report the true concentrations of the solution.
+A mixture is defined by two phases, a solid and a fluid phase. The fluid is assumed to be a solvent in which several species were dissolved. The volume fractions of the dissolved solutions are negligible and thus the solid and fluid volume fractions add up to unity.</p>
+<div class="arithmatex">\[
+\begin{equation}
+{{\varphi }^{s}}+{{\varphi }^{f}}=1
+\end{equation}
+\]</div>
+<p>We now consider the case that a chemical species exists as part of the solid phase. Such a species is called a <em>solid-bound molecule</em> (sbm). Since it is bound to the solid (immovable) phase, it is assumed that a solid-bound molecule does not undergo diffusion. Let us denote the apparent density of the sbm by <span class="arithmatex">\(\rho^{\sigma}\)</span>. It then follows that the governing equation for a solid-bound molecule is given by,</p>
+<div class="arithmatex">\[
+\begin{equation}
+\frac{d{{\rho }^{\sigma }}}{dt}={{\hat{\rho }}^{\sigma }}
+\end{equation}
+\]</div>
+<p>where <span class="arithmatex">\({{\hat{\rho }}^{\sigma }}\)</span> is the mass supply for the sbm. In this context, the mass supply will be calculated from the chemical reactions.</p>
+<p>A change in the apparent density of an SBM has an effect of the solid volume fraction, which is now defined via,</p>
+<div class="arithmatex">\[
+\begin{equation}
+{{\varphi }^{s}}=\varphi _{0}^{s}+\sum\limits_{\sigma }{{{\varphi }^{\sigma }}}
+\end{equation}
+\]</div>
+<p>where the volume fraction of the sbm is defined via,</p>
+<div class="arithmatex">\[
+\begin{equation}
+{{\varphi }^{\sigma }}=\frac{{{\rho }^{\sigma }}}{\rho _{T}^{\sigma }}
+\end{equation}
+\]</div>
+<p>That is, it is the ratio of the apparent density over the true density of the sbm. The fluid volume fraction, or porosity, is then defined via <span class="arithmatex">\(\varphi =1-{{\varphi }^{s}}\)</span>.</p>
+<h2 id="using-the-febiochem-plugin">Using the FEBioChem plugin<a class="headerlink" href="#using-the-febiochem-plugin" title="Permanent link">&para;</a></h2>
+<p>Like any other FEBio plugin, the plugin must be placed in a folder and the path to the plugin must be defined in the FEBio configuration file. This file is usually called <code>febio.xml</code> and can be found in the same location as the FEBio executable. In this file, add the following line:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;import&gt;</span>C:\path\to\febio\plugin\FEBioChem.dll<span class="nt">&lt;/import&gt;</span>
+</code></pre></div>
+<p>Make sure to include the full path name and file name of the plugin. When FEBio starts it will read the configuration file and load all the plugins defined therein. A message will be shown to the screen to inform the user whether the plugin was loaded successfully or not.</p>
+<h2 id="defining-an-febiochem-model">Defining an FEBioChem model<a class="headerlink" href="#defining-an-febiochem-model" title="Permanent link">&para;</a></h2>
+<p>For the most part an FEBioChem model is a standard FEBio model with a few modifications. These are discussed in the following sections. Note that this user’s manual assumes version 4.0 of the FEBio file format.</p>
+<h3 id="module">Module<a class="headerlink" href="#module" title="Permanent link">&para;</a></h3>
+<p>The <code>type</code> attribute of <code>Module</code> tag needs the value <code>reaction-diffusion</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;Module</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;reaction-diffusion&quot;</span><span class="nt">/&gt;</span>
+</code></pre></div>
+<p>This will inform FEBio to load the reaction-diffusion solver that is part of the FEBioChem plugin.</p>
+<p>This module does not include convection. If you want to include the convection term, you need to use the <code>reaction-diffusion-convection</code> module.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;Module</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;reaction-diffusion-convection&quot;</span><span class="nt">/&gt;</span>
+</code></pre></div>
+<p>Now, a velocity field variable is added to the model, which can be defined in the <code>Initial</code> section of the input file. See section <a href="#initial-velocity">initial velocity</a> for more information on how to initialize the velocity field.</p>
+<h3 id="globals">Globals<a class="headerlink" href="#globals" title="Permanent link">&para;</a></h3>
+<p>The chemical species that are used in the model are defined in the <code>Globals</code> section. The species are defined identically to the way they are defined for a multiphasic problem and we refer to the FEBio user’s manual. The following caveat applies:</p>
+<ul>
+<li>A <strong>solute</strong> defines a chemical species that is not bound to the solid phase of a mixture. If a model doesn’t represent a mixture, each solute defines a chemical species. No child properties need to be defined for a solute.</li>
+<li>A <strong>solid_bound</strong> defines a chemical species that is bound to the solid-phase of a mixture. Again, no child properties need to be defined for a solid bound species.</li>
+</ul>
+<h3 id="material">Material<a class="headerlink" href="#material" title="Permanent link">&para;</a></h3>
+<p>The material type needed by this plugin is <code>reaction-diffusion</code>. It needs the following material properties. Note that not all are required.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>solid_volume_fraction</code></td>
+<td>The volume fraction of the solid phase</td>
+</tr>
+<tr>
+<td><code>species</code></td>
+<td>Specifies the properties of a chemical species</td>
+</tr>
+<tr>
+<td><code>solid_bound_species</code></td>
+<td>Specifies a species that remains bound to the solid phase of the mixture.</td>
+</tr>
+<tr>
+<td><code>reaction</code></td>
+<td>Specifies the chemical reaction.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>solid_volume_fraction</code> is only required when modeling a mixture. It has an initial value of zero.</p>
+<h4 id="species-property">species property<a class="headerlink" href="#species-property" title="Permanent link">&para;</a></h4>
+<p>Each chemical species that is used by the material must be defined in the material’s definition. (Note that this can be less than the total number of species in the model, as defined by the <code>Globals</code> section.). A particular species is referenced by name. For each species, the <code>diffusivity</code> parameter must be defined.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;species</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;A&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;diffusivity&gt;</span>0.05<span class="nt">&lt;/diffusivity&gt;</span>
+<span class="nt">&lt;/species&gt;</span>
+</code></pre></div>
+<h4 id="solid_bound_species-property">solid_bound_species property<a class="headerlink" href="#solid_bound_species-property" title="Permanent link">&para;</a></h4>
+<p>Each solid-bound chemical species that is used by the material must be included in the material’s definition. (Note that this can be less than the total number of species in the model, as defined by the <code>Globals</code> section). For each solid-bound species, define the following material parameters.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rho0</code></td>
+<td>Initial apparent density (w.r.t. the mixture volume)</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>density</code></td>
+<td>The true density of the solid-bound species</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>rhomin</code></td>
+<td>The minimum value of the apparent density allowed</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>rhomax</code></td>
+<td>The maximum value of the apparent density allowed</td>
+<td>(ignored)</td>
+</tr>
+<tr>
+<td><code>molar_mass</code></td>
+<td>The molar mass of the solid-bound species.</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h4 id="reaction-property">reaction property<a class="headerlink" href="#reaction-property" title="Permanent link">&para;</a></h4>
+<p>The <code>reaction</code> property allows you to define a chemical reaction. Note that currently FEBioChem only models forward reactions. To model a reversible reaction you must specify two reactions, where the first reaction defines the forward reaction and the second defines the reverse reaction. Defining a reaction in the FEBioChem plugin is very easy since only two parameters need to be specified.</p>
+<p>The reaction equation is defined by writing the reaction formula as follows.</p>
+<ul>
+<li>Use the name of the species as defined in the Globals section to reference it.</li>
+<li>A stoichiometric coefficient of 1 does not need to be defined, but otherwise it must an integer number that appears before the species’ name and separated from it via a multiplication symbol <code>*</code>. </li>
+<li>A plus symbol <code>+</code> is used to enumerate all reactants and products.</li>
+<li>The symbols <code>--&gt;</code> or <code>-&gt;</code> can be used to separate the reactants from the products. </li>
+<li>The reactant or product lists can be empty. </li>
+</ul>
+<p>Here are some examples. Assume that all the chemical species are properly defined in the <code>Globals</code> section. </p>
+<div class="highlight"><pre><span></span><code>A--&gt;B
+A+B--&gt;C
+2*A+2*B-&gt;C+B
+A--&gt;
+--&gt;B
+</code></pre></div>
+<p>Again, it is emphasized that all species involved in a reaction must be defined inside the material’s definition.</p>
+<h3 id="initial-values">Initial values<a class="headerlink" href="#initial-values" title="Permanent link">&para;</a></h3>
+<p>For each species (but not solid-bound species), an initial value can be set in the <code>Initial</code> section of the FEBio input file via the <code>init</code> tag.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;init</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;c1&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;set1&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;</span>1.0<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/init&gt;</span>
+</code></pre></div>
+<p>The <code>bc</code> attribute references the particular species (or solute). In this case, <code>c1</code> references the solute with ID equal to 1. The <code>node_set</code> references a node set that needs to be defined in the <code>Geometry</code> section of the input file.</p>
+<h3 id="boundary-conditions">Boundary conditions<a class="headerlink" href="#boundary-conditions" title="Permanent link">&para;</a></h3>
+<p>The syntax for defining fixed or prescribed is identical for any FEBio model. Use <code>c[n]</code> to reference a particular species (or solute, again no solid-bound species). Thus, for example, <code>c1</code> references solute with ID one, <code>c2</code> is the solute with ID 2, and so forth. 
+An example of a fixed boundary condition looks like this.</p>
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;fix</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;c1&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;FixedSet1&quot;</span><span class="nt">/&gt;</span>
+</code></pre></div>
+An example of a prescribed boundary condition looks like this.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;prescribe</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;c1&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;PrescribedSet1&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;scale</span><span class="w"> </span><span class="na">lc=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>1.0<span class="nt">&lt;/scale&gt;</span>
+<span class="nt">&lt;/prescribe&gt;</span>
+</code></pre></div>
+<p>The <code>node_set</code> attribute references nodesets that need to be defined in the <code>Mesh</code> section of the input file.</p>
+<h3 id="prescribing-a-concentration-flux">Prescribing a concentration flux<a class="headerlink" href="#prescribing-a-concentration-flux" title="Permanent link">&para;</a></h3>
+<p>A concentration flux can be prescribed via a surface load of type concentration flux and is defined as follows.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;surface_load</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;concentration flux&quot;</span><span class="w"> </span><span class="na">surface=</span><span class="s">&quot;SurfaceLoad1&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;solute_id&gt;</span>1<span class="nt">&lt;/solute_id&gt;</span>
+<span class="w">    </span><span class="nt">&lt;flux</span><span class="w"> </span><span class="na">lc=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>-1.0<span class="nt">&lt;/flux&gt;</span>
+<span class="nt">&lt;/surface_load&gt;</span>
+</code></pre></div>
+<p>The <code>surface</code> attribute references a surface that is defined in the <code>Mesh</code> section. The <code>solute_id</code> references the ID of the corresponding solute as defined in the <code>Globals</code> section of the input file.</p>
+<h3 id="plot-variables">Plot Variables<a class="headerlink" href="#plot-variables" title="Permanent link">&para;</a></h3>
+<p>The FEBioChem plugin defines several new plot variables. They are list in the table below.</p>
+<table>
+<thead>
+<tr>
+<th>Plot variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>concentration</code> / <code>actual concentration</code></td>
+<td>Get the true concentration of a species</td>
+</tr>
+<tr>
+<td><code>effective concentration</code></td>
+<td>Get the effective concentration of a species</td>
+</tr>
+<tr>
+<td><code>sbs concentration</code></td>
+<td>The true concentration of a solid-bound species</td>
+</tr>
+<tr>
+<td><code>sbs apparent density</code></td>
+<td>The apparent density of a solid-bound species</td>
+</tr>
+<tr>
+<td><code>solid volume fraction</code></td>
+<td>The solid volume fraction of the mixture</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the variables that references a species or a solid-bound species need to specify the name of the corresponding species as part of the plot variable definition. For instance,</p>
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;var</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;concentration[&#39;c1&#39;]&quot;</span><span class="nt">/&gt;</span>
+</code></pre></div>
+As with any other plot variable definition in FEBio, you can define an alias.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;var</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;concentration[&#39;c1&#39;]=c1/</span><span class="nt">&gt;</span>
+</code></pre></div>
+<p>The alias is the name of the data field that will be stored in the plot file, and thus will be show in FEBioStudio.</p>
+<h3 id="initial-velocity">Initial velocity<a class="headerlink" href="#initial-velocity" title="Permanent link">&para;</a></h3>
+<p>For reaction-diffusion-convection problems, the fluid velocity needs to be initialized. This is done in the <code>Initial</code> section of the FEBio input file.</p>
+<p>The following example sets the x-component of the velocity vector to 1.0.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;init</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;vx&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;SomeNodeSet&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;</span>1.0<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/init&gt;</span>
+</code></pre></div>
+<p>You can also define a heterogeneous field. For instance,</p>
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;init</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;vx&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;SomeNodeSet&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value</span><span class="w"> </span><span class="na">node_data=</span><span class="s">&quot;init_vel&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/init&gt;</span>
+</code></pre></div>
+Here, <code>init_vel</code> is a node data field that is defined in the MeshData section.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.top", "search.highlight", "search.suggest", "toc.integrate", "content.external.links", "content.code.annotate", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../js/mathjax_config.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
