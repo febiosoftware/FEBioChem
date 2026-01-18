@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<febio_spec version="3.0">
+<febio_spec version="4.0">
 	<Module type="reaction-diffusion"/>
 	<Control>
 		<time_steps>100</time_steps>
 		<step_size>0.1</step_size>
-		<solver>
+		<solver type="reaction-diffusion">
 			<max_refs>15</max_refs>
-			<max_ups>0</max_ups>
+			<qn_method type="BFGS">
+				<max_ups>0</max_ups>
+			</qn_method>
 		</solver>
 	</Control>
 	<Globals>
@@ -131,37 +133,27 @@
 			<elem id="19">73,77,79,75,74,78,80,76</elem>
 			<elem id="20">77,81,83,79,78,82,84,80</elem>
 		</Elements>
-		<NodeSet name="set1">
-			<n id="81"/>
-			<n id="82"/>
-			<n id="83"/>
-			<n id="84"/>
-		</NodeSet>
-		<NodeSet name="set2">
-			<n id="1"/>
-			<n id="2"/>
-			<n id="3"/>
-			<n id="4"/>
-		</NodeSet>
+		<NodeSet name="set1">81,82,83,84</NodeSet>
+		<NodeSet name="set2">1,2,3,4</NodeSet>
 	</Mesh>
 	<MeshDomains>
 		<SolidDomain name="Part1" mat="Cartilage"/>
 	</MeshDomains>
 	<MeshData>
-		<NodeData node_set="Object01" name="IC" generator="math">
+		<NodeData node_set="Object01" name="IC" type="math">
 			<math>cos(0.5*pi*X/0.05)</math>
 		</NodeData>
 	</MeshData>
 	<Boundary>
-		<bc name="FixedConcentration01" type="fix" node_set="set1">
-			<dofs>c1</dofs>
+		<bc name="FixedConcentration01" type="zero concentration" node_set="set1">
+			<dof>c1</dof>
 		</bc>
-		<bc name="FixedConcentration02" type="fix" node_set="set2">
-			<dofs>c1</dofs>
+		<bc name="FixedConcentration02" type="zero concentration" node_set="set2">
+			<dof>c1</dof>
 		</bc>
 	</Boundary>
 	<Initial>
-		<ic type="init_dof" node_set="Object01">
+		<ic type="initial concentration" node_set="Object01">
 			<dof>c1</dof>
 			<value type="map">IC</value>
 		</ic>

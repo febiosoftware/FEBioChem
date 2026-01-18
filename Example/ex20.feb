@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<febio_spec version="3.0">
+<febio_spec version="4.0">
 	<Module type="reaction-diffusion"/>
 	<Control>
 		<time_steps>10</time_steps>
 		<step_size>1</step_size>
-		<solver>
+		<solver type="reaction-diffusion">
 			<alpha>0.5</alpha>
 		</solver>
 	</Control>
@@ -197,7 +197,7 @@
 		<SolidDomain name="_no_name" mat="Cartilage"/>
 	</MeshDomains>
 	<Initial>
-		<ic type="init_dof" node_set="Object01">
+		<ic type="initial concentration" node_set="Object01">
 			<dof>c1</dof>
 			<value>0.0001</value>
 		</ic>

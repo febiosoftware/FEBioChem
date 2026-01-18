@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<febio_spec version="3.0">
+<febio_spec version="4.0">
   <Module type="reaction-diffusion"/>
   <Control>
     	<time_steps>80000</time_steps>
 		<step_size>0.1</step_size>
-		<solver>
+		<solver type="reaction-diffusion">
 			<max_refs>5</max_refs>
-			<max_ups>10</max_ups>
 			<Rtol>0</Rtol>
 			<Ctol>0</Ctol>
 			<force_positive_concentrations>1</force_positive_concentrations>
+			<qn_method type="BFGS">
+				<max_ups>10</max_ups>
+			</qn_method>
 		</solver>
 		<time_stepper>
 			<dtmin>0.001</dtmin>

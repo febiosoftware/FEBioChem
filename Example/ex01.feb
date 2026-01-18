@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<febio_spec version="3.0">
+<febio_spec version="4.0">
 	<Module type="reaction-diffusion"/>
 	<Control>
 		<time_steps>100</time_steps>
 		<step_size>0.01</step_size>
+		<solver type="reaction-diffusion"/>
 	</Control>
 	<Globals>
 		<Solutes>
@@ -65,23 +66,13 @@
 			<elem id="7">13,22,25,16,14,23,26,17</elem>
 			<elem id="8">14,23,26,17,15,24,27,18</elem>
 		</Elements>
-		<NodeSet name="set1">
-			<n id="1"/>
-			<n id="2"/>
-			<n id="3"/>
-			<n id="4"/>
-			<n id="5"/>
-			<n id="6"/>
-			<n id="7"/>
-			<n id="8"/>
-			<n id="9"/>
-		</NodeSet>
+		<NodeSet name="set1">1,2,3,4,5,6,7,8,9</NodeSet>
 	</Mesh>
 	<MeshDomains>
 		<SolidDomain name="Part1" mat="Material1"/>
 	</MeshDomains>
 	<Initial>
-		<ic type="init_dof" node_set="set1">
+		<ic type="initial concentration" node_set="set1">
 			<dof>c1</dof>
 			<value>1</value>
 		</ic>

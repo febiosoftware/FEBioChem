@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<febio_spec version="3.0">
+<febio_spec version="4.0">
 	<Module type="reaction-diffusion"/>
 	<Control>
 		<time_steps>100</time_steps>
 		<step_size>0.01</step_size>
-		<solver>
+		<solver type="reaction-diffusion">
 			<alpha>0.5</alpha>
 		</solver>
 	</Control>
@@ -130,37 +130,27 @@
 			<elem id="19">73,77,79,75,74,78,80,76</elem>
 			<elem id="20">77,81,83,79,78,82,84,80</elem>
 		</Elements>
-		<NodeSet name="FixedBC1">
-			<n id="1"/>
-			<n id="2"/>
-			<n id="3"/>
-			<n id="4"/>
-		</NodeSet>
-		<NodeSet name="FixedBC2">
-			<n id="81"/>
-			<n id="82"/>
-			<n id="83"/>
-			<n id="84"/>
-		</NodeSet>
-	</Mesh>
+		<NodeSet name="FixedBC1">1,2,3,4</NodeSet>
+		<NodeSet name="FixedBC2">81,82,83,84</NodeSet>
+		</Mesh>
 	<MeshDomains>
 		<SolidDomain name="Part1" mat="Material1"/>
 	</MeshDomains>
 	<MeshData>
-		<NodeData node_set="Object01" name="IC" generator="math">
+		<NodeData node_set="Object01" name="IC" type="math">
 			<math>sin(pi*X)+sin(2*pi*X)</math>
 		</NodeData>
 	</MeshData>
 	<Boundary>
-		<bc name="FixedConcentration01" type="fix" node_set="FixedBC1">
-			<dofs>c1</dofs>
+		<bc name="FixedConcentration01" type="zero concentration" node_set="FixedBC1">
+			<dof>c1</dof>
 		</bc>
-		<bc name="FixedConcentration02" type="fix" node_set="FixedBC2">
-			<dofs>c1</dofs>
+		<bc name="FixedConcentration02" type="zero concentration" node_set="FixedBC2">
+			<dof>c1</dof>
 		</bc>
 	</Boundary>
 	<Initial>
-		<ic type="init_dof" node_set="Object01">
+		<ic type="initial concentration" node_set="Object01">
 			<dof>c1</dof>
 			<value type="map">IC</value>
 		</ic>

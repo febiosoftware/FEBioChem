@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<febio_spec version="3.0">
+<febio_spec version="4.0">
 	<Module type="reaction-diffusion"/>
 	<Control>
 		<time_steps>10</time_steps>
 		<step_size>0.1</step_size>
-		<solver>
+		<solver type="reaction-diffusion">
 			<Ctol>0.001</Ctol>
 			<Rtol>0.01</Rtol>
 			<force_positive_concentrations>0</force_positive_concentrations>
@@ -394,28 +394,9 @@
 			<elem id="100">217,239,241,219,218,240,242,220</elem>
 		</Elements>
 		<NodeSet name="InitialCondition1">
-			<n id="1"/>
-			<n id="2"/>
-			<n id="3"/>
-			<n id="4"/>
-			<n id="5"/>
-			<n id="6"/>
-			<n id="7"/>
-			<n id="8"/>
-			<n id="9"/>
-			<n id="10"/>
-			<n id="11"/>
-			<n id="12"/>
-			<n id="13"/>
-			<n id="14"/>
-			<n id="15"/>
-			<n id="16"/>
-			<n id="17"/>
-			<n id="18"/>
-			<n id="19"/>
-			<n id="20"/>
-			<n id="21"/>
-			<n id="22"/>
+			1,2,3,4,5,6,7,8,9,10,
+			11,12,13,14,15,16,17,18,19,20,
+			21,22
 		</NodeSet>
 	</Mesh>
 	<MeshDomains>
@@ -423,7 +404,7 @@
 		<SolidDomain name="Part3" mat="Material2"/>
 	</MeshDomains>
 	<Initial>
-		<ic type="init_dof" node_set="InitialCondition1">
+		<ic type="initial concentration" node_set="InitialCondition1">
 			<dof>c1</dof>
 			<value>1</value>
 		</ic>
