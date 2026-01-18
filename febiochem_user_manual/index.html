@@ -414,6 +414,23 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#solver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solver
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Solver">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
   <a href="#material" class="md-nav__link">
     <span class="md-ellipsis">
@@ -631,6 +648,12 @@ A mixture is defined by two phases, a solid and a fluid phase. The fluid is assu
 <li>A <strong>solute</strong> defines a chemical species that is not bound to the solid phase of a mixture. If a model doesn’t represent a mixture, each solute defines a chemical species. No child properties need to be defined for a solute.</li>
 <li>A <strong>solid_bound</strong> defines a chemical species that is bound to the solid-phase of a mixture. Again, no child properties need to be defined for a solid bound species.</li>
 </ul>
+<h2 id="solver">Solver<a class="headerlink" href="#solver" title="Permanent link">&para;</a></h2>
+<p>Make sure to set the solver type to the same name as the module. For instance, for a reaction-diffusion model, set</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;solver</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;reaction-diffusion&quot;</span><span class="nt">&gt;</span>
+...
+<span class="nt">&lt;/solver&gt;</span>
+</code></pre></div>
 <h3 id="material">Material<a class="headerlink" href="#material" title="Permanent link">&para;</a></h3>
 <p>The material type needed by this plugin is <code>reaction-diffusion</code>. It needs the following material properties. Note that not all are required.</p>
 <table>
@@ -724,19 +747,23 @@ A--&gt;
 <p>Again, it is emphasized that all species involved in a reaction must be defined inside the material’s definition.</p>
 <h3 id="initial-values">Initial values<a class="headerlink" href="#initial-values" title="Permanent link">&para;</a></h3>
 <p>For each species (but not solid-bound species), an initial value can be set in the <code>Initial</code> section of the FEBio input file via the <code>init</code> tag.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&lt;init</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;c1&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;set1&quot;</span><span class="nt">&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;ic</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;initial concentration&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;set1&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dof&gt;</span>c1<span class="nt">&lt;/dof&gt;</span>
 <span class="w">    </span><span class="nt">&lt;value&gt;</span>1.0<span class="nt">&lt;/value&gt;</span>
 <span class="nt">&lt;/init&gt;</span>
 </code></pre></div>
-<p>The <code>bc</code> attribute references the particular species (or solute). In this case, <code>c1</code> references the solute with ID equal to 1. The <code>node_set</code> references a node set that needs to be defined in the <code>Geometry</code> section of the input file.</p>
+<p>The <code>dof</code> parameter references the particular species (or solute). In this case, <code>c1</code> references the solute with ID equal to 1. The <code>node_set</code> references a node set that needs to be defined in the <code>Mesh</code> section of the input file.</p>
 <h3 id="boundary-conditions">Boundary conditions<a class="headerlink" href="#boundary-conditions" title="Permanent link">&para;</a></h3>
 <p>The syntax for defining fixed or prescribed is identical for any FEBio model. Use <code>c[n]</code> to reference a particular species (or solute, again no solid-bound species). Thus, for example, <code>c1</code> references solute with ID one, <code>c2</code> is the solute with ID 2, and so forth. 
 An example of a fixed boundary condition looks like this.</p>
-<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;fix</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;c1&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;FixedSet1&quot;</span><span class="nt">/&gt;</span>
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;bc</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;zero concentration&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;FixedSet1&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dof&gt;</span>c1<span class="nt">&lt;/dof&gt;</span>
+<span class="nt">&lt;/bc&gt;</span>
 </code></pre></div>
 An example of a prescribed boundary condition looks like this.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&lt;prescribe</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;c1&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;PrescribedSet1&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;scale</span><span class="w"> </span><span class="na">lc=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>1.0<span class="nt">&lt;/scale&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;bc</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;prescribed concentration&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;PrescribedSet1&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dof&gt;</span>c1<span class="nt">&lt;/dof&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value</span><span class="w"> </span><span class="na">lc=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>1.0<span class="nt">&lt;/value&gt;</span>
 <span class="nt">&lt;/prescribe&gt;</span>
 </code></pre></div>
 <p>The <code>node_set</code> attribute references nodesets that need to be defined in the <code>Mesh</code> section of the input file.</p>
@@ -790,16 +817,24 @@ As with any other plot variable definition in FEBio, you can define an alias.</p
 <h3 id="initial-velocity">Initial velocity<a class="headerlink" href="#initial-velocity" title="Permanent link">&para;</a></h3>
 <p>For reaction-diffusion-convection problems, the fluid velocity needs to be initialized. This is done in the <code>Initial</code> section of the FEBio input file.</p>
 <p>The following example sets the x-component of the velocity vector to 1.0.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&lt;init</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;vx&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;SomeNodeSet&quot;</span><span class="nt">&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;ic</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;initial velocity&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;SomeNodeSet&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dof&gt;</span>vx<span class="nt">&lt;/dof&gt;</span>
 <span class="w">    </span><span class="nt">&lt;value&gt;</span>1.0<span class="nt">&lt;/value&gt;</span>
 <span class="nt">&lt;/init&gt;</span>
 </code></pre></div>
 <p>You can also define a heterogeneous field. For instance,</p>
-<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;init</span><span class="w"> </span><span class="na">bc=</span><span class="s">&quot;vx&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;SomeNodeSet&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;value</span><span class="w"> </span><span class="na">node_data=</span><span class="s">&quot;init_vel&quot;</span><span class="nt">/&gt;</span>
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;ic</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;initial velocity&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;SomeNodeSet&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dof&gt;</span>vx<span class="nt">&lt;/dof&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;map&quot;</span><span class="nt">&gt;</span>init_vel<span class="nt">&lt;value/&gt;</span>
 <span class="nt">&lt;/init&gt;</span>
 </code></pre></div>
-Here, <code>init_vel</code> is a node data field that is defined in the MeshData section.</p>
+Here, <code>init_vel</code> is a node data field that is defined in the <code>MeshData</code> section.</p>
+<p>You can also use a mathematical expression to set the initial velocity field. </p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;ic</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;initial velocity&quot;</span><span class="w"> </span><span class="na">node_set=</span><span class="s">&quot;SomeNodeSet&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dof&gt;</span>vx<span class="nt">&lt;/dof&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;math&quot;</span><span class="nt">&gt;</span>4*(0.5<span class="w"> </span>-<span class="w"> </span>Y)*(Y<span class="w"> </span>+<span class="w"> </span>0.5)<span class="nt">&lt;value/&gt;</span>
+<span class="nt">&lt;/init&gt;</span>
+</code></pre></div>
 
 
 
