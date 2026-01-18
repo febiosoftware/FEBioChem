@@ -137,7 +137,13 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 2, "c3");
 
 	// Reaction-diffusion-convection module
-	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection", info);
+	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection", "{ " \
+		"   \"title\" : \"Reaction-Diffusion-Convection\","
+		"   \"info\"  : \"Transient reaction-diffusion convection analysis.\","
+		"   \"author\": \"Steve Maas\","
+		"   \"version\": \"1.0\""
+		"}");
+
 	fecore.AddModuleDependency("reaction-diffusion");
 
 	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
