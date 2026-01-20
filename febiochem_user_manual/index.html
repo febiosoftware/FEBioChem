@@ -13,8 +13,10 @@
       
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../febiochem_tutorial1/">
       
+      
+        <link rel="next" href="../febiochem_theory/">
       
       
         
@@ -74,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#introduction" class="md-skip">
+        <a href="#using-the-febiochem-plugin" class="md-skip">
           Skip to content
         </a>
       
@@ -200,6 +202,26 @@
   
   
   
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../febiochem_tutorial1/" class="md-tabs__link">
+          
+  
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
     
   
   
@@ -211,6 +233,25 @@
     
   
   User Manual
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../febiochem_theory/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Theory
 
       </a>
     </li>
@@ -283,6 +324,91 @@
       
   
   
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../febiochem_tutorial1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -340,34 +466,6 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Introduction
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Introduction">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#mixtures" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mixtures
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#using-the-febiochem-plugin" class="md-nav__link">
@@ -549,6 +647,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../febiochem_theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -568,64 +693,6 @@
 
   <h1>User Manual</h1>
 
-<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p>The FEBioChem plugin was designed for solving the reaction-diffusion equation in the context of a (non-deformable) mixture with multiple chemical species. The species can be solutes that flow with the solvent, or can be bound to the solid phase of the mixture. In this regard, this plugin offers similar capabilities as the FEBioMix module in FEBio (at least for non-deformable mixtures). However, since the mixture is assumed non-deformable, the calculations are optimized and the performance improved.</p>
-<p>The basic set of equations that FEBioChem solves are the nonlinear reaction-diffusion equations, which can be stated in the following form.</p>
-<div class="arithmatex">\[
-\begin{equation}
-{{\partial }_{t}}{{u}^{\left( i \right)}}=\nabla \cdot \left( {{\mathbf{D}}^{\left( i \right)}}\nabla {{u}^{\left( i \right)}} \right)-\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)+{{R}^{\left( i \right)}}\left( \mathbf{u} \right),i=1\ldots N
-\end{equation}
-\]</div>
-<p>Here, <span class="arithmatex">\({{u}^{\left( i \right)}}\)</span> represents the concentration of chemical species <span class="arithmatex">\(i\)</span>, <span class="arithmatex">\({{\mathbf{D}}^{\left( i \right)}}\)</span> the diffusion constant of species <span class="arithmatex">\(i\)</span>, and <span class="arithmatex">\({{R}^{\left( i \right)}}\)</span> accounts for all local reactions that contribute to the concentration of species <span class="arithmatex">\(i\)</span>. The vector <span class="arithmatex">\({{\mathbf{u}}^{T}}=\left[ {{u}^{\left( 1 \right)}},...,{{u}^{\left( N \right)}} \right]\)</span> represents all the concentrations, and <span class="arithmatex">\(v\)</span> represents a velocity field in which the solutes can flow. </p>
-<p>A general (forward) chemical reaction is notated as follows.</p>
-<div class="arithmatex">\[
-\begin{equation}
-\sum\limits_{i}{{{{{v}'}}_{ij}}}{{M}_{i}}\overset{{{k}_{j}}}{\mathop{\to }}\,\sum\limits_{i}{{{{{v}''}}_{ij}}{{M}_{i}}}
-\end{equation}
-\]</div>
-<p>Here, <span class="arithmatex">\(M_i\)</span> identifies the chemical species, <span class="arithmatex">\({{{v}'}_{ij}}\)</span> and <span class="arithmatex">\({{{v}''}_{ij}}\)</span> are the stoichiometric coefficients of the reactants and products, respectively, <span class="arithmatex">\(k_j\)</span> is the rate coefficient of the j-th reaction.</p>
-<p>The source term <span class="arithmatex">\({{R}^{\left( i \right)}}=\sum\limits_{j=1}^{J}{{{v}_{ij}}{{r}_{j}}}\)</span> takes on the following form,</p>
-<p>Here, the sum is over <span class="arithmatex">\(J\)</span> reactions and <span class="arithmatex">\({{v}_{ij}}={{{v}''}_{ij}}-{{{v}'}_{ij}}\)</span> and,</p>
-<div class="arithmatex">\[
-\begin{equation}
-{{r}_{j}}={{k}_{j}}\prod\limits_{i=1}^{I}{{{\left[ {{u}^{\left( i \right)}} \right]}^{{{\mu }_{ij}}}}}
-\end{equation}
-\]</div>
-<p>the reaction rate of reaction <span class="arithmatex">\(j\)</span>. Usually, the exponent is taken to be <span class="arithmatex">\({{\mu }_{ij}}={{{\nu }'}_{ij}}\)</span> ,as according to the law of mass action.</p>
-<h3 id="mixtures">Mixtures<a class="headerlink" href="#mixtures" title="Permanent link">&para;</a></h3>
-<p>Thus far, we considered the case where the solute is free, i.e. not inside a porous material. In the case if the solutes are contained inside a porous material, then the equations above remain valid, except now that the concentrations are with respect to the mixture volume. The ‘true’ concentration <span class="arithmatex">\({{c}^{\left( i \right)}}\)</span>, i.e. the concentration w.r.t. to the solvent is related to the ‘bulk’ concentration via,</p>
-<div class="arithmatex">\[
-\begin{equation}
-{{u}^{\left( i \right)}}=\varphi\,{{c}^{\left( i \right)}}
-\end{equation}
-\]</div>
-<p>where <span class="arithmatex">\(\varphi\)</span> is the fluid volume fraction, i.e. the fraction of the volume that is accessible to the fluid (and therefore to the solvents). The FEBioChem plugin will report the true concentrations of the solution.
-A mixture is defined by two phases, a solid and a fluid phase. The fluid is assumed to be a solvent in which several species were dissolved. The volume fractions of the dissolved solutions are negligible and thus the solid and fluid volume fractions add up to unity.</p>
-<div class="arithmatex">\[
-\begin{equation}
-{{\varphi }^{s}}+{{\varphi }^{f}}=1
-\end{equation}
-\]</div>
-<p>We now consider the case that a chemical species exists as part of the solid phase. Such a species is called a <em>solid-bound molecule</em> (sbm). Since it is bound to the solid (immovable) phase, it is assumed that a solid-bound molecule does not undergo diffusion. Let us denote the apparent density of the sbm by <span class="arithmatex">\(\rho^{\sigma}\)</span>. It then follows that the governing equation for a solid-bound molecule is given by,</p>
-<div class="arithmatex">\[
-\begin{equation}
-\frac{d{{\rho }^{\sigma }}}{dt}={{\hat{\rho }}^{\sigma }}
-\end{equation}
-\]</div>
-<p>where <span class="arithmatex">\({{\hat{\rho }}^{\sigma }}\)</span> is the mass supply for the sbm. In this context, the mass supply will be calculated from the chemical reactions.</p>
-<p>A change in the apparent density of an SBM has an effect of the solid volume fraction, which is now defined via,</p>
-<div class="arithmatex">\[
-\begin{equation}
-{{\varphi }^{s}}=\varphi _{0}^{s}+\sum\limits_{\sigma }{{{\varphi }^{\sigma }}}
-\end{equation}
-\]</div>
-<p>where the volume fraction of the sbm is defined via,</p>
-<div class="arithmatex">\[
-\begin{equation}
-{{\varphi }^{\sigma }}=\frac{{{\rho }^{\sigma }}}{\rho _{T}^{\sigma }}
-\end{equation}
-\]</div>
-<p>That is, it is the ratio of the apparent density over the true density of the sbm. The fluid volume fraction, or porosity, is then defined via <span class="arithmatex">\(\varphi =1-{{\varphi }^{s}}\)</span>.</p>
 <h2 id="using-the-febiochem-plugin">Using the FEBioChem plugin<a class="headerlink" href="#using-the-febiochem-plugin" title="Permanent link">&para;</a></h2>
 <p>Like any other FEBio plugin, the plugin must be placed in a folder and the path to the plugin must be defined in the FEBio configuration file. This file is usually called <code>febio.xml</code> and can be found in the same location as the FEBio executable. In this file, add the following line:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">&lt;import&gt;</span>C:\path\to\febio\plugin\FEBioChem.dll<span class="nt">&lt;/import&gt;</span>
