@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<febio_spec version="4.0">
+	<Module type="reaction-diffusion"/>
+	<Control>
+		<analysis>TRANSIENT</analysis>
+		<time_steps>100</time_steps>
+		<step_size>0.1</step_size>
+		<plot_zero_state>0</plot_zero_state>
+		<plot_range>0,-1</plot_range>
+		<plot_level>PLOT_MAJOR_ITRS</plot_level>
+		<output_level>OUTPUT_MAJOR_ITRS</output_level>
+		<plot_stride>1</plot_stride>
+		<output_stride>1</output_stride>
+		<adaptor_re_solve>1</adaptor_re_solve>
+		<time_stepper type="default">
+			<max_retries>5</max_retries>
+			<opt_iter>11</opt_iter>
+			<dtmin>0</dtmin>
+			<dtmax>0.1</dtmax>
+			<aggressiveness>0</aggressiveness>
+			<cutback>0.5</cutback>
+			<dtforce>0</dtforce>
+		</time_stepper>
+		<solver type="reaction-diffusion">
+			<symmetric_stiffness>non-symmetric</symmetric_stiffness>
+			<equation_scheme>staggered</equation_scheme>
+			<equation_order>default</equation_order>
+			<optimize_bw>0</optimize_bw>
+			<lstol>0.9</lstol>
+			<lsmin>0.01</lsmin>
+			<lsiter>5</lsiter>
+			<ls_check_jacobians>0</ls_check_jacobians>
+			<max_refs>15</max_refs>
+			<check_zero_diagonal>0</check_zero_diagonal>
+			<zero_diagonal_tol>0</zero_diagonal_tol>
+			<force_partition>0</force_partition>
+			<reform_each_time_step>1</reform_each_time_step>
+			<reform_augment>0</reform_augment>
+			<diverge_reform>0</diverge_reform>
+			<min_residual>1e-20</min_residual>
+			<max_residual>0</max_residual>
+			<Ctol>0.001</Ctol>
+			<Stol>0</Stol>
+			<Rtol>0.01</Rtol>
+			<force_positive_concentrations>0</force_positive_concentrations>
+			<convection>0</convection>
+			<alpha>0.5</alpha>
+			<qn_method type="BFGS">
+				<max_ups>10</max_ups>
+				<max_buffer_size>0</max_buffer_size>
+				<cycle_buffer>1</cycle_buffer>
+				<cmax>100000</cmax>
+			</qn_method>
+		</solver>
+	</Control>
+	<Globals>
+		<Constants>
+			<T>0</T>
+			<P>0</P>
+			<R>8.31446</R>
+			<Fc>96485.3</Fc>
+		</Constants>
+		<Solutes>
+			<solute id="1" name="A">
+				<charge_number>0</charge_number>
+				<molar_mass>1</molar_mass>
+				<density>1</density>
+			</solute>
+			<solute id="2" name="B">
+				<charge_number>0</charge_number>
+				<molar_mass>1</molar_mass>
+				<density>1</density>
+			</solute>
+		</Solutes>
+	</Globals>
+	<Material>
+		<material id="1" name="Material1" type="reaction-diffusion">
+			<solid_volume_fraction>0</solid_volume_fraction>
+			<species name="A">
+				<diffusivity>1</diffusivity>
+			</species>
+			<species name="B">
+				<diffusivity>1</diffusivity>
+			</species>
+			<reaction type="mass action">
+				<rate_constant>1</rate_constant>
+				<equation>A-->B</equation>
+				<force_positive_concentrations>0</force_positive_concentrations>
+			</reaction>
+		</material>
+	</Material>
+	<Mesh>
+		<Nodes name="Object1">
+			<node id="1">-5,-0.5,0</node>
+			<node id="2">5,-0.5,0</node>
+			<node id="3">5,0.5,0</node>
+			<node id="4">-5,0.5,0</node>
+			<node id="5">-5,-0.5,1</node>
+			<node id="6">5,-0.5,1</node>
+			<node id="7">5,0.5,1</node>
+			<node id="8">-5,0.5,1</node>
+			<node id="9">-4.9,-0.5,0</node>
+			<node id="10">-4.8,-0.5,0</node>
+			<node id="11">-4.7,-0.5,0</node>
+			<node id="12">-4.6,-0.5,0</node>
+			<node id="13">-4.5,-0.5,0</node>
+			<node id="14">-4.4,-0.5,0</node>
+			<node id="15">-4.3,-0.5,0</node>
+			<node id="16">-4.2,-0.5,0</node>
+			<node id="17">-4.1,-0.5,0</node>
+			<node id="18">-4,-0.5,0</node>
+			<node id="19">-3.9,-0.5,0</node>
+			<node id="20">-3.8,-0.5,0</node>
+			<node id="21">-3.7,-0.5,0</node>
+			<node id="22">-3.6,-0.5,0</node>
+			<node id="23">-3.5,-0.5,0</node>
+			<node id="24">-3.4,-0.5,0</node>
+			<node id="25">-3.3,-0.5,0</node>
+			<node id="26">-3.2,-0.5,0</node>
+			<node id="27">-3.1,-0.5,0</node>
+			<node id="28">-3,-0.5,0</node>
+			<node id="29">-2.9,-0.5,0</node>
+			<node id="30">-2.8,-0.5,0</node>
+			<node id="31">-2.7,-0.5,0</node>
+			<node id="32">-2.6,-0.5,0</node>
+			<node id="33">-2.5,-0.5,0</node>
+			<node id="34">-2.4,-0.5,0</node>
+			<node id="35">-2.3,-0.5,0</node>
+			<node id="36">-2.2,-0.5,0</node>
+			<node id="37">-2.1,-0.5,0</node>
+			<node id="38">-2,-0.5,0</node>
+			<node id="39">-1.9,-0.5,0</node>
+			<node id="40">-1.8,-0.5,0</node>
+			<node id="41">-1.7,-0.5,0</node>
+			<node id="42">-1.6,-0.5,0</node>
+			<node id="43">-1.5,-0.5,0</node>
+			<node id="44">-1.4,-0.5,0</node>
+			<node id="45">-1.3,-0.5,0</node>
+			<node id="46">-1.2,-0.5,0</node>
+			<node id="47">-1.1,-0.5,0</node>
+			<node id="48">-1,-0.5,0</node>
+			<node id="49">-0.9,-0.5,0</node>
+			<node id="50">-0.8,-0.5,0</node>
+			<node id="51">-0.7,-0.5,0</node>
+			<node id="52">-0.6,-0.5,0</node>
+			<node id="53">-0.5,-0.5,0</node>
+			<node id="54">-0.4,-0.5,0</node>
+			<node id="55">-0.3,-0.5,0</node>
+			<node id="56">-0.2,-0.5,0</node>
+			<node id="57">-0.1,-0.5,0</node>
+			<node id="58">1.77635684e-15,-0.5,0</node>
+			<node id="59">0.1,-0.5,0</node>
+			<node id="60">0.2,-0.5,0</node>
+			<node id="61">0.3,-0.5,0</node>
+			<node id="62">0.4,-0.5,0</node>
+			<node id="63">0.5,-0.5,0</node>
+			<node id="64">0.6,-0.5,0</node>
+			<node id="65">0.7,-0.5,0</node>
+			<node id="66">0.8,-0.5,0</node>
+			<node id="67">0.9,-0.5,0</node>
+			<node id="68">1,-0.5,0</node>
+			<node id="69">1.1,-0.5,0</node>
+			<node id="70">1.2,-0.5,0</node>
+			<node id="71">1.3,-0.5,0</node>
+			<node id="72">1.4,-0.5,0</node>
+			<node id="73">1.5,-0.5,0</node>
+			<node id="74">1.6,-0.5,0</node>
+			<node id="75">1.7,-0.5,0</node>
+			<node id="76">1.8,-0.5,0</node>
+			<node id="77">1.9,-0.5,0</node>
+			<node id="78">2,-0.5,0</node>
+			<node id="79">2.1,-0.5,0</node>
+			<node id="80">2.2,-0.5,0</node>
+			<node id="81">2.3,-0.5,0</node>
+			<node id="82">2.4,-0.5,0</node>
+			<node id="83">2.5,-0.5,0</node>
+			<node id="84">2.6,-0.5,0</node>
+			<node id="85">2.7,-0.5,0</node>
+			<node id="86">2.8,-0.5,0</node>
+			<node id="87">2.9,-0.5,0</node>
+			<node id="88">3,-0.5,0</node>
+			<node id="89">3.1,-0.5,0</node>
+			<node id="90">3.2,-0.5,0</node>
+			<node id="91">3.3,-0.5,0</node>
+			<node id="92">3.4,-0.5,0</node>
+			<node id="93">3.5,-0.5,0</node>
+			<node id="94">3.6,-0.5,0</node>
+			<node id="95">3.7,-0.5,0</node>
+			<node id="96">3.8,-0.5,0</node>
+			<node id="97">3.9,-0.5,0</node>
+			<node id="98">4,-0.5,0</node>
+			<node id="99">4.1,-0.5,0</node>
+			<node id="100">4.2,-0.5,0</node>
+			<node id="101">4.3,-0.5,0</node>
+			<node id="102">4.4,-0.5,0</node>
+			<node id="103">4.5,-0.5,0</node>
+			<node id="104">4.6,-0.5,0</node>
+			<node id="105">4.7,-0.5,0</node>
+			<node id="106">4.8,-0.5,0</node>
+			<node id="107">4.9,-0.5,0</node>
+			<node id="108">4.9,-0.5,1</node>
+			<node id="109">4.8,-0.5,1</node>
+			<node id="110">4.7,-0.5,1</node>
+			<node id="111">4.6,-0.5,1</node>
+			<node id="112">4.5,-0.5,1</node>
+			<node id="113">4.4,-0.5,1</node>
+			<node id="114">4.3,-0.5,1</node>
+			<node id="115">4.2,-0.5,1</node>
+			<node id="116">4.1,-0.5,1</node>
+			<node id="117">4,-0.5,1</node>
+			<node id="118">3.9,-0.5,1</node>
+			<node id="119">3.8,-0.5,1</node>
+			<node id="120">3.7,-0.5,1</node>
+			<node id="121">3.6,-0.5,1</node>
+			<node id="122">3.5,-0.5,1</node>
+			<node id="123">3.4,-0.5,1</node>
+			<node id="124">3.3,-0.5,1</node>
+			<node id="125">3.2,-0.5,1</node>
+			<node id="126">3.1,-0.5,1</node>
+			<node id="127">3,-0.5,1</node>
+			<node id="128">2.9,-0.5,1</node>
+			<node id="129">2.8,-0.5,1</node>
+			<node id="130">2.7,-0.5,1</node>
+			<node id="131">2.6,-0.5,1</node>
+			<node id="132">2.5,-0.5,1</node>
+			<node id="133">2.4,-0.5,1</node>
+			<node id="134">2.3,-0.5,1</node>
+			<node id="135">2.2,-0.5,1</node>
+			<node id="136">2.1,-0.5,1</node>
+			<node id="137">2,-0.5,1</node>
+			<node id="138">1.9,-0.5,1</node>
+			<node id="139">1.8,-0.5,1</node>
+			<node id="140">1.7,-0.5,1</node>
+			<node id="141">1.6,-0.5,1</node>
+			<node id="142">1.5,-0.5,1</node>
+			<node id="143">1.4,-0.5,1</node>
+			<node id="144">1.3,-0.5,1</node>
+			<node id="145">1.2,-0.5,1</node>
+			<node id="146">1.1,-0.5,1</node>
+			<node id="147">1,-0.5,1</node>
+			<node id="148">0.9,-0.5,1</node>
+			<node id="149">0.8,-0.5,1</node>
+			<node id="150">0.7,-0.5,1</node>
+			<node id="151">0.6,-0.5,1</node>
+			<node id="152">0.5,-0.5,1</node>
+			<node id="153">0.4,-0.5,1</node>
+			<node id="154">0.3,-0.5,1</node>
+			<node id="155">0.2,-0.5,1</node>
+			<node id="156">0.1,-0.5,1</node>
+			<node id="157">-1.77635684e-15,-0.5,1</node>
+			<node id="158">-0.1,-0.5,1</node>
+			<node id="159">-0.2,-0.5,1</node>
+			<node id="160">-0.3,-0.5,1</node>
+			<node id="161">-0.4,-0.5,1</node>
+			<node id="162">-0.5,-0.5,1</node>
+			<node id="163">-0.6,-0.5,1</node>
+			<node id="164">-0.7,-0.5,1</node>
+			<node id="165">-0.8,-0.5,1</node>
+			<node id="166">-0.9,-0.5,1</node>
+			<node id="167">-1,-0.5,1</node>
+			<node id="168">-1.1,-0.5,1</node>
+			<node id="169">-1.2,-0.5,1</node>
+			<node id="170">-1.3,-0.5,1</node>
+			<node id="171">-1.4,-0.5,1</node>
+			<node id="172">-1.5,-0.5,1</node>
+			<node id="173">-1.6,-0.5,1</node>
+			<node id="174">-1.7,-0.5,1</node>
+			<node id="175">-1.8,-0.5,1</node>
+			<node id="176">-1.9,-0.5,1</node>
+			<node id="177">-2,-0.5,1</node>
+			<node id="178">-2.1,-0.5,1</node>
+			<node id="179">-2.2,-0.5,1</node>
+			<node id="180">-2.3,-0.5,1</node>
+			<node id="181">-2.4,-0.5,1</node>
+			<node id="182">-2.5,-0.5,1</node>
+			<node id="183">-2.6,-0.5,1</node>
+			<node id="184">-2.7,-0.5,1</node>
+			<node id="185">-2.8,-0.5,1</node>
+			<node id="186">-2.9,-0.5,1</node>
+			<node id="187">-3,-0.5,1</node>
+			<node id="188">-3.1,-0.5,1</node>
+			<node id="189">-3.2,-0.5,1</node>
+			<node id="190">-3.3,-0.5,1</node>
+			<node id="191">-3.4,-0.5,1</node>
+			<node id="192">-3.5,-0.5,1</node>
+			<node id="193">-3.6,-0.5,1</node>
+			<node id="194">-3.7,-0.5,1</node>
+			<node id="195">-3.8,-0.5,1</node>
+			<node id="196">-3.9,-0.5,1</node>
+			<node id="197">-4,-0.5,1</node>
+			<node id="198">-4.1,-0.5,1</node>
+			<node id="199">-4.2,-0.5,1</node>
+			<node id="200">-4.3,-0.5,1</node>
+			<node id="201">-4.4,-0.5,1</node>
+			<node id="202">-4.5,-0.5,1</node>
+			<node id="203">-4.6,-0.5,1</node>
+			<node id="204">-4.7,-0.5,1</node>
+			<node id="205">-4.8,-0.5,1</node>
+			<node id="206">-4.9,-0.5,1</node>
+			<node id="207">4.9,0.5,0</node>
+			<node id="208">4.8,0.5,0</node>
+			<node id="209">4.7,0.5,0</node>
+			<node id="210">4.6,0.5,0</node>
+			<node id="211">4.5,0.5,0</node>
+			<node id="212">4.4,0.5,0</node>
+			<node id="213">4.3,0.5,0</node>
+			<node id="214">4.2,0.5,0</node>
+			<node id="215">4.1,0.5,0</node>
+			<node id="216">4,0.5,0</node>
+			<node id="217">3.9,0.5,0</node>
+			<node id="218">3.8,0.5,0</node>
+			<node id="219">3.7,0.5,0</node>
+			<node id="220">3.6,0.5,0</node>
+			<node id="221">3.5,0.5,0</node>
+			<node id="222">3.4,0.5,0</node>
+			<node id="223">3.3,0.5,0</node>
+			<node id="224">3.2,0.5,0</node>
+			<node id="225">3.1,0.5,0</node>
+			<node id="226">3,0.5,0</node>
+			<node id="227">2.9,0.5,0</node>
+			<node id="228">2.8,0.5,0</node>
+			<node id="229">2.7,0.5,0</node>
+			<node id="230">2.6,0.5,0</node>
+			<node id="231">2.5,0.5,0</node>
+			<node id="232">2.4,0.5,0</node>
+			<node id="233">2.3,0.5,0</node>
+			<node id="234">2.2,0.5,0</node>
+			<node id="235">2.1,0.5,0</node>
+			<node id="236">2,0.5,0</node>
+			<node id="237">1.9,0.5,0</node>
+			<node id="238">1.8,0.5,0</node>
+			<node id="239">1.7,0.5,0</node>
+			<node id="240">1.6,0.5,0</node>
+			<node id="241">1.5,0.5,0</node>
+			<node id="242">1.4,0.5,0</node>
+			<node id="243">1.3,0.5,0</node>
+			<node id="244">1.2,0.5,0</node>
+			<node id="245">1.1,0.5,0</node>
+			<node id="246">1,0.5,0</node>
+			<node id="247">0.9,0.5,0</node>
+			<node id="248">0.8,0.5,0</node>
+			<node id="249">0.7,0.5,0</node>
+			<node id="250">0.6,0.5,0</node>
+			<node id="251">0.5,0.5,0</node>
+			<node id="252">0.4,0.5,0</node>
+			<node id="253">0.3,0.5,0</node>
+			<node id="254">0.2,0.5,0</node>
+			<node id="255">0.1,0.5,0</node>
+			<node id="256">-1.77635684e-15,0.5,0</node>
+			<node id="257">-0.1,0.5,0</node>
+			<node id="258">-0.2,0.5,0</node>
+			<node id="259">-0.3,0.5,0</node>
+			<node id="260">-0.4,0.5,0</node>
+			<node id="261">-0.5,0.5,0</node>
+			<node id="262">-0.6,0.5,0</node>
+			<node id="263">-0.7,0.5,0</node>
+			<node id="264">-0.8,0.5,0</node>
+			<node id="265">-0.9,0.5,0</node>
+			<node id="266">-1,0.5,0</node>
+			<node id="267">-1.1,0.5,0</node>
+			<node id="268">-1.2,0.5,0</node>
+			<node id="269">-1.3,0.5,0</node>
+			<node id="270">-1.4,0.5,0</node>
+			<node id="271">-1.5,0.5,0</node>
+			<node id="272">-1.6,0.5,0</node>
+			<node id="273">-1.7,0.5,0</node>
+			<node id="274">-1.8,0.5,0</node>
+			<node id="275">-1.9,0.5,0</node>
+			<node id="276">-2,0.5,0</node>
+			<node id="277">-2.1,0.5,0</node>
+			<node id="278">-2.2,0.5,0</node>
+			<node id="279">-2.3,0.5,0</node>
+			<node id="280">-2.4,0.5,0</node>
+			<node id="281">-2.5,0.5,0</node>
+			<node id="282">-2.6,0.5,0</node>
+			<node id="283">-2.7,0.5,0</node>
+			<node id="284">-2.8,0.5,0</node>
+			<node id="285">-2.9,0.5,0</node>
+			<node id="286">-3,0.5,0</node>
+			<node id="287">-3.1,0.5,0</node>
+			<node id="288">-3.2,0.5,0</node>
+			<node id="289">-3.3,0.5,0</node>
+			<node id="290">-3.4,0.5,0</node>
+			<node id="291">-3.5,0.5,0</node>
+			<node id="292">-3.6,0.5,0</node>
+			<node id="293">-3.7,0.5,0</node>
+			<node id="294">-3.8,0.5,0</node>
+			<node id="295">-3.9,0.5,0</node>
+			<node id="296">-4,0.5,0</node>
+			<node id="297">-4.1,0.5,0</node>
+			<node id="298">-4.2,0.5,0</node>
+			<node id="299">-4.3,0.5,0</node>
+			<node id="300">-4.4,0.5,0</node>
+			<node id="301">-4.5,0.5,0</node>
+			<node id="302">-4.6,0.5,0</node>
+			<node id="303">-4.7,0.5,0</node>
+			<node id="304">-4.8,0.5,0</node>
+			<node id="305">-4.9,0.5,0</node>
+			<node id="306">-4.9,0.5,1</node>
+			<node id="307">-4.8,0.5,1</node>
+			<node id="308">-4.7,0.5,1</node>
+			<node id="309">-4.6,0.5,1</node>
+			<node id="310">-4.5,0.5,1</node>
+			<node id="311">-4.4,0.5,1</node>
+			<node id="312">-4.3,0.5,1</node>
+			<node id="313">-4.2,0.5,1</node>
+			<node id="314">-4.1,0.5,1</node>
+			<node id="315">-4,0.5,1</node>
+			<node id="316">-3.9,0.5,1</node>
+			<node id="317">-3.8,0.5,1</node>
+			<node id="318">-3.7,0.5,1</node>
+			<node id="319">-3.6,0.5,1</node>
+			<node id="320">-3.5,0.5,1</node>
+			<node id="321">-3.4,0.5,1</node>
+			<node id="322">-3.3,0.5,1</node>
+			<node id="323">-3.2,0.5,1</node>
+			<node id="324">-3.1,0.5,1</node>
+			<node id="325">-3,0.5,1</node>
+			<node id="326">-2.9,0.5,1</node>
+			<node id="327">-2.8,0.5,1</node>
+			<node id="328">-2.7,0.5,1</node>
+			<node id="329">-2.6,0.5,1</node>
+			<node id="330">-2.5,0.5,1</node>
+			<node id="331">-2.4,0.5,1</node>
+			<node id="332">-2.3,0.5,1</node>
+			<node id="333">-2.2,0.5,1</node>
+			<node id="334">-2.1,0.5,1</node>
+			<node id="335">-2,0.5,1</node>
+			<node id="336">-1.9,0.5,1</node>
+			<node id="337">-1.8,0.5,1</node>
+			<node id="338">-1.7,0.5,1</node>
+			<node id="339">-1.6,0.5,1</node>
+			<node id="340">-1.5,0.5,1</node>
+			<node id="341">-1.4,0.5,1</node>
+			<node id="342">-1.3,0.5,1</node>
+			<node id="343">-1.2,0.5,1</node>
+			<node id="344">-1.1,0.5,1</node>
+			<node id="345">-1,0.5,1</node>
+			<node id="346">-0.9,0.5,1</node>
+			<node id="347">-0.8,0.5,1</node>
+			<node id="348">-0.7,0.5,1</node>
+			<node id="349">-0.6,0.5,1</node>
+			<node id="350">-0.5,0.5,1</node>
+			<node id="351">-0.4,0.5,1</node>
+			<node id="352">-0.3,0.5,1</node>
+			<node id="353">-0.2,0.5,1</node>
+			<node id="354">-0.1,0.5,1</node>
+			<node id="355">1.77635684e-15,0.5,1</node>
+			<node id="356">0.1,0.5,1</node>
+			<node id="357">0.2,0.5,1</node>
+			<node id="358">0.3,0.5,1</node>
+			<node id="359">0.4,0.5,1</node>
+			<node id="360">0.5,0.5,1</node>
+			<node id="361">0.6,0.5,1</node>
+			<node id="362">0.7,0.5,1</node>
+			<node id="363">0.8,0.5,1</node>
+			<node id="364">0.9,0.5,1</node>
+			<node id="365">1,0.5,1</node>
+			<node id="366">1.1,0.5,1</node>
+			<node id="367">1.2,0.5,1</node>
+			<node id="368">1.3,0.5,1</node>
+			<node id="369">1.4,0.5,1</node>
+			<node id="370">1.5,0.5,1</node>
+			<node id="371">1.6,0.5,1</node>
+			<node id="372">1.7,0.5,1</node>
+			<node id="373">1.8,0.5,1</node>
+			<node id="374">1.9,0.5,1</node>
+			<node id="375">2,0.5,1</node>
+			<node id="376">2.1,0.5,1</node>
+			<node id="377">2.2,0.5,1</node>
+			<node id="378">2.3,0.5,1</node>
+			<node id="379">2.4,0.5,1</node>
+			<node id="380">2.5,0.5,1</node>
+			<node id="381">2.6,0.5,1</node>
+			<node id="382">2.7,0.5,1</node>
+			<node id="383">2.8,0.5,1</node>
+			<node id="384">2.9,0.5,1</node>
+			<node id="385">3,0.5,1</node>
+			<node id="386">3.1,0.5,1</node>
+			<node id="387">3.2,0.5,1</node>
+			<node id="388">3.3,0.5,1</node>
+			<node id="389">3.4,0.5,1</node>
+			<node id="390">3.5,0.5,1</node>
+			<node id="391">3.6,0.5,1</node>
+			<node id="392">3.7,0.5,1</node>
+			<node id="393">3.8,0.5,1</node>
+			<node id="394">3.9,0.5,1</node>
+			<node id="395">4,0.5,1</node>
+			<node id="396">4.1,0.5,1</node>
+			<node id="397">4.2,0.5,1</node>
+			<node id="398">4.3,0.5,1</node>
+			<node id="399">4.4,0.5,1</node>
+			<node id="400">4.5,0.5,1</node>
+			<node id="401">4.6,0.5,1</node>
+			<node id="402">4.7,0.5,1</node>
+			<node id="403">4.8,0.5,1</node>
+			<node id="404">4.9,0.5,1</node>
+		</Nodes>
+		<Elements type="hex8" name="Part1">
+			<elem id="1">1,9,305,4,5,206,306,8</elem>
+			<elem id="2">9,10,304,305,206,205,307,306</elem>
+			<elem id="3">10,11,303,304,205,204,308,307</elem>
+			<elem id="4">11,12,302,303,204,203,309,308</elem>
+			<elem id="5">12,13,301,302,203,202,310,309</elem>
+			<elem id="6">13,14,300,301,202,201,311,310</elem>
+			<elem id="7">14,15,299,300,201,200,312,311</elem>
+			<elem id="8">15,16,298,299,200,199,313,312</elem>
+			<elem id="9">16,17,297,298,199,198,314,313</elem>
+			<elem id="10">17,18,296,297,198,197,315,314</elem>
+			<elem id="11">18,19,295,296,197,196,316,315</elem>
+			<elem id="12">19,20,294,295,196,195,317,316</elem>
+			<elem id="13">20,21,293,294,195,194,318,317</elem>
+			<elem id="14">21,22,292,293,194,193,319,318</elem>
+			<elem id="15">22,23,291,292,193,192,320,319</elem>
+			<elem id="16">23,24,290,291,192,191,321,320</elem>
+			<elem id="17">24,25,289,290,191,190,322,321</elem>
+			<elem id="18">25,26,288,289,190,189,323,322</elem>
+			<elem id="19">26,27,287,288,189,188,324,323</elem>
+			<elem id="20">27,28,286,287,188,187,325,324</elem>
+			<elem id="21">28,29,285,286,187,186,326,325</elem>
+			<elem id="22">29,30,284,285,186,185,327,326</elem>
+			<elem id="23">30,31,283,284,185,184,328,327</elem>
+			<elem id="24">31,32,282,283,184,183,329,328</elem>
+			<elem id="25">32,33,281,282,183,182,330,329</elem>
+			<elem id="26">33,34,280,281,182,181,331,330</elem>
+			<elem id="27">34,35,279,280,181,180,332,331</elem>
+			<elem id="28">35,36,278,279,180,179,333,332</elem>
+			<elem id="29">36,37,277,278,179,178,334,333</elem>
+			<elem id="30">37,38,276,277,178,177,335,334</elem>
+			<elem id="31">38,39,275,276,177,176,336,335</elem>
+			<elem id="32">39,40,274,275,176,175,337,336</elem>
+			<elem id="33">40,41,273,274,175,174,338,337</elem>
+			<elem id="34">41,42,272,273,174,173,339,338</elem>
+			<elem id="35">42,43,271,272,173,172,340,339</elem>
+			<elem id="36">43,44,270,271,172,171,341,340</elem>
+			<elem id="37">44,45,269,270,171,170,342,341</elem>
+			<elem id="38">45,46,268,269,170,169,343,342</elem>
+			<elem id="39">46,47,267,268,169,168,344,343</elem>
+			<elem id="40">47,48,266,267,168,167,345,344</elem>
+			<elem id="41">48,49,265,266,167,166,346,345</elem>
+			<elem id="42">49,50,264,265,166,165,347,346</elem>
+			<elem id="43">50,51,263,264,165,164,348,347</elem>
+			<elem id="44">51,52,262,263,164,163,349,348</elem>
+			<elem id="45">52,53,261,262,163,162,350,349</elem>
+			<elem id="46">53,54,260,261,162,161,351,350</elem>
+			<elem id="47">54,55,259,260,161,160,352,351</elem>
+			<elem id="48">55,56,258,259,160,159,353,352</elem>
+			<elem id="49">56,57,257,258,159,158,354,353</elem>
+			<elem id="50">57,58,256,257,158,157,355,354</elem>
+			<elem id="51">58,59,255,256,157,156,356,355</elem>
+			<elem id="52">59,60,254,255,156,155,357,356</elem>
+			<elem id="53">60,61,253,254,155,154,358,357</elem>
+			<elem id="54">61,62,252,253,154,153,359,358</elem>
+			<elem id="55">62,63,251,252,153,152,360,359</elem>
+			<elem id="56">63,64,250,251,152,151,361,360</elem>
+			<elem id="57">64,65,249,250,151,150,362,361</elem>
+			<elem id="58">65,66,248,249,150,149,363,362</elem>
+			<elem id="59">66,67,247,248,149,148,364,363</elem>
+			<elem id="60">67,68,246,247,148,147,365,364</elem>
+			<elem id="61">68,69,245,246,147,146,366,365</elem>
+			<elem id="62">69,70,244,245,146,145,367,366</elem>
+			<elem id="63">70,71,243,244,145,144,368,367</elem>
+			<elem id="64">71,72,242,243,144,143,369,368</elem>
+			<elem id="65">72,73,241,242,143,142,370,369</elem>
+			<elem id="66">73,74,240,241,142,141,371,370</elem>
+			<elem id="67">74,75,239,240,141,140,372,371</elem>
+			<elem id="68">75,76,238,239,140,139,373,372</elem>
+			<elem id="69">76,77,237,238,139,138,374,373</elem>
+			<elem id="70">77,78,236,237,138,137,375,374</elem>
+			<elem id="71">78,79,235,236,137,136,376,375</elem>
+			<elem id="72">79,80,234,235,136,135,377,376</elem>
+			<elem id="73">80,81,233,234,135,134,378,377</elem>
+			<elem id="74">81,82,232,233,134,133,379,378</elem>
+			<elem id="75">82,83,231,232,133,132,380,379</elem>
+			<elem id="76">83,84,230,231,132,131,381,380</elem>
+			<elem id="77">84,85,229,230,131,130,382,381</elem>
+			<elem id="78">85,86,228,229,130,129,383,382</elem>
+			<elem id="79">86,87,227,228,129,128,384,383</elem>
+			<elem id="80">87,88,226,227,128,127,385,384</elem>
+			<elem id="81">88,89,225,226,127,126,386,385</elem>
+			<elem id="82">89,90,224,225,126,125,387,386</elem>
+			<elem id="83">90,91,223,224,125,124,388,387</elem>
+			<elem id="84">91,92,222,223,124,123,389,388</elem>
+			<elem id="85">92,93,221,222,123,122,390,389</elem>
+			<elem id="86">93,94,220,221,122,121,391,390</elem>
+			<elem id="87">94,95,219,220,121,120,392,391</elem>
+			<elem id="88">95,96,218,219,120,119,393,392</elem>
+			<elem id="89">96,97,217,218,119,118,394,393</elem>
+			<elem id="90">97,98,216,217,118,117,395,394</elem>
+			<elem id="91">98,99,215,216,117,116,396,395</elem>
+			<elem id="92">99,100,214,215,116,115,397,396</elem>
+			<elem id="93">100,101,213,214,115,114,398,397</elem>
+			<elem id="94">101,102,212,213,114,113,399,398</elem>
+			<elem id="95">102,103,211,212,113,112,400,399</elem>
+			<elem id="96">103,104,210,211,112,111,401,400</elem>
+			<elem id="97">104,105,209,210,111,110,402,401</elem>
+			<elem id="98">105,106,208,209,110,109,403,402</elem>
+			<elem id="99">106,107,207,208,109,108,404,403</elem>
+			<elem id="100">107,2,3,207,108,6,7,404</elem>
+		</Elements>
+		<Surface name="ConcentrationFlux1">
+			<quad4 id="1">4,1,5,8</quad4>
+		</Surface>
+	</Mesh>
+	<MeshDomains>
+		<SolidDomain name="Part1" mat="Material1"/>
+	</MeshDomains>
+	<Loads>
+		<surface_load name="ConcentrationFlux1" surface="ConcentrationFlux1" type="concentration flux">
+			<flux>-1</flux>
+			<solute_id>1</solute_id>
+		</surface_load>
+	</Loads>
+	<Output>
+		<plotfile type="febio">
+			<var type="actual concentration"/>
+			<var type="concentration flux"/>
+		</plotfile>
+	</Output>
+</febio_spec>
