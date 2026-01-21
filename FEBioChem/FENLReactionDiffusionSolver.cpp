@@ -30,7 +30,7 @@ FEChemNLReactionDiffusionSolver::FEChemNLReactionDiffusionSolver(FEModel* fem) :
 	// alpha = 0    --> Forward Euler (conditionally stable)
 	// alpha = 0.5  --> Trapezoidal rule (unconditionally stable, second-order accurate)
 	// alpha = 1.0  --> Backward Euler (unconditionally stable, first-order accurate)
-	m_alpha = 0.5;
+	m_alpha = 1.0; // we choose 1, eventhough it's less accurate, it doesn't cause oscillations
 
 	// we'll need a non-symmetric stiffness matrix
 	m_msymm = REAL_UNSYMMETRIC;

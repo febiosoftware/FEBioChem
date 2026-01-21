@@ -41,6 +41,7 @@ bool FEChemPlotEffectiveConcentration::SetFilter(const char* sz)
 	if (m_nsol >= 0)
 	{
 		SetVarType(PLT_FLOAT);
+		SetArraySize(0);
 	}
 	return (m_nsol != -1);
 }
