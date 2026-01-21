@@ -33,7 +33,7 @@ The chemical species that are used in the model are defined in the `Globals` sec
 * A **solute** defines a chemical species that is not bound to the solid phase of a mixture. If a model doesn’t represent a mixture, each solute defines a chemical species. No child properties need to be defined for a solute.
 * A **solid_bound** defines a chemical species that is bound to the solid-phase of a mixture. Again, no child properties need to be defined for a solid bound species.
 
-## Solver
+### Solver
 Make sure to set the solver type to the same name as the module. For instance, for a reaction-diffusion model, set
 
 ```xml

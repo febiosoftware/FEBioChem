@@ -13,6 +13,7 @@
 *.userosscache
 *.sln.docstates
 site/
+Example/jobs/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
