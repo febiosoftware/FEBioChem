@@ -3,6 +3,7 @@ site_description: Documentation site for FEBioChem
 site_author: Steve Maas
 theme:
   name: material
+  logo: figs/FEBioChem.png
   palette:
     primary: indigo
     accent: indigo
