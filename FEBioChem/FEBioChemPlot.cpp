@@ -7,9 +7,28 @@
 #include <FECore/writeplot.h>
 
 //-----------------------------------------------------------------------------
-FEChemPlotEffectiveConcentration::FEChemPlotEffectiveConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_NODE)
+FEChemPlotEffectiveConcentration::FEChemPlotEffectiveConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_NODE)
 {
-	m_pfem = pfem;
+	if (pfem)
+	{
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
+
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
+		{
+			FEChemSpeciesData* ps = dynamic_cast<FEChemSpeciesData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+			}
+		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
+	}
 	m_nsol = -1;
 }
 
@@ -17,21 +36,57 @@ FEChemPlotEffectiveConcentration::FEChemPlotEffectiveConcentration(FEModel* pfem
 // Resolve solute by solute ID
 bool FEChemPlotEffectiveConcentration::SetFilter(const char* sz)
 {
-	m_nsol = m_pfem->GetDOFIndex(sz);
+	FEModel* fem = GetFEModel();
+	m_nsol = fem->GetDOFIndex(sz);
+	if (m_nsol >= 0)
+	{
+		SetVarType(PLT_FLOAT);
+	}
 	return (m_nsol != -1);
 }
 
 //-----------------------------------------------------------------------------
-bool FEChemPlotEffectiveConcentration::Save(FEDomain &dom, FEDataStream& a)
+bool FEChemPlotEffectiveConcentration::Save(FEDomain& dom, FEDataStream& a)
 {
-	// make sure we have a valid index
-	if (m_nsol == -1) return false;
+	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(dom.GetMaterial());
+	if (mat == nullptr) return false;
 
-	int N = dom.Nodes();
-	for (int i = 0; i<N; ++i)
+	// make sure we have a valid index
+	if (m_nsol >= 0)
 	{
-		FENode& node = dom.Node(i);
-		a << node.get(m_nsol);
+		int N = dom.Nodes();
+		for (int i = 0; i < N; ++i)
+		{
+			FENode& node = dom.Node(i);
+			a << node.get(m_nsol);
+		}
+	}
+	else
+	{
+		// figure out the local solute IDs. This depends on the material
+		DOFS& dofs = GetFEModel()->GetDOFS();
+		int nsols = dofs.GetVariableSize("concentration");
+		vector<int> lid(nsols, -1);
+		int negs = 0;
+		for (int i = 0; i < nsols; ++i)
+		{
+			FEChemReactiveSpecies* rs = mat->FindSpeciesFromGlobalID(i);
+			if (rs) lid[i] = rs->GetLocalID();
+			if (lid[i] < 0) negs++;
+		}
+		if (negs == nsols) return false;
+
+		int N = dom.Nodes();
+		for (int i = 0; i < N; ++i)
+		{
+			FENode& node = dom.Node(i);
+			for (int k = 0; k < nsols; ++k)
+			{
+				int nsid = lid[k];
+				if (nsid == -1) a << 0.f;
+				else a << node.get(nsid);
+			}
+		}
 	}
 	return true;
 }
@@ -39,24 +94,26 @@ bool FEChemPlotEffectiveConcentration::Save(FEDomain &dom, FEDataStream& a)
 //-----------------------------------------------------------------------------
 FEChemPlotActualConcentration::FEChemPlotActualConcentration(FEModel* pfem) : FEPlotDomainData(pfem, PLT_ARRAY, FMT_ITEM)
 {
-	DOFS& dofs = pfem->GetDOFS();
-	int nsol = dofs.GetVariableSize("concentration");
-	SetArraySize(nsol);
-
-	// collect the names
-	int ndata = pfem->GlobalDataItems();
-	vector<string> s;
-	for (int i = 0; i < ndata; ++i)
+	if (pfem)
 	{
-		FEChemSpeciesData* ps = dynamic_cast<FEChemSpeciesData*>(pfem->GetGlobalData(i));
-		if (ps)
-		{
-			s.push_back(ps->GetName());
-		}
-	}
-	assert(nsol == (int)s.size());
-	SetArrayNames(s);
+		DOFS& dofs = pfem->GetDOFS();
+		int nsol = dofs.GetVariableSize("concentration");
+		SetArraySize(nsol);
 
+		// collect the names
+		int ndata = pfem->GlobalDataItems();
+		vector<string> s;
+		for (int i = 0; i < ndata; ++i)
+		{
+			FEChemSpeciesData* ps = dynamic_cast<FEChemSpeciesData*>(pfem->GetGlobalData(i));
+			if (ps)
+			{
+				s.push_back(ps->GetName());
+			}
+		}
+		assert(nsol == (int)s.size());
+		SetArrayNames(s);
+	}
 	m_nsol = -1;
 }
 
