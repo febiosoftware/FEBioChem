@@ -39,6 +39,12 @@ public:
 protected:
 	void ElementForceVector(FESolidElement& el, vector<double>& fe);
 
+	void ElementMassVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un);
+
+	void ElementDiffusionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha, bool bconvection);
+
+	void ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha, bool bconvection);
+
 public:
 	void ElementMassMatrix(FESolidElement& el, matrix& ke);
 
@@ -47,6 +53,8 @@ public:
 	void ElementReactionStiffness(FESolidElement& el, matrix& ke);
 
 	void ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn);
+
+	void UpdateElement(FESolidElement& el, const FETimeInfo& tp);
 
 private:
 	FEChemReactionDiffusionMaterial*	m_mat;

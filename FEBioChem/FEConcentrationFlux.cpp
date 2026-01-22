@@ -102,4 +102,4 @@ BEGIN_FECORE_CLASS(FEChemSoluteFlux, FEChemConcentrationFlux)
 	ADD_PARAMETER(m_blinear, "linear");
 END_FECORE_CLASS();
 
-FEChemSoluteFlux::FEChemSoluteFlux(FEModel* fem) : FEChemConcentrationFlux(fem) {}
+FEChemSoluteFlux::FEChemSoluteFlux(FEModel* fem) : FEChemConcentrationFlux(fem) { m_blinear = false; }
