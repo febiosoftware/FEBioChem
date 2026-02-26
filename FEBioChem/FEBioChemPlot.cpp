@@ -350,26 +350,40 @@ bool FEChemPlotSBSConcentration::Save(FEDomain &dom, FEDataStream& a)
 }
 
 //-----------------------------------------------------------------------------
-FEChemPlotSBSApparentDensity::FEChemPlotSBSApparentDensity(FEModel* pfem) : FEPlotDomainData(pfem, PLT_FLOAT, FMT_ITEM)
+FEChemPlotSBSApparentDensity::FEChemPlotSBSApparentDensity(FEModel* fem) : FEPlotDomainData(fem, PLT_ARRAY, FMT_ITEM)
 {
-	m_pfem = pfem;
+	int nsbm = 0;
+	m_sbmName.clear();
+	for (int i = 0; i < fem->GlobalDataItems(); ++i)
+	{
+		FEChemSolidBoundSpeciesData* pd = dynamic_cast<FEChemSolidBoundSpeciesData*>(fem->GetGlobalData(i));
+		if (pd)
+		{
+			nsbm++;
+			m_sbmName.push_back(pd->GetName());
+		}
+	}
+	SetArraySize(nsbm);
+	if (nsbm > 0) SetArrayNames(m_sbmName);
 }
 
 //-----------------------------------------------------------------------------
 // Resolve sbm by name
 bool FEChemPlotSBSApparentDensity::SetFilter(const char* sz)
 {
+	FEModel* fem = GetFEModel();
 	string name(sz);
 	m_sbmName.clear();
-	for (int i = 0; i<m_pfem->GlobalDataItems(); ++i)
+	for (int i = 0; i<fem->GlobalDataItems(); ++i)
 	{
-		FEGlobalData* pd = m_pfem->GetGlobalData(i);
+		FEGlobalData* pd = fem->GetGlobalData(i);
 		if (pd->GetName() == name)
 		{
-			m_sbmName = name;
+			m_sbmName.push_back(name);
 			break;
 		}
 	}
+	SetVarType(PLT_FLOAT);
 	return (m_sbmName.empty() == false);
 }
 
@@ -382,29 +396,41 @@ bool FEChemPlotSBSApparentDensity::Save(FEDomain &dom, FEDataStream& a)
 	FEChemReactionDomain& rdom = static_cast<FEChemReactionDomain&>(dom);
 
 	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(rdom.GetMaterial());
-	FEChemReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName);
-	if (rs == 0) return false;
+	int nsbm = m_sbmName.size();
+	vector<int> lid(nsbm, -1);
+	for (int i = 0; i < nsbm; ++i)
+	{
+		FEChemReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName[i]);
+		if (rs) lid[i] = rs->GetLocalID();
+	}
 
-	int nsbm = rs->GetID();
+	if ((nsbm == 1) && (lid[0] == -1)) return false;
 
 	int N = dom.Elements();
 	for (int i = 0; i<N; ++i)
 	{
 		FEElement& el = dom.ElementRef(i);
 
-		// calculate average concentration
-		double ew = 0;
-		for (int j = 0; j<el.GaussPoints(); ++j)
+		for (int k = 0; k < nsbm; ++k)
 		{
-			FEMaterialPoint& mp = *el.GetMaterialPoint(j);
-			FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
+			// calculate average
+			double ew = 0;
 
-			if (pt) ew += pt->m_sbmr[nsbm];
+			int id = lid[k];
+			if (id >= 0)
+			{
+				for (int j = 0; j < el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.GetMaterialPoint(j);
+					FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
+
+					if (pt) ew += pt->m_sbmr[id];
+				}
+				ew /= el.GaussPoints();
+			}
+
+			a << ew;
 		}
-
-		ew /= el.GaussPoints();
-
-		a << ew;
 	}
 	return true;
 }
