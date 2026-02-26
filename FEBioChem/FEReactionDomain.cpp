@@ -250,10 +250,8 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 
 			// update the solid-bound apparent density (i.e. mass supply)
 
-			// time integration
-			// alpha = 1, backward Euler
-			// alpha = 1/2, trapezoidal rule
-			rp.m_sbmr[i] = rp.m_sbmrp[i] + dt * (alpha * rhohati + (1.0 - alpha) * rp.m_sbmrhatp[i]);
+			// time integration (midpoint-rule)
+			rp.m_sbmr[i] = rp.m_sbmrp[i] + dt * (rhohati + rp.m_sbmrhatp[i])*0.5;
 
 			rp.m_sbmri[i] = rp.m_sbmr[i] - tmp;
 
