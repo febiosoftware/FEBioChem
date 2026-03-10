@@ -86,8 +86,14 @@ public:
 
 	bool Init();
 
-	// evaluate diffusivity
-	double Diffusivity() { return m_diffusivity; }
+	// concentration flux
+	vec3d ConcentrationFlux(FEMaterialPoint& mp);
+
+	// derivative of flux with respect to concentration (dJ/dc)
+	vec3d FluxConcentrationTangent(FEMaterialPoint& mp);
+
+	// evaluate diffusivity (dJ/d(grad c))
+	mat3d DiffusivityTensor(FEMaterialPoint& mp);
 
 private:
 	int		m_speciesId;

@@ -25,6 +25,7 @@ public:
 		FEChemReactionMaterialPoint* pt = new FEChemReactionMaterialPoint;
 		pt->m_c = m_c;
 		pt->m_ca = m_ca;
+		pt->m_dc = m_dc;
 		pt->m_j = m_j;
 		pt->m_sbmr = m_sbmr;
 		pt->m_sbmrp = m_sbmrp;
@@ -52,6 +53,7 @@ public:
 public:
 	vector<double>	m_c;	//!< concentration values at integration points (of ALL concentration dofs)
 	vector<double>	m_ca;	//!< "actual" concentrations (includes both free species and solid-bound species)
+	vector<vec3d>	m_dc;	//!< concentration gradients at integration points (of ALL concentration dofs)
 	vector<vec3d>	m_j;	//!< concentration flux
 
 	vector<double>	m_sbmr;		//!< apparent densities of solid-bound molecules at current time

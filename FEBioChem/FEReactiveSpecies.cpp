@@ -2,7 +2,7 @@
 #include "FEReactiveSpecies.h"
 #include <FECore/FEModel.h>
 #include <FECore/FEGlobalData.h>
-
+#include "FEReactionMaterial.h"
 
 //=============================================================================
 // FESpeciesData
@@ -117,6 +117,25 @@ bool FEChemReactiveSpecies::Init()
 	if (m_speciesId == -1) return false;
 	SetID(m_speciesId - 1); // ID has to be zero-based
 	return FEChemReactiveSpeciesBase::Init();
+}
+
+mat3d FEChemReactiveSpecies::DiffusivityTensor(FEMaterialPoint& mp)
+{ 
+	return mat3dd(-m_diffusivity); 
+}
+
+vec3d FEChemReactiveSpecies::FluxConcentrationTangent(FEMaterialPoint& mp)
+{
+	return vec3d(0, 0, 0);
+}
+
+vec3d FEChemReactiveSpecies::ConcentrationFlux(FEMaterialPoint& mp)
+{
+	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
+	vec3d grad_c = rp.m_dc[GetLocalID()];
+	mat3d D = DiffusivityTensor(mp);
+	return -D * grad_c;
 }
 
 //=================================================================================================

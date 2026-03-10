@@ -137,7 +137,7 @@ void FEChemReactionDomain::Activate()
 				FEChemReactiveSpecies* s = m_mat->GetSpecies(i);
 
 				// evaluate gradient at this integration point
-				vec3d grad_c = gradient(el, &c[i][0], n);
+				rp.m_dc[s->GetLocalID()] = gradient(el, &c[i][0], n);
 
 				// evaluate concentration
 				double ci = el.Evaluate(&(c[i][0]), n);
@@ -147,7 +147,7 @@ void FEChemReactionDomain::Activate()
 				rp.m_ca[s->GetLocalID()] = ci;
 
 				// evaluate the flux
-				rp.m_j[s->GetLocalID()] = -grad_c * s->Diffusivity() * f;
+				rp.m_j[s->GetLocalID()] = s->ConcentrationFlux(mp) * f;
 			}
 
 			// update the solid volume fraction
@@ -222,7 +222,7 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 			FEChemReactiveSpecies* s = m_mat->GetSpecies(i);
 
 			// evaluate gradient at this integration point
-			vec3d grad_c = gradient(el, &c[i][0], n);
+			rp.m_dc[s->GetLocalID()] = gradient(el, &c[i][0], n);
 
 			// evaluate concentration
 			double ci = el.Evaluate(&(c[i][0]), n);
@@ -232,7 +232,7 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 			rp.m_ca[s->GetLocalID()] = ci;
 
 			// evaluate the flux
-			rp.m_j[s->GetLocalID()] = -grad_c * s->Diffusivity() * f;
+			rp.m_j[s->GetLocalID()] = s->ConcentrationFlux(mp) * f;
 		}
 
 		// evaluate the solid-bound species concentrations
@@ -512,10 +512,6 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 	// get the number of concentration variables
 	int ncv = (int)m_dofC.Size();
 
-	// get the diffusion coefficients
-	vector<double> D(ncv);
-	for (int i=0; i<ncv; ++i) D[i] = m_mat->GetSpecies(i)->Diffusivity();
-
 	int ne = el.Nodes();
 	int ni = el.GaussPoints();
 
@@ -523,6 +519,8 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 	vec3d G[EN];
 	double Gi[3], Gj[3];
 	double DB[3];
+	vector<mat3d> D(ncv);
+	vector<vec3d> d(ncv);
 
 	// loop over all integration points
 	const double *gw = el.GaussWeights();
@@ -535,9 +533,16 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
+		// get the concentration tangents
+		for (int i = 0; i < ncv; ++i)
+		{
+			d[i] = m_mat->GetSpecies(i)->FluxConcentrationTangent(mp);
+			D[i] = m_mat->GetSpecies(i)->DiffusivityTensor(mp);
+		}
+
 		// fluid volume fraction
 		double phi = m_mat->Porosity(pt);
-
+		double* H = el.H(n);
 		for (int a = 0; a<ne; ++a)
 		{
 			Gi[0] = G[a].x;
@@ -552,13 +557,17 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 
 				for (int i = 0; i<ncv; ++i)
 				{
-					DB[0] = D[i]*Gj[0];
-					DB[1] = D[i]*Gj[1];
-					DB[2] = D[i]*Gj[2];
+					// Flux concentration tangent stiffness matrix contribution
+					double kab_d = (Gi[0] * d[i].x + Gi[1] * d[i].y + Gi[2] * d[i].z) * H[b];
 
-					double kab = (Gi[0] * DB[0] + Gi[1] * DB[1] + Gi[2] * DB[2])*detJt*gw[n];
+					// Diffusivity contribution to stiffness matrix
+					DB[0] = D[i](0, 0) * Gj[0] + D[i](0, 1) * Gj[1] + D[i](0, 2) * Gj[2];
+					DB[1] = D[i](1, 0) * Gj[0] + D[i](1, 1) * Gj[1] + D[i](1, 2) * Gj[2];
+					DB[2] = D[i](2, 0) * Gj[0] + D[i](2, 1) * Gj[1] + D[i](2, 2) * Gj[2];
+					double kab_D = (Gi[0] * DB[0] + Gi[1] * DB[1] + Gi[2] * DB[2]);
 
-					ke[a*ncv + i][b*ncv + i] += kab * phi;
+					// add it all up
+					ke[a*ncv + i][b*ncv + i] -= (kab_d + kab_D) * detJt * gw[n]* phi;
 				}
 			}
 		}
