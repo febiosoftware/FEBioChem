@@ -10,6 +10,7 @@
 #include "FEReactionDomain.h"
 #include "FEMassActionReaction.h"
 #include "FEMichaelisMentenReaction.h"
+#include "FEChemLogisticGrowthReaction.h"
 #include "FEReactiveSpecies.h"
 #include "FEConcentrationFlux.h"
 #include "FESBSPointSource.h"
@@ -89,6 +90,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemReactionDiffusionMaterial          , "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FEChemMassActionReaction                 , "mass action");
 	REGISTER_FECORE_CLASS(FEChemMichaelisMentenReaction            , "Michaelis-Menten");
+	REGISTER_FECORE_CLASS(FEChemLogisticGrowthReaction             , "Logistic growth");
 	REGISTER_FECORE_CLASS(FEChemReactiveSpecies                    , "species");
 	REGISTER_FECORE_CLASS(FEChemSolidBoundSpecies                  , "solid_bound_species");
 	REGISTER_FECORE_CLASS(FEChemConcentrationFlux                  , "concentration flux");
