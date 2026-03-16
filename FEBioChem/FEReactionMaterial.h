@@ -3,7 +3,6 @@
 #include <FECore/FEGlobalData.h>
 #include <vector>
 #include <string>
-using namespace std;
 
 class FEChemReactionDiffusionMaterial;
 
@@ -51,17 +50,17 @@ public:
 	}
 
 public:
-	vector<double>	m_c;	//!< concentration values at integration points (of ALL concentration dofs)
-	vector<double>	m_ca;	//!< "actual" concentrations (includes both free species and solid-bound species)
-	vector<vec3d>	m_dc;	//!< concentration gradients at integration points (of ALL concentration dofs)
-	vector<vec3d>	m_j;	//!< concentration flux
+	std::vector<double>	m_c;	//!< concentration values at integration points (of ALL concentration dofs)
+	std::vector<double>	m_ca;	//!< "actual" concentrations (includes both free species and solid-bound species)
+	std::vector<vec3d>	m_dc;	//!< concentration gradients at integration points (of ALL concentration dofs)
+	std::vector<vec3d>	m_j;	//!< concentration flux
 
-	vector<double>	m_sbmr;		//!< apparent densities of solid-bound molecules at current time
-	vector<double>	m_sbmrp;	//!< apparent densities of solid-bound molecules at previous time
-	vector<double>	m_sbmri;	//!< increment of apparent density of solid-bound molecules at current time
+	std::vector<double>	m_sbmr;		//!< apparent densities of solid-bound molecules at current time
+	std::vector<double>	m_sbmrp;	//!< apparent densities of solid-bound molecules at previous time
+	std::vector<double>	m_sbmri;	//!< increment of apparent density of solid-bound molecules at current time
 
-	vector<double>	m_sbmrhat;
-	vector<double>	m_sbmrhatp;
+	std::vector<double>	m_sbmrhat;
+	std::vector<double>	m_sbmrhatp;
 
 	double	m_phi;		//!< current solid volume fraction
 	double	m_phip;		//!< previous solid volume fraction
@@ -77,8 +76,6 @@ public:
 class FEChemReactionMaterial : public FEMaterialProperty
 {
 	FECORE_BASE_CLASS(FEChemReactionMaterial)
-
-public:
 
 public:
 	FEChemReactionMaterial(FEModel* fem);
@@ -98,10 +95,22 @@ public:
 	virtual double GetReactionRateDeriv(FEMaterialPoint& pt, int id) = 0;
 
 public:
-	vector<int>	m_vR;	//!< stoichiometric coefficients for reactants
-	vector<int>	m_vP;	//!< stoichiometric coefficients for products
-	vector<int>	m_v;	//!< net stoichiometric coefficients (vP - vR)
+	std::vector<int>	m_vR;	//!< stoichiometric coefficients for reactants
+	std::vector<int>	m_vP;	//!< stoichiometric coefficients for products
+	std::vector<int>	m_v;	//!< net stoichiometric coefficients (vP - vR)
 
 protected:
 	FEChemReactionDiffusionMaterial*	m_pRDM;	//!< parent reaction-diffusion material (will be set by parent during Init)
 };
+
+//-----------------------------------------------------------------------------
+// Helper class for keeping track of terms in the chemical equation.
+// first = stoichiometric coefficient
+// second = name of species (this should correspond with the name of one the global species defined)
+using ReactionTerm = std::pair<int, std::string>;
+
+// helper function for parsing the chemical equation string.
+bool parseFormula(char* sz, vector<ReactionTerm>& term);
+
+// helper function for converting the chemical equation to a list of reactants and products.
+bool convert(const char* szeq, vector<ReactionTerm>& reactants, vector<ReactionTerm>& products);

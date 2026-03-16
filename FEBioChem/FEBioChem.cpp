@@ -22,6 +22,7 @@
 #include "FEInitialConcentration.h"
 #include "FEConcentrationBC.h"
 #include "FEBioChemLog.h"
+#include "FEChemCustomReaction.h"	
 
 class FEBioChemModule : public FEModule
 {
@@ -91,6 +92,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemMassActionReaction                 , "mass action");
 	REGISTER_FECORE_CLASS(FEChemMichaelisMentenReaction            , "Michaelis-Menten");
 	REGISTER_FECORE_CLASS(FEChemLogisticGrowthReaction             , "Logistic growth");
+	REGISTER_FECORE_CLASS(FEChemCustomReaction                     , "custom reaction");
 	REGISTER_FECORE_CLASS(FEChemReactiveSpecies                    , "species");
 	REGISTER_FECORE_CLASS(FEChemSolidBoundSpecies                  , "solid_bound_species");
 	REGISTER_FECORE_CLASS(FEChemConcentrationFlux                  , "concentration flux");
@@ -106,9 +108,11 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemSBSPointSource                     , "sbs point source");
 	REGISTER_FECORE_CLASS(FEChemSpeciesPointSource                 , "point source");
 
+	// initial conditions
 	REGISTER_FECORE_CLASS(FEChemInitialConcentration, "initial concentration");
 	REGISTER_FECORE_CLASS(FEChemInitialVelocity     , "initial velocity");
 
+	// log variables
 	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxX_T, 0, "j1x");
 	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxY_T, 0, "j1y");
 	REGISTER_FECORE_CLASS_T(FEChemLogElemSoluteFluxZ_T, 0, "j1z");
