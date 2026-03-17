@@ -74,12 +74,12 @@ bool FEChemCustomReaction::Init()
 			}
 
 			string varName = "_" + reactant_i.second;
-			m.speciesSlots[spec->GetLocalID()] = m.valRate->AddGlobal(varName);
+			m.speciesSlots[spec->GetLocalID()] = m.valRate->AddGlobalDouble(varName);
 			m.valDeriv[spec->GetLocalID()].derivVal->CompileDerivative(varName);
 
 			for (int j = 0; j < ntot; ++j)
 			{
-				m.valDeriv[j].speciesSlots[spec->GetLocalID()] = m.valDeriv[j].derivVal->AddGlobal(varName);
+				m.valDeriv[j].speciesSlots[spec->GetLocalID()] = m.valDeriv[j].derivVal->AddGlobalDouble(varName);
 			}
 		}
 		for (int i = 0; i < products.size(); ++i)
@@ -94,12 +94,12 @@ bool FEChemCustomReaction::Init()
 			}
 
 			string varName = "_" + product_i.second;
-			m.speciesSlots[spec->GetLocalID()] = m.valRate->AddGlobal(varName);
+			m.speciesSlots[spec->GetLocalID()] = m.valRate->AddGlobalDouble(varName);
 			m.valDeriv[spec->GetLocalID()].derivVal->CompileDerivative(varName);
 
 			for (int j = 0; j < ntot; ++j)
 			{
-				m.valDeriv[j].speciesSlots[spec->GetLocalID()] = m.valDeriv[j].derivVal->AddGlobal(varName);
+				m.valDeriv[j].speciesSlots[spec->GetLocalID()] = m.valDeriv[j].derivVal->AddGlobalDouble(varName);
 			}
 		}
 
@@ -171,12 +171,18 @@ double FEChemCustomReaction::GetReactionRate(FEMaterialPoint& pt)
 		double* c = rp.m_ca.data();
 
 		// if we have a script valuator, we need to set the global variables before evaluating the rate
-		for (int i = 0; i<m.speciesSlots.size(); ++i)
+		std::vector<std::pair<int, double>> globals(m.speciesSlots.size());
+		for (int i = 0; i < m.speciesSlots.size(); ++i)
 		{
-			m.valRate->SetGlobal(m.speciesSlots[i], c[i]);
+			globals[i].first = m.speciesSlots[i];
+			globals[i].second = c[i];
 		}
+
+		double r = m.valRate->run(pt, globals);
+		return r;
 	}
-	return m_rate(pt);
+	else
+		return m_rate(pt);
 }
 
 double FEChemCustomReaction::GetReactionRateDeriv(FEMaterialPoint& pt, int id)
@@ -189,12 +195,15 @@ double FEChemCustomReaction::GetReactionRateDeriv(FEMaterialPoint& pt, int id)
 		double* c = rp.m_ca.data();
 
 		// if we have a script valuator, we need to set the global variables before evaluating the rate
+		std::vector<std::pair<int, double>> globals(deriv_i.speciesSlots.size());
 		for (int i = 0; i < deriv_i.speciesSlots.size(); ++i)
 		{
-			deriv_i.derivVal->SetGlobal(deriv_i.speciesSlots[i], c[i]);
+			globals[i].first = deriv_i.speciesSlots[i];
+			globals[i].second = c[i];
 		}
 
-		return deriv_i.derivVal->operator()(pt);
+		double dr = deriv_i.derivVal->run(pt, globals);
+		return dr;
 	}
 	return 0.0;
 }
