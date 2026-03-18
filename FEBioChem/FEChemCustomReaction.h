@@ -1,9 +1,9 @@
 #pragma once
 #include "FEReactionMaterial.h"
+#include <FECore/FEPhysicsParam.h>
+
 class FEChemCustomReaction : public FEChemReactionMaterial
 {
-	class Imp; // PIMPL for hiding implementation details
-
 public:
 	FEChemCustomReaction(FEModel* fem);
 
@@ -18,9 +18,7 @@ public:
 
 private:
 	string	m_equation;		//!< reaction equation
-	FEParamDouble m_rate;	//!< reaction rate (evaluated at integration points)
-
-	Imp& m;
+	FEPhysicsParam m_rate;	//!< reaction rate (evaluated at integration points)
 
 	DECLARE_FECORE_CLASS();
 };
