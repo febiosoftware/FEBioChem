@@ -4,32 +4,40 @@ Consider $N$ chemical species that undergo diffusion and can react with each oth
 \[
 \begin{equation}
 \label{eq:strong-form}
-{{\partial }_{t}}{{u}^{\left( i \right)}}=\nabla \cdot \left( {{\mathbf{D}}^{\left( i \right)}}\nabla {{u}^{\left( i \right)}} \right)-\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)+{{R}^{\left( i \right)}}\left( \mathbf{u} \right),i=1\ldots N
+{{\partial }_{t}}{{u}^{\left( i \right)}}= - \nabla \cdot \left( \mathbf{J}^{(i)}\left(\mathbf{u},\nabla\mathbf{u} \right) \right)-\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)+{{R}^{\left( i \right)}}\left( \mathbf{u} \right),i=1\ldots N
 \end{equation}
 \]
 
-Here, ${{u}^{\left( i \right)}}$ represents the concentration of chemical species i, ${{\mathbf{D}}^{\left( i \right)}}$ the diffusion tensor of species $i$, and ${{R}^{\left( i \right)}}$ accounts for all local reactions that contribute to the concentration of species $i$. The vector ${{\mathbf{u}}^{T}}=\left[ {{u}^{\left( 1 \right)}},...,{{u}^{\left( N \right)}} \right]$ represents all the concentrations.
+Here, ${{u}^{\left( i \right)}}$ represents the concentration of chemical species i, $\mathbf{J}^{(i)}$ is the concentration flux, and ${{R}^{\left( i \right)}}$ accounts for all local reactions that contribute to the concentration of species $i$. The vector ${{\mathbf{u}}^{T}}=\left[ {{u}^{\left( 1 \right)}},...,{{u}^{\left( N \right)}} \right]$ represents all the concentrations.
+
+Note that we assume that the concentration flux in general can be a function of both the concentrations $\mathbf{u}$ and their gradients $\nabla \mathbf{u}$. As a simple example, consider the case of Fickian diffusion, where the concentration flux takes on the familiar form.
+
+\[
+\mathbf{J}^{(i)} = -{{\mathbf{D}}^{\left( i \right)}}\nabla {{u}^{\left( i \right)}}
+\]
+
+Here, ${{\mathbf{D}}^{\left( i \right)}}$ the diffusion tensor of species $i$. 
 
 ## Weak Formulation
 
 First, an integral version of this equation must be established. Let’s reorganize the terms as follows,
 
 \[
--{{\partial }_{t}}{{u}^{\left( i \right)}}-\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)+\nabla \cdot \left( {{\mathbf{D}}^{\left( i \right)}}\nabla {{u}^{\left( i \right)}} \right)+{{R}^{\left( i \right)}}\left( \mathbf{u} \right)=0
+-{{\partial }_{t}}{{u}^{\left( i \right)}}-\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)-\nabla \cdot \left( {{\mathbf{J}}^{\left( i \right)}} \right)+{{R}^{\left( i \right)}}\left( \mathbf{u} \right)=0
 \]
 
 Then, consider $w$ a trial function and integrate over the domain.
 
-\[\sum\limits_{i=1}^{N}{\int\limits_{V}{{{w}^{\left( i \right)}}\left[ -{{\partial }_{t}}{{u}^{\left( i \right)}}-\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)+\nabla \cdot \left( {{\mathbf{D}}^{\left( i \right)}}\nabla {{u}^{\left( i \right)}} \right)+{{R}^{\left( i \right)}}\left( \mathbf{u} \right) \right]dV}}=0\]
+\[\sum\limits_{i=1}^{N}{\int\limits_{V}{{{w}^{\left( i \right)}}\left[ -{{\partial }_{t}}{{u}^{\left( i \right)}}-\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)-\nabla \cdot \left( {{\mathbf{J}}^{\left( i \right)}} \right)+{{R}^{\left( i \right)}}\left( \mathbf{u} \right) \right]dV}}=0\]
 
 This can be rewritten as,
 
 \[\begin{align}
-  & -\sum\limits_{i=1}^{N}{\int\limits_{V}{{{w}^{\left( i \right)}}{{\partial }_{t}}{{u}^{\left( i \right)}}dV}}-\sum\limits_{i=1}^{N}{\int\limits_{V}{{{w}^{\left( i \right)}}\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)}}+\sum\limits_{i=1}^{N}{\int\limits_{S}{{{w}^{\left( i \right)}}{{\mathbf{q}}^{\left( i \right)}}\cdot \mathbf{n}dS}} \\ 
- & -\sum\limits_{i=1}^{N}{\int\limits_{V}{\nabla {{w}^{\left( i \right)}}\cdot {{\mathbf{D}}^{\left( i \right)}}\nabla {{u}^{\left( i \right)}}dV}}+\sum\limits_{i=1}^{N}{\int\limits_{V}{{{w}^{\left( i \right)}}{{R}^{\left( i \right)}}dV}}=0 \\ 
+  & -\sum\limits_{i=1}^{N}{\int\limits_{V}{{{w}^{\left( i \right)}}{{\partial }_{t}}{{u}^{\left( i \right)}}dV}}-\sum\limits_{i=1}^{N}{\int\limits_{V}{{{w}^{\left( i \right)}}\nabla \cdot \left( \mathbf{v}{{u}^{\left( i \right)}} \right)}}-\sum\limits_{i=1}^{N}{\int\limits_{S}{{{w}^{\left( i \right)}}{{{J_n}}^{\left( i \right)}}dS}} \\ 
+ & +\sum\limits_{i=1}^{N}{\int\limits_{V}{\nabla {{w}^{\left( i \right)}}\cdot {{\mathbf{J}}^{\left( i \right)}}dV}}+\sum\limits_{i=1}^{N}{\int\limits_{V}{{{w}^{\left( i \right)}}{{R}^{\left( i \right)}}dV}}=0 \\ 
 \end{align}\]
 
-Here, $\mathbf{q}=-\mathbf{D}\nabla u$, is the flux vector and the second term is integrated over the surface for which $\mathbf{q}$ is prescribed.
+Note that the third term is integrated over the surface for which $J_n = \mathbf{J}\cdot \mathbf{n}$ is prescribed.
 
 ## Discretization
 
@@ -40,8 +48,8 @@ Next, the finite element approximations are introduced.
 This results in the following,
 
 \[\begin{align}
-  & -\sum\limits_{i=1}^{N}{\sum\limits_{b}{\dot{u}_{b}^{\left( i \right)}\left( \int\limits_{V}{{{N}_{a}}{{N}_{b}}dV} \right)}}-\sum\limits_{i=1}^{N}{\sum\limits_{b}^{{}}{u_{b}^{\left( i \right)}\left( \int\limits_{V}{{{N}_{a}}\nabla \cdot \left( \mathbf{v}{{N}_{b}} \right)}dV \right)}}+\sum\limits_{i=1}^{N}{\int\limits_{S}{{{N}_{a}}{{\mathbf{q}}^{\left( i \right)}}\cdot \mathbf{n}dS}} \\ 
- & -\sum\limits_{i=1}^{N}{\sum\limits_{b}{u_{b}^{\left( i \right)}\left( \int\limits_{V}{\nabla {{N}_{a}}\cdot {{\mathbf{D}}^{\left( i \right)}}\nabla {{N}_{b}}dV} \right)}}+\sum\limits_{i=1}^{N}{\int\limits_{V}{{{N}_{a}}{{R}^{\left( i \right)}}dV}}=0 \\ 
+  & -\sum\limits_{i=1}^{N}{\sum\limits_{b}{\dot{u}_{b}^{\left( i \right)}\left( \int\limits_{V}{{{N}_{a}}{{N}_{b}}dV} \right)}}-\sum\limits_{i=1}^{N}{\sum\limits_{b}^{{}}{u_{b}^{\left( i \right)}\left( \int\limits_{V}{{{N}_{a}}\nabla \cdot \left( \mathbf{v}{{N}_{b}} \right)}dV \right)}}-\sum\limits_{i=1}^{N}{\int\limits_{S}{{{N}_{a}}{{\mathbf{q}}^{\left( i \right)}}\cdot \mathbf{n}dS}} \\ 
+ & +\sum\limits_{i=1}^{N}{\sum\limits_{b}{u_{b}^{\left( i \right)}\left( \int\limits_{V}{\nabla {{N}_{a}}\cdot {{\mathbf{J}}^{\left( i \right)}}dV} \right)}}+\sum\limits_{i=1}^{N}{\int\limits_{V}{{{N}_{a}}{{R}^{\left( i \right)}}dV}}=0 \\ 
 \end{align}\]
 
 This can be written as a matrix equation,
@@ -49,49 +57,69 @@ This can be written as a matrix equation,
 \[
 \begin{equation}
 \label{eq:semi-discrete}
-\mathbf{M\dot{U}}+\mathbf{DU}=\mathbf{F}\left( \mathbf{U} \right)
+\mathbf{M\dot{U}}+\mathbf{C}\mathbf{U}-\mathbf{D\left(U\right)}=\mathbf{F}\left( \mathbf{U} \right)
 \end{equation}
 \]
 
 \[\begin{align}
   & {{M}_{pq}}=\int\limits_{V}{{{N}_{a}}{{N}_{b}}dV} \\ 
- & {{D}_{pq}}=\int\limits_{V}{\nabla {{N}_{a}}\cdot {{\mathbf{D}}^{\left( i \right)}}\nabla {{N}_{b}}dV}+\int\limits_{V}{{{N}_{a}}\nabla \cdot \left( \mathbf{v}{{N}_{b}} \right)dV} \\ 
- & {{F}_{p}}=\sum\limits_{i=1}^{N}{\int\limits_{S}{{{N}_{a}}{{\mathbf{q}}^{\left( i \right)}}\cdot \mathbf{n}dS}}+\int\limits_{V}{{{N}_{a}}{{R}^{\left( i \right)}}dV} \\ 
+  &{{C}_{pq}} = \int\limits_{V}{{{N}_{a}}\nabla \cdot \left( \mathbf{v}{{N}_{b}} \right)dV}\\
+ & {{D}_{pq}}=\int\limits_{V}{\nabla {{N}_{a}}\cdot {{\mathbf{J}}^{\left( i \right)}}dV} \\ 
+ & {{F}_{p}}=\int\limits_{V}{{{N}_{a}}{{R}^{\left( i \right)}}dV} - \sum\limits_{i=1}^{N}{\int\limits_{S}{{{N}_{a}}{{{J_n}}^{\left( i \right)}}dS}}\\ 
 \end{align}\]
 
 Here, degrees of freedom are denoted by $p$, where $p$ is the degree of freedom $i$ of node $a$. Similarly, $q$ refers to the degree of freedom $j$ of node $b$.
 
-Equation (\ref{eq:semi-discrete}) is the semi-discrete equation. Next, a time integration method needs to be introduced. Using the generalized trapezoidal rule this can be written as,
-
-\[\left( \mathbf{M}+\alpha \Delta t\mathbf{D} \right){{\mathbf{U}}_{n+1}}=\left( \mathbf{M}-\left( 1-\alpha  \right)\Delta t\mathbf{D} \right){{\mathbf{U}}_{n}}+\Delta t\left( \alpha {{\mathbf{F}}_{n+1}}+\left( 1-\alpha  \right){{\mathbf{F}}_{n}} \right)\]
-
-which is a nonlinear system of equations.
-
 ## Time Integration
+Equation (\ref{eq:semi-discrete}) is the semi-discrete equation. Next, a time integration method needs to be introduced. First, we enforce equation (\ref{eq:semi-discrete}) at time $t_{n+1}$. 
+
+\[
+\begin{equation}
+\mathbf{M\dot{U}}_{n+1}+\mathbf{C}\mathbf{U}_{n+1}-\mathbf{D}\left(\mathbf{U}_{n+1}\right)=\mathbf{F}\left( \mathbf{U}_{n+1} \right)
+\end{equation}
+\]
+
+Then, we use the following update rules. 
+
+\[
+  \begin{align}
+  & \mathbf{U}_{n+1}=\mathbf{U}_{n} + \Delta{t}\dot{\mathbf{U}}_{n+\alpha} \\
+  & \dot{\mathbf{U}}_{n+\alpha} = \alpha\dot{\mathbf{U}}_{n+1}+\left(1 - \alpha \right)\dot{\mathbf{U}}_{n}
+  \end{align}
+\]
+
+From this we can find ${{\mathbf{\dot{U}}}_{n+1}}$,
+
+\[\,{{\mathbf{\dot{U}}}_{n+1}}=\frac{1}{\alpha }\left[ \frac{1}{\Delta t}\left( {{\mathbf{U}}_{n+1}}-{{\mathbf{U}}_{n}} \right)-\left( 1-\alpha  \right){{{\mathbf{\dot{U}}}}_{n}} \right]\]
+
+Substitution back into the semi-discrete equation results in the *generalized trapezoidal rule*.
+
+\[\left( \mathbf{M}+\alpha \Delta t\mathbf{C} \right){{\mathbf{U}}_{n+1}}-\alpha \Delta t\mathbf{D}\left( {{\mathbf{U}}_{n+1}} \right)=\alpha \Delta t\mathbf{F}\left( {{\mathbf{U}}_{n+1}} \right)+\mathbf{M}{{\mathbf{U}}_{n}}+\left( 1-\alpha  \right)\Delta t\mathbf{M}{{\mathbf{\dot{U}}}_{n}}\]
+
+which is a nonlinear system of equations. This can be solved using Newton's method. 
+
 
 ### Backward Euler
 
 For $\alpha=1$ , we recover the backward Euler method.
 
-\[\left( \mathbf{M}+\Delta t\mathbf{D} \right){{\mathbf{U}}_{n+1}}=\mathbf{M}{{\mathbf{U}}_{n}}+\Delta t\mathbf{F}\left( {{\mathbf{U}}_{n+1}} \right)\]
+\[\left( \mathbf{M}+\Delta t\mathbf{C} \right){{\mathbf{U}}_{n+1}}-\Delta t\mathbf{D}\left( {{\mathbf{U}}_{n+1}} \right)=\Delta t\mathbf{F}\left( {{\mathbf{U}}_{n+1}} \right)+\mathbf{M}{{\mathbf{U}}_{n}}\]
 
 We solve it using Newton’s method. First, we define the residual.
 
-\[\begin{align}
-  & \mathbf{R}\left( {{\mathbf{U}}_{n+1}} \right)=\mathbf{\tilde{K}}{{\mathbf{U}}_{n+1}}-\Delta t\mathbf{F}\left( {{\mathbf{U}}_{n+1}} \right)-\mathbf{M}{{\mathbf{U}}_{n}} \\ 
- & =\mathbf{M}\left( {{\mathbf{U}}_{n+1}}-{{\mathbf{U}}_{n}} \right)+\Delta t\mathbf{D}{{\mathbf{U}}_{n+1}}-\Delta t\mathbf{F}\left( {{\mathbf{U}}_{n+1}} \right)  
-\end{align}\]
+\[\mathbf{R}\left( {{\mathbf{U}}_{n+1}} \right)=\left( \mathbf{M}+\Delta t\mathbf{C} \right){{\mathbf{U}}_{n+1}}-\Delta t\mathbf{D}\left( {{\mathbf{U}}_{n+1}} \right)-\Delta t\mathbf{F}\left( {{\mathbf{U}}_{n+1}} \right)-\mathbf{M}{{\mathbf{U}}_{n}}\]
 
-where $\mathbf{\tilde{K}}=\mathbf{M}+\Delta t\mathbf{D}$. A Taylor expansion around the current guess gives,
+A Taylor expansion around the current guess gives,
 
-\[\mathbf{R}\left( \mathbf{U}_{n+1}^{k}+\Delta \mathbf{U} \right)=\mathbf{R}\left( \mathbf{U}_{n+1}^{k} \right)+\mathbf{K}\left( \mathbf{U}_{n+1}^{k} \right)\Delta \mathbf{U}=\mathbf{0}\]
+\[\mathbf{R}\left( \mathbf{U}_{n+1}^{k}+\Delta \mathbf{U} \right)=\mathbf{R}\left( \mathbf{U}_{n+1}^{k} \right)+D\mathbf{R}\left( \mathbf{U}_{n+1}^{k} \right)\Delta \mathbf{U}=\mathbf{0}\]
 
 Here,
 
 \[\begin{align}
-  & \mathbf{K}=\frac{d\mathbf{R}}{d\mathbf{U}}=\mathbf{\tilde{K}}-\Delta t\frac{d\mathbf{F}}{d\mathbf{U}} \\ 
- & =\mathbf{M}+\Delta t\left( \mathbf{D}-\frac{d\mathbf{F}}{d\mathbf{U}} \right)  
+   D\mathbf{R}\left( {{\mathbf{U}}_{n+1}} \right)\left[ \Delta \mathbf{u} \right] &=\left( \mathbf{M}+\Delta t\mathbf{C} \right)\Delta \mathbf{U}-\Delta t\left[ D\mathbf{D}\left( {{\mathbf{U}}_{n+1}} \right)\left[ \Delta \mathbf{U} \right]-\frac{d\mathbf{F}}{d\mathbf{U}}\Delta \mathbf{U} \right] \\ 
+ & =\mathbf{K}\Delta \mathbf{u}  
 \end{align}\]
+
 
 This can be solved for $\Delta \mathbf{U}$.
 
@@ -101,19 +129,40 @@ Then, the solution can be updated,
 
 \[\mathbf{U}_{n+1}^{k+1}=\mathbf{U}_{n+1}^{k}+\Delta \mathbf{U}\]
 
-### Generalized Trapezoidal Rule
+We still need to evaluate $D\mathbf{D}\left( {{\mathbf{U}}_{n+1}} \right)\left[ \Delta \mathbf{U} \right]$. First note that,
 
-Considering the general case,
+\[\delta \mathbf{J}=\frac{\partial \mathbf{J}}{\partial u}\delta u+\frac{\partial \mathbf{J}}{\partial \nabla u}\nabla \left( \delta u \right)\]
 
-\[\left( \mathbf{M}+\alpha \Delta t\mathbf{D} \right){{\mathbf{U}}_{n+1}}=\left( \mathbf{M}-\left( 1-\alpha  \right)\Delta t\mathbf{D} \right){{\mathbf{U}}_{n}}+\Delta t\left( \alpha \mathbf{F}\left( {{\mathbf{U}}_{n+1}} \right)+\left( 1-\alpha  \right)\mathbf{F}\left( {{\mathbf{U}}_{n}} \right) \right)\]
+Thus,
 
-The residual in this case can be written as,
+\[\Delta {{D}_{pq}}=\int\limits_{V}{\nabla {{N}_{a}}\cdot \Delta {{\mathbf{J}}^{\left( i \right)}}dV}=\int\limits_{V}{\nabla {{N}_{a}}\cdot \left( \frac{\partial {{\mathbf{J}}^{\left( i \right)}}}{\partial {{u}^{\left( j \right)}}}\Delta {{u}^{\left( j \right)}}+\frac{\partial {{\mathbf{J}}^{\left( i \right)}}}{\partial \nabla {{u}^{\left( j \right)}}}\nabla \left( \Delta {{u}^{\left( j \right)}} \right) \right)dV}\]
 
-\[\mathbf{R}\left( {{\mathbf{U}}_{n+1}} \right)=\mathbf{M}\left( {{\mathbf{U}}_{n+1}}-{{\mathbf{U}}_{n}} \right)+\Delta t\mathbf{D}\left( \alpha {{\mathbf{U}}_{n+1}}+\left( 1-\alpha  \right){{\mathbf{U}}_{n}} \right)-\Delta t\left( \alpha {{\mathbf{F}}_{n+1}}+\left( 1-\alpha  \right){{\mathbf{F}}_{n}} \right)\]
+Or finally,
 
-It follows that the stiffness matrix is given by,
+\[\Delta {{D}_{pq}}=\left\{ \int\limits_{V}{\nabla {{N}_{a}}\cdot \left( \frac{\partial {{\mathbf{J}}^{\left( i \right)}}}{\partial {{u}^{\left( j \right)}}}{{N}_{b}}+\frac{\partial {{\mathbf{J}}^{\left( i \right)}}}{\partial \nabla {{u}^{\left( j \right)}}}\nabla {{N}_{b}} \right)dV} \right\}\Delta {{u}^{\left( j \right)}}=\mathbf{D}\,\Delta \mathbf{u}\]
 
-\[\mathbf{K}=\mathbf{M}+\alpha \Delta t\left( \mathbf{D}-\frac{d\mathbf{F}}{d\mathbf{U}} \right)\]
+And thus,
+
+\[\mathbf{K}=\left( \mathbf{M}+\Delta t\mathbf{C} \right)-\Delta t\left( \mathbf{D}\,-\frac{d\mathbf{F}}{d\mathbf{U}} \right)\]
+
+## Examples of Diffusion Laws
+### Fick's Law
+As an example of how to evaluate the necessary derivatives of the concentration flux $\mathbf{J}$, consider again the case of Fickian diffusion. The equation for the flux is repeated here. 
+
+\[{{\mathbf{J}}^{\left( i \right)}}=-\mathbf{D}\cdot \nabla {{u}^{\left( i \right)}}\]
+
+From this, 
+
+\[\frac{\partial {{\mathbf{J}}^{\left( i \right)}}}{\partial {{u}^{\left( i \right)}}}=\mathbf{0},\quad \frac{\partial {{\mathbf{J}}^{\left( i \right)}}}{\partial \nabla {{u}^{\left( i \right)}}}=-\mathbf{D}\]
+
+### Isotropic Diffusivity
+Consider now a special case of Fick's law, where the diffusivity is isotropic, but may depend on the concentration.
+
+\[{{\mathbf{J}}^{\left( i \right)}}=-D\left({{u}^{\left( i \right)}} \right)\nabla {{u}^{\left( i \right)}}\]
+
+Here, $D\left( {{u}^{\left( i \right)}} \right)$ is a scalar function of the concentration. Then,
+
+\[\frac{\partial {{\mathbf{J}}^{\left( i \right)}}}{\partial {{u}^{\left( i \right)}}}=-\left( \frac{dD}{d{{u}^{\left( i \right)}}} \right)\nabla {{u}^{\left( i \right)}},\quad \frac{\partial {{\mathbf{J}}^{\left( i \right)}}}{\partial \nabla {{u}^{\left( i \right)}}}=-D\,\mathbf{1}\]
 
 ## Chemical Reactions
 

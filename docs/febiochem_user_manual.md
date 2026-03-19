@@ -1,17 +1,7 @@
-## Using the FEBioChem plugin
-Like any other FEBio plugin, the plugin must be placed in a folder and the path to the plugin must be defined in the FEBio configuration file. This file is usually called `febio.xml` and can be found in the same location as the FEBio executable. In this file, add the following line:
-
-```xml
-<import>C:\path\to\febio\plugin\FEBioChem.dll</import>
-```
-
-Make sure to include the full path name and file name of the plugin. When FEBio starts it will read the configuration file and load all the plugins defined therein. A message will be shown to the screen to inform the user whether the plugin was loaded successfully or not.
-
-## Defining an FEBioChem model
 For the most part an FEBioChem model is a standard FEBio model with a few modifications. These are discussed in the following sections. Note that this user’s manual assumes version 4.0 of the FEBio file format.
 
 ### Module
-The `type` attribute of `Module` tag needs the value `reaction-diffusion`.
+The `type` attribute of the `Module` tag needs the value `reaction-diffusion`.
 
 ```xml
 <Module type="reaction-diffusion"/>
@@ -28,7 +18,7 @@ This module does not include convection. If you want to include the convection t
 Now, a velocity field variable is added to the model, which can be defined in the `Initial` section of the input file. See section [initial velocity](#initial-velocity) for more information on how to initialize the velocity field.
 
 ### Globals
-The chemical species that are used in the model are defined in the `Globals` section. The species are defined identically to the way they are defined for a multiphasic problem and we refer to the FEBio user’s manual. The following caveat applies:
+The chemical species that are used in the model are defined in the `Globals` section of the FEBio input file. The species are defined identically to the way they are defined for a multiphasic problem and we refer to the FEBio user’s manual for more details. The following caveat applies:
 
 * A **solute** defines a chemical species that is not bound to the solid phase of a mixture. If a model doesn’t represent a mixture, each solute defines a chemical species. No child properties need to be defined for a solute.
 * A **solid_bound** defines a chemical species that is bound to the solid-phase of a mixture. Again, no child properties need to be defined for a solid bound species.
@@ -76,27 +66,7 @@ Each solid-bound chemical species that is used by the material must be included 
 
 #### reaction property
 
-The `reaction` property allows you to define a chemical reaction. Note that currently FEBioChem only models forward reactions. To model a reversible reaction you must specify two reactions, where the first reaction defines the forward reaction and the second defines the reverse reaction. Defining a reaction in the FEBioChem plugin is very easy since only two parameters need to be specified.
-
-The reaction equation is defined by writing the reaction formula as follows.
-
-* Use the name of the species as defined in the Globals section to reference it.
-* A stoichiometric coefficient of 1 does not need to be defined, but otherwise it must an integer number that appears before the species’ name and separated from it via a multiplication symbol `*`. 
-* A plus symbol `+` is used to enumerate all reactants and products.
-* The symbols `-->` or `->` can be used to separate the reactants from the products. 
-* The reactant or product lists can be empty. 
-
-Here are some examples. Assume that all the chemical species are properly defined in the `Globals` section. 
-
-```
-A-->B
-A+B-->C
-2*A+2*B->C+B
-A-->
--->B
-```
-
-Again, it is emphasized that all species involved in a reaction must be defined inside the material’s definition.
+The `reaction` property allows you to define a chemical reaction. FEBioChem supports several different type of reactions. Note that currently FEBioChem only models forward reactions. To model a reversible reaction you must specify two reactions, where the first reaction defines the forward reaction and the second defines the reverse reaction. See the list of reactions for more details on defining specific reactions. 
 
 ### Initial values
 For each species (but not solid-bound species), an initial value can be set in the `Initial` section of the FEBio input file via the `init` tag.

@@ -46,6 +46,12 @@ extra_javascript:
 nav:
   - Home: index.md
   - Tutorials:
-      - Tutorial 1: febiochem_tutorial1.md
-  - User Manual: febiochem_user_manual.md
+    - Tutorial 1: febiochem_tutorial1.md
+  - User Manual:
+    - Using the FEBioChem plugin: using_the_febiochem_plugin.md
+    - Defining an FEBioChem model: febiochem_user_manual.md
+    - Reactions:
+      - Mass-action reaction: mass_action_reaction.md
+      - Michaelis-Menten reaction: michaelis_menten_reaction.md
+      - Logistic growth reaction: logistic_growth_reaction.md
   - Theory: febiochem_theory.md
