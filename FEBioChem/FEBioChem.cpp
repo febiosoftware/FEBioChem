@@ -11,7 +11,8 @@
 #include "FEMassActionReaction.h"
 #include "FEMichaelisMentenReaction.h"
 #include "FEChemLogisticGrowthReaction.h"
-#include "FEReactiveSpecies.h"
+#include "FEChemFickianSpecies.h"
+#include "FEChemCustomSpecies.h"
 #include "FEConcentrationFlux.h"
 #include "FESBSPointSource.h"
 #include "FESpeciesPointSource.h"
@@ -93,8 +94,9 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemMichaelisMentenReaction            , "Michaelis-Menten");
 	REGISTER_FECORE_CLASS(FEChemLogisticGrowthReaction             , "Logistic growth");
 	REGISTER_FECORE_CLASS(FEChemCustomReaction                     , "custom reaction");
-	REGISTER_FECORE_CLASS(FEChemReactiveSpecies                    , "species");
+	REGISTER_FECORE_CLASS(FEChemFickianSpecies                     , "species");
 	REGISTER_FECORE_CLASS(FEChemSolidBoundSpecies                  , "solid_bound_species");
+	REGISTER_FECORE_CLASS(FEChemCustomSpecies                      , "custom species");
 	REGISTER_FECORE_CLASS(FEChemConcentrationFlux                  , "concentration flux");
 	REGISTER_FECORE_CLASS(FEChemFixedConcentration                 , "zero concentration");
 	REGISTER_FECORE_CLASS(FEChemPrescribedConcentration            , "prescribed concentration");

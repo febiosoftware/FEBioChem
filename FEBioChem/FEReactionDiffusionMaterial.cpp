@@ -24,6 +24,9 @@ FEChemReactionDiffusionMaterial::FEChemReactionDiffusionMaterial(FEModel* fem) :
 // initialization
 bool FEChemReactionDiffusionMaterial::Init()
 {
+	FEModel& fem = *GetFEModel();
+	int nvar = fem.GlobalDataItems();
+
 	// set the parent for all reaction materials
 	for (int i=0; i<Reactions(); ++i)
 	{
@@ -33,11 +36,22 @@ bool FEChemReactionDiffusionMaterial::Init()
 	// set the local IDs for all species
 	for (int i=0; i<Species(); ++i)
 	{
-		m_species[i]->SetLocalID(i);
+		FEChemDiffusiveSpecies& spec = *m_species[i];
+		spec.SetLocalID(i);
+		int gid = spec.GetSpeciesID() - 1;
+		if ((gid < 0) || (gid >= nvar)) return false;
+		FEGlobalData& d = *fem.GetGlobalData(gid);
+		spec.SetName(d.GetName());
 	}
+
 	for (int i=0; i<SolidBoundSpecies(); ++i)
 	{
-		m_sbs[i]->SetLocalID(Species() + i);
+		FEChemSolidBoundSpecies& sbs = *m_sbs[i];
+		sbs.SetLocalID(Species() + i);
+		int gid = sbs.GetSpeciesID() - 1;
+		if ((gid < 0) || (gid >= nvar)) return false;
+		FEGlobalData& d = *fem.GetGlobalData(gid);
+		sbs.SetName(d.GetName());
 	}
 
 	// base class initialization
@@ -85,7 +99,7 @@ FEMaterialPointData* FEChemReactionDiffusionMaterial::CreateMaterialPointData()
 
 //-----------------------------------------------------------------------------
 // Find a species by name
-FEChemReactiveSpeciesBase* FEChemReactionDiffusionMaterial::FindSpecies(const string& name)
+FEChemReactiveSpecies* FEChemReactionDiffusionMaterial::FindSpecies(const string& name)
 {
 	// try the free species first
 	for (int i=0; i<Species(); ++i)

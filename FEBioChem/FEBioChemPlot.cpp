@@ -3,7 +3,7 @@
 #include <FECore/FEModel.h>
 #include "FEReactionMaterial.h"
 #include "FEReactionDomain.h"
-#include "FEReactiveSpecies.h"
+#include "FEChemFickianSpecies.h"
 #include <FECore/writeplot.h>
 
 //-----------------------------------------------------------------------------
@@ -314,7 +314,7 @@ bool FEChemPlotSBSConcentration::Save(FEDomain &dom, FEDataStream& a)
 	vector<int> lid(nsbm, -1);
 	for (int i = 0; i < nsbm; ++i)
 	{
-		FEChemReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName[i]);
+		FEChemReactiveSpecies* rs = mat->FindSpecies(m_sbmName[i]);
 		if (rs) lid[i] = rs->GetLocalID();
 	}
 
@@ -400,7 +400,7 @@ bool FEChemPlotSBSApparentDensity::Save(FEDomain &dom, FEDataStream& a)
 	vector<int> lid(nsbm, -1);
 	for (int i = 0; i < nsbm; ++i)
 	{
-		FEChemReactiveSpeciesBase* rs = mat->FindSpecies(m_sbmName[i]);
+		FEChemReactiveSpecies* rs = mat->FindSpecies(m_sbmName[i]);
 		if (rs) lid[i] = rs->GetLocalID();
 	}
 

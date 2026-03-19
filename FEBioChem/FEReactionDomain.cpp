@@ -134,7 +134,7 @@ void FEChemReactionDomain::Activate()
 			// evaluate concentrations at integration points
 			for (int i = 0; i<nsol; ++i)
 			{
-				FEChemReactiveSpecies* s = m_mat->GetSpecies(i);
+				FEChemDiffusiveSpecies* s = m_mat->GetSpecies(i);
 
 				// evaluate gradient at this integration point
 				rp.m_dc[s->GetLocalID()] = gradient(el, &c[i][0], n);
@@ -219,7 +219,7 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 		// evaluate concentrations at integration points
 		for (int i = 0; i < nsol; ++i)
 		{
-			FEChemReactiveSpecies* s = m_mat->GetSpecies(i);
+			FEChemDiffusiveSpecies* s = m_mat->GetSpecies(i);
 
 			// evaluate gradient at this integration point
 			rp.m_dc[s->GetLocalID()] = gradient(el, &c[i][0], n);
@@ -519,8 +519,6 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 	vec3d G[EN];
 	double Gi[3], Gj[3];
 	double DB[3];
-	vector<mat3d> D(ncv);
-	vector<vec3d> d(ncv);
 
 	// loop over all integration points
 	const double *gw = el.GaussWeights();
@@ -532,13 +530,6 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 		// evaluate the conductivity
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
-
-		// get the concentration tangents
-		for (int i = 0; i < ncv; ++i)
-		{
-			d[i] = m_mat->GetSpecies(i)->FluxConcentrationTangent(mp);
-			D[i] = m_mat->GetSpecies(i)->DiffusivityTensor(mp);
-		}
 
 		// fluid volume fraction
 		double phi = m_mat->Porosity(pt);
@@ -557,17 +548,22 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 
 				for (int i = 0; i<ncv; ++i)
 				{
-					// Flux concentration tangent stiffness matrix contribution
-					double kab_d = (Gi[0] * d[i].x + Gi[1] * d[i].y + Gi[2] * d[i].z) * H[b];
+					for (int j = 0; j < ncv; ++j)
+					{
+						// Flux concentration tangent stiffness matrix contribution
+						vec3d d = m_mat->GetSpecies(i)->FluxConcentrationTangent(mp, j);
+						double kab_d = (Gi[0] * d.x + Gi[1] * d.y + Gi[2] * d.z) * H[b];
 
-					// Diffusivity contribution to stiffness matrix
-					DB[0] = D[i](0, 0) * Gj[0] + D[i](0, 1) * Gj[1] + D[i](0, 2) * Gj[2];
-					DB[1] = D[i](1, 0) * Gj[0] + D[i](1, 1) * Gj[1] + D[i](1, 2) * Gj[2];
-					DB[2] = D[i](2, 0) * Gj[0] + D[i](2, 1) * Gj[1] + D[i](2, 2) * Gj[2];
-					double kab_D = (Gi[0] * DB[0] + Gi[1] * DB[1] + Gi[2] * DB[2]);
+						// Diffusivity contribution to stiffness matrix
+						mat3d D = m_mat->GetSpecies(i)->DiffusivityTensor(mp, j);
+						DB[0] = D(0, 0) * Gj[0] + D(0, 1) * Gj[1] + D(0, 2) * Gj[2];
+						DB[1] = D(1, 0) * Gj[0] + D(1, 1) * Gj[1] + D(1, 2) * Gj[2];
+						DB[2] = D(2, 0) * Gj[0] + D(2, 1) * Gj[1] + D(2, 2) * Gj[2];
+						double kab_D = (Gi[0] * DB[0] + Gi[1] * DB[1] + Gi[2] * DB[2]);
 
-					// add it all up
-					ke[a*ncv + i][b*ncv + i] -= (kab_d + kab_D) * detJt * gw[n]* phi;
+						// add it all up
+						ke[a * ncv + i][b * ncv + j] -= (kab_d + kab_D) * detJt * gw[n] * phi;
+					}
 				}
 			}
 		}

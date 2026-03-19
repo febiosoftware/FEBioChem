@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEMichaelisMentenReaction.h"
-#include "FEReactiveSpecies.h"
+#include "FEChemReactiveSpecies.h"
 #include "FEReactionDiffusionMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -29,11 +29,11 @@ bool FEChemMichaelisMentenReaction::Init()
 	if (FEChemReactionMaterial::Init() == false) return false;
 
 	// Find the subtrate
-	FEChemReactiveSpeciesBase* sub = m_pRDM->FindSpecies(m_sub);
+	FEChemReactiveSpecies* sub = m_pRDM->FindSpecies(m_sub);
 	if (sub == 0) return false; // MaterialError("Cannot find substrate. Check the name.");
 
 	// find the product
-	FEChemReactiveSpeciesBase* prd = m_pRDM->FindSpecies(m_prd);
+	FEChemReactiveSpecies* prd = m_pRDM->FindSpecies(m_prd);
 	if (prd == 0) return false; // MaterialError("Cannot find product. Check the name.");
 
 	// get the number of species for this material

@@ -32,7 +32,7 @@ bool FEChemCustomReaction::Init()
 	{
 		ReactionTerm& reactant_i = reactants[i];
 
-		FEChemReactiveSpeciesBase* spec = m_pRDM->FindSpecies(reactant_i.second);
+		FEChemReactiveSpecies* spec = m_pRDM->FindSpecies(reactant_i.second);
 		if (spec == nullptr)
 		{
 			// Oh, oh. This shouldn't happen
@@ -46,7 +46,7 @@ bool FEChemCustomReaction::Init()
 	{
 		ReactionTerm& product_i = products[i];
 
-		FEChemReactiveSpeciesBase* spec = m_pRDM->FindSpecies(product_i.second);
+		FEChemReactiveSpecies* spec = m_pRDM->FindSpecies(product_i.second);
 		if (spec == nullptr)
 		{
 			// Oh, oh. This shouldn't happen
@@ -68,7 +68,7 @@ bool FEChemCustomReaction::Init()
 		ReactionTerm& reactant_i = reactants[i];
 
 		// try to find the reactive species
-		FEChemReactiveSpeciesBase* spec = m_pRDM->FindSpecies(reactant_i.second);
+		FEChemReactiveSpecies* spec = m_pRDM->FindSpecies(reactant_i.second);
 		if (spec == 0)
 		{
 			// Oh, oh. This shouldn't happen
@@ -85,7 +85,7 @@ bool FEChemCustomReaction::Init()
 		ReactionTerm& prod_i = products[i];
 
 		// try to find the reactive species
-		FEChemReactiveSpeciesBase* spec = m_pRDM->FindSpecies(prod_i.second);
+		FEChemReactiveSpecies* spec = m_pRDM->FindSpecies(prod_i.second);
 		if (spec == 0)
 		{
 			// Oh, oh. This shouldn't happen

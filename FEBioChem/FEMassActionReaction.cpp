@@ -42,7 +42,7 @@ bool FEChemMassActionReaction::Init()
 		ReactionTerm& reactant_i = reactants[i];
 
 		// try to find the reactive species
-		FEChemReactiveSpeciesBase* spec = m_pRDM->FindSpecies(reactant_i.second);
+		FEChemReactiveSpecies* spec = m_pRDM->FindSpecies(reactant_i.second);
 		if (spec == 0)
 		{
 			// Oh, oh. This shouldn't happen
@@ -59,7 +59,7 @@ bool FEChemMassActionReaction::Init()
 		ReactionTerm& prod_i = products[i];
 
 		// try to find the reactive species
-		FEChemReactiveSpeciesBase* spec = m_pRDM->FindSpecies(prod_i.second);
+		FEChemReactiveSpecies* spec = m_pRDM->FindSpecies(prod_i.second);
 		if (spec == 0)
 		{
 			// Oh, oh. This shouldn't happen

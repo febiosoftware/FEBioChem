@@ -1,7 +1,8 @@
 #pragma once
 #include <FECore/FEMaterial.h>
 #include "FEReactionMaterial.h"
-#include "FEReactiveSpecies.h"
+#include "FEChemDiffusiveSpecies.h"
+#include "FEChemSolidBoundSpecies.h"
 
 //-----------------------------------------------------------------------------
 // Material used by reaction-diffusion domains
@@ -37,10 +38,10 @@ public:
 	int Species() const { return (int) m_species.size(); }
 
 	// return a specific species
-	FEChemReactiveSpecies* GetSpecies(int i) { return m_species[i]; }
+	FEChemDiffusiveSpecies* GetSpecies(int i) { return m_species[i]; }
 
 	// Find a species by name
-	FEChemReactiveSpeciesBase* FindSpecies(const string& name);
+	FEChemReactiveSpecies* FindSpecies(const string& name);
 
 	// Find a species form a global ID
 	FEChemReactiveSpecies* FindSpeciesFromGlobalID(int id);
@@ -58,8 +59,8 @@ public:
 	double SolidVolumeFraction(FEChemReactionMaterialPoint& mp);
 
 protected:
-	std::vector<FEChemReactiveSpecies*>	m_species;	//!< list of species active for this material
-	std::vector<FEChemSolidBoundSpecies*> m_sbs;		//!< list of solid-bound species active for this material
+	std::vector<FEChemDiffusiveSpecies*>	m_species;	//!< list of diffusive species active for this material
+	std::vector<FEChemSolidBoundSpecies*>	m_sbs;		//!< list of solid-bound species active for this material
 	std::vector<FEChemReactionMaterial*>	m_reaction;	//!< list of reactions occuring in this material
 
 private:

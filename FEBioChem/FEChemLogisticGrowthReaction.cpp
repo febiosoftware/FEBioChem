@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEChemLogisticGrowthReaction.h"
-#include "FEReactiveSpecies.h"
+#include "FEChemReactiveSpecies.h"
 #include "FEReactionDiffusionMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ bool FEChemLogisticGrowthReaction::Init()
 	if (FEChemReactionMaterial::Init() == false) return false;
 
 	// Find the solute
-	FEChemReactiveSpeciesBase* sol = m_pRDM->FindSpecies(m_sol);
+	FEChemReactiveSpecies* sol = m_pRDM->FindSpecies(m_sol);
 	if (sol == nullptr) return false; // MaterialError("Cannot find solute. Check the name.");
 
 	// get the number of species for this material
