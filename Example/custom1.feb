@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<febio_spec version="4.0">
+	<Module type="reaction-diffusion"/>
+	<Control>
+		<analysis>STEADY-STATE</analysis>
+		<time_steps>100</time_steps>
+		<step_size>0.01</step_size>
+		<plot_zero_state>0</plot_zero_state>
+		<plot_range>0,-1</plot_range>
+		<plot_level>PLOT_MAJOR_ITRS</plot_level>
+		<output_level>OUTPUT_MAJOR_ITRS</output_level>
+		<plot_stride>1</plot_stride>
+		<output_stride>1</output_stride>
+		<adaptor_re_solve>1</adaptor_re_solve>
+		<solver type="reaction-diffusion">
+			<symmetric_stiffness>0</symmetric_stiffness>
+			<equation_scheme>staggered</equation_scheme>
+			<equation_order>default</equation_order>
+			<optimize_bw>0</optimize_bw>
+			<lstol>0.9</lstol>
+			<lsmin>0.01</lsmin>
+			<lsiter>5</lsiter>
+			<ls_check_jacobians>0</ls_check_jacobians>
+			<max_refs>15</max_refs>
+			<check_zero_diagonal>0</check_zero_diagonal>
+			<zero_diagonal_tol>0</zero_diagonal_tol>
+			<force_partition>0</force_partition>
+			<reform_each_time_step>1</reform_each_time_step>
+			<reform_augment>0</reform_augment>
+			<diverge_reform>0</diverge_reform>
+			<min_residual>1e-20</min_residual>
+			<max_residual>0</max_residual>
+			<Ctol>0.001</Ctol>
+			<Stol>0</Stol>
+			<Rtol>0.01</Rtol>
+			<force_positive_concentrations>0</force_positive_concentrations>
+			<convection>0</convection>
+			<alpha>1</alpha>
+			<qn_method type="Broyden">
+				<max_ups>10</max_ups>
+				<max_buffer_size>0</max_buffer_size>
+				<cycle_buffer>1</cycle_buffer>
+				<cmax>100000</cmax>
+			</qn_method>
+		</solver>
+	</Control>
+	<Globals>
+		<Constants>
+			<T>0</T>
+			<P>0</P>
+			<R>8.31446</R>
+			<Fc>96485.3</Fc>
+		</Constants>
+		<Solutes>
+			<solute id="1" name="A">
+				<charge_number>0</charge_number>
+				<molar_mass>1</molar_mass>
+				<density>1</density>
+			</solute>
+			<solute id="2" name="B">
+				<charge_number>0</charge_number>
+				<molar_mass>1</molar_mass>
+				<density>1</density>
+			</solute>
+		</Solutes>
+	</Globals>
+	<Material>
+		<material id="1" name="Material1" type="reaction-diffusion">
+			<solid_volume_fraction>0</solid_volume_fraction>
+			<species name="A">
+				<diffusivity>1</diffusivity>
+			</species>
+			<species name="B">
+				<diffusivity>1</diffusivity>
+			</species>
+			<reaction type="custom reaction">
+				<equation>A --> B</equation>
+				<reaction_rate type="code">script2</reaction_rate>
+			</reaction>
+		</material>
+	</Material>
+	<Mesh>
+		<Nodes name="Object1">
+			<node id="1">-0.5,-0.5,0</node>
+			<node id="2">0.5,-0.5,0</node>
+			<node id="3">0.5,0.5,0</node>
+			<node id="4">-0.5,0.5,0</node>
+			<node id="5">-0.5,-0.5,1</node>
+			<node id="6">0.5,-0.5,1</node>
+			<node id="7">0.5,0.5,1</node>
+			<node id="8">-0.5,0.5,1</node>
+		</Nodes>
+		<Elements type="hex8" name="Part1">
+			<elem id="1">1,2,3,4,5,6,7,8</elem>
+		</Elements>
+	</Mesh>
+	<MeshDomains>
+		<SolidDomain name="Part1" mat="Material1"/>
+	</MeshDomains>
+	<Initial>
+		<ic type="initial concentration" node_set="Object1">
+			<dof>c1</dof>
+			<value>1</value>
+		</ic>
+	</Initial>
+	<Scripts>
+		<script name="script1"><![CDATA[
+			return 10.0*_A**2.0;
+		]]></script>
+		<script name="script2"><![CDATA[
+			// This simulates Michaelis-Menten kinetics.
+			return 5.0*_A / (0.5 + _A);
+		]]></script>
+	</Scripts>
+	<Output>
+		<plotfile type="febio">
+			<var type="actual concentration"/>
+			<var type="effective concentration"/>
+		</plotfile>
+	</Output>
+</febio_spec>
