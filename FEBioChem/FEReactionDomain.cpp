@@ -446,14 +446,21 @@ void FEChemReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 	}
 }
 
-void FEChemReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un, bool bconvection)
+void FEChemReactionDomain::DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un)
 {
 	AssembleSolidDomain(*this, R, [&](FESolidElement& el, vector<double>& fe) {
-		ElementDiffusionVector(el, fe, Un, tp.timeIncrement, tp.alpha, bconvection);
+		ElementDiffusionVector(el, fe, Un, tp.timeIncrement, tp.alpha);
 	});
 }
 
-void FEChemReactionDomain::ElementDiffusionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha, bool bconvection)
+void FEChemReactionDomain::ConvectionVector(FEGlobalVector& R, const FETimeInfo& tp, const vector<double>& Un)
+{
+	AssembleSolidDomain(*this, R, [&](FESolidElement& el, vector<double>& fe) {
+		ElementConvectionVector(el, fe, Un, tp.timeIncrement, tp.alpha);
+		});
+}
+
+void FEChemReactionDomain::ElementDiffusionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha)
 {
 	int ne = el.Nodes();
 	int ncv = (int)m_dofC.Size();
@@ -468,16 +475,54 @@ void FEChemReactionDomain::ElementDiffusionVector(FESolidElement& el, vector<dou
 	// get the element diffusion matrix
 	ElementDiffusionMatrix(el, ke);
 
+	// get the nodal values
+	FEMesh& mesh = *GetMesh();
+	vector<double> un(ndof, 0.0);
+	for (int i = 0; i < ne; ++i)
+	{
+		for (int j = 0; j < ncv; ++j)
+		{
+			double cn = mesh.Node(el.m_node[i]).get(m_dofC[j]);
+			un[i * ncv + j] = alpha * dt * cn;
+		}
+	}
+
+	// add previous values
+	if (alpha != 1.0)
+	{
+		for (int i = 0; i < ndof; ++i)
+		{
+			int n = lm[i];
+			if (-n - 2 >= 0) n = -n - 2;
+			if (n >= 0) un[i] += (1.0 - alpha) * dt * Un[n];
+		}
+	}
+
+	// multiply with diffusion matrix
+	vector<double> kun = ke * un;
+
+	fe = kun;
+}
+
+void FEChemReactionDomain::ElementConvectionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha)
+{
+	int ne = el.Nodes();
+	int ncv = (int)m_dofC.Size();
+	int ndof = ne * ncv;
+
+	matrix ke(ndof, ndof);
+	ke.zero();
+
+	vector<int> lm;
+	UnpackLM(el, lm);
+
 	// get the nodal velocities
 	FEMesh& mesh = *GetMesh();
 	vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
-	if (bconvection)
-	{
-		for (int i = 0; i < ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+	for (int i = 0; i < ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
 
-		// add the convection matrix
-		ElementConvectionMatrix(el, ke, vn);
-	}
+	// add the convection matrix
+	ElementConvectionMatrix(el, ke, vn);
 
 	// get the nodal values
 	vector<double> un(ndof, 0.0);
@@ -506,6 +551,7 @@ void FEChemReactionDomain::ElementDiffusionVector(FESolidElement& el, vector<dou
 
 	fe = kun;
 }
+
 
 void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
 {

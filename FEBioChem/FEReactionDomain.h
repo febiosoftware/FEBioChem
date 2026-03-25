@@ -34,14 +34,18 @@ public:
 
 	void MassVector(FEGlobalVector& R, const vector<double>& Un);
 
-	void DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un, bool bconvection);
+	void DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un);
+
+	void ConvectionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un);
 
 protected:
 	void ElementForceVector(FESolidElement& el, vector<double>& fe);
 
 	void ElementMassVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un);
 
-	void ElementDiffusionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha, bool bconvection);
+	void ElementDiffusionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha);
+
+	void ElementConvectionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha);
 
 	void ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha, bool bconvection);
 

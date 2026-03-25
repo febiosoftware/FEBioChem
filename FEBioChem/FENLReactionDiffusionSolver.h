@@ -36,6 +36,8 @@ private:
 
 	void DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp);
 
+	void ConvectionVector(FEGlobalVector& R, const FETimeInfo& tp);
+
 	void ForceVector(FEGlobalVector& F);
 
 private:

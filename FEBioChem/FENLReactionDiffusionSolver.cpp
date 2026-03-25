@@ -251,6 +251,12 @@ bool FEChemNLReactionDiffusionSolver::Residual(vector<double>& R)
 	// add diffusion matrix contribution
 	DiffusionVector(RHS, ti);
 
+	// add convection contribution
+	if (m_convection)
+	{
+		ConvectionVector(RHS, ti);
+	}
+
 	// multiply everything by -1
 	R *= -1.0;
 
@@ -280,7 +286,19 @@ void FEChemNLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const F
 	for (int ndom = 0; ndom<NDOM; ++ndom)
 	{
 		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
-		if (dom) dom->DiffusionVector(R, tp, m_Un, m_convection);
+		if (dom) dom->DiffusionVector(R, tp, m_Un);
+	}
+}
+
+void FEChemNLReactionDiffusionSolver::ConvectionVector(FEGlobalVector& R, const FETimeInfo& tp)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int NDOM = mesh.Domains();
+	for (int ndom = 0; ndom < NDOM; ++ndom)
+	{
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
+		if (dom) dom->ConvectionVector(R, tp, m_Un);
 	}
 }
 
