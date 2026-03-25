@@ -2,24 +2,24 @@
 #include "FEReactionDiffusionMaterial.h"
 #include <FECore/FEModel.h>
 #include <FECore/FECodeValuator.h>
+#include <FECore/FECoreClass.h>
 #include <FECore/log.h>
 #include <memory>
 
 BEGIN_FECORE_CLASS(FEChemCustomReaction, FEChemReactionMaterial)
 	ADD_PARAMETER(m_equation, "equation")->setLongName("reaction equation");
-	ADD_PARAMETER(m_rate, "reaction_rate");
+
+	ADD_PROPERTY(m_rate, "reaction_rate");
 END_FECORE_CLASS();
 
-FEChemCustomReaction::FEChemCustomReaction(FEModel* fem) : FEChemReactionMaterial(fem), m_rate(fem)
+FEChemCustomReaction::FEChemCustomReaction(FEModel* fem) : FEChemReactionMaterial(fem)
 {
-	m_rate = 0.0;
+	m_rate = nullptr;
 }
 
 bool FEChemCustomReaction::Init()
 {
 	// convert the equation string to actual stoichiometric coefficients and species
-	vector<ReactionTerm> reactants;
-	vector<ReactionTerm> products;
 	if (convert(m_equation.c_str(), reactants, products) == false) return false;
 
 	// get the number of species for this material
@@ -38,9 +38,6 @@ bool FEChemCustomReaction::Init()
 			// Oh, oh. This shouldn't happen
 			return false;// MaterialError("Invalid reaction equation");
 		}
-
-		string varName = reactant_i.second;
-		m_rate.AddVariable(varName);
 	}
 	for (int i = 0; i < products.size(); ++i)
 	{
@@ -52,9 +49,6 @@ bool FEChemCustomReaction::Init()
 			// Oh, oh. This shouldn't happen
 			return false;// MaterialError("Invalid reaction equation");
 		}
-
-		string varName = product_i.second;
-		m_rate.AddVariable(varName);
 	}
 
 	// allocate coefficient tables
@@ -102,17 +96,63 @@ bool FEChemCustomReaction::Init()
 		m_v[i] = m_vP[i] - m_vR[i];
 	}
 
+	if (m_rate == nullptr)
+	{
+		// Oh, oh. This shouldn't happen
+		return false; // MaterialError("Reaction rate must be specified for reaction");
+	}
+	m_rate->SetReaction(this);
+
 	return FEChemReactionMaterial::Init();
 }
 
 double FEChemCustomReaction::GetReactionRate(FEMaterialPoint& pt)
 {
-	FEChemReactionMaterialPoint& rp = *pt.ExtractData<FEChemReactionMaterialPoint>();
-	return m_rate.Value(pt, rp.m_ca);
+	return m_rate->ReactionRate(pt);
 }
 
 double FEChemCustomReaction::GetReactionRateDeriv(FEMaterialPoint& pt, int id)
 {
-	FEChemReactionMaterialPoint& rp = *pt.ExtractData<FEChemReactionMaterialPoint>();
-	return m_rate.DerivValue(pt, rp.m_ca, id);
+	return m_rate->ReactionRateDeriv(pt, id);
+}
+
+BEGIN_FECORE_CLASS(FEChemReactionRateScript, FEChemReactionRate)
+	ADD_PARAMETER(m_scriptName, "script")->setLongName("reaction rate script")->SetFlags(FE_PARAM_ATTRIBUTE);
+END_FECORE_CLASS();
+
+double FEChemReactionRateScript::ReactionRate(FEMaterialPoint& pt)
+{
+	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
+	return Value(rmp.m_ca);
+}
+
+double FEChemReactionRateScript::ReactionRateDeriv(FEMaterialPoint& pt, int id)
+{
+	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
+	return DerivValue(rmp.m_ca, id);
+}
+
+bool FEChemReactionRateScript::Init()
+{
+	if (m_pReaction == nullptr)
+	{
+		// Oh, oh. This shouldn't happen
+		return false; // MaterialError("Reaction rate must be assigned to a reaction");
+	}
+
+	FEPhysicsProperty::SetSibling(static_cast<FECoreBase*>(this));
+
+	for (int i=0; i<m_pReaction->Reactants(); ++i)
+	{
+		const ReactionTerm& reactant_i = m_pReaction->GetReactant(i);
+		AddVariable(reactant_i.second, FEValueType::Double);
+	}
+
+	for (int i = 0; i < m_pReaction->Products(); ++i)
+	{
+		const ReactionTerm& product_i = m_pReaction->GetProduct(i);
+		AddVariable(product_i.second, FEValueType::Double);
+	}
+
+	return FEChemReactionRate::Init() && FEPhysicsProperty::Init();
 }
