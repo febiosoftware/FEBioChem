@@ -85,6 +85,18 @@ bool FEChemNLReactionDiffusionSolver::Init()
 	return true;
 }
 
+void FEChemNLReactionDiffusionSolver::PrepStep()
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+	for (int i = 0; i < mesh.Nodes(); ++i)
+	{
+		FENode& ni = mesh.Node(i);
+		ni.UpdateValues();
+	}
+
+	FENewtonSolver::PrepStep();
+}
+
 bool FEChemNLReactionDiffusionSolver::CheckConvergence(int niter, const vector<double>& ui, double ls)
 {
 	// update solution
@@ -208,7 +220,7 @@ void FEChemNLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 	for (int n = 0; n<NDOM; ++n)
 	{
 		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(n));
-		if (dom) dom->ForceVector(R);
+		if (dom) dom->SupplyVector(R, 1.0);
 	}
 
 	// do the surface loads
@@ -268,13 +280,14 @@ bool FEChemNLReactionDiffusionSolver::Residual(vector<double>& R)
 
 void FEChemNLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
 {
+	double dt = GetFEModel()->GetTime().timeIncrement;
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 	for (int n = 0; n<NDOM; ++n)
 	{
 		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(n));
-		if (dom) dom->MassVector(R, m_Un);
+		if (dom) dom->MassVector(R, dt);
 	}
 }
 

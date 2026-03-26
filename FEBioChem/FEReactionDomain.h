@@ -28,36 +28,58 @@ public:
 	const FEDofList& GetDOFList() const override;
 
 public:
-	void ForceVector(FEGlobalVector& R);
+	void SupplyVector(FEGlobalVector& R, double scale);
 
-	void StiffnessMatrix(FELinearSystem& LS);
-
-	void MassVector(FEGlobalVector& R, const vector<double>& Un);
+	void MassVector(FEGlobalVector& R, double scale);
 
 	void DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un);
 
 	void ConvectionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un);
 
-protected:
-	void ElementForceVector(FESolidElement& el, vector<double>& fe);
+	void AdvectionVector(FEGlobalVector&R, double scale);
 
-	void ElementMassVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un);
+	void FluxVector(FEGlobalVector&R, double scale);
+
+protected:
+	void ElementSupplyVector(FESolidElement& el, vector<double>& fe, double scale);
+
+	void ElementMassVector(FESolidElement& el, vector<double>& fe, double scale);
 
 	void ElementDiffusionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha);
 
 	void ElementConvectionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha);
 
-	void ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha);
+	void ElementAdvectionVector(FESolidElement& el, vector<double>& fe, double scale);
+
+	void ElementFluxVector(FESolidElement& el, vector<double>& fe, double scale);
 
 public:
-	void ElementMassMatrix(FESolidElement& el, matrix& ke);
+	void StiffnessMatrix(FELinearSystem& LS);
 
-	void ElementDiffusionMatrix(FESolidElement& el, matrix& ke);
+	void MassMatrix(FELinearSystem& LS, double scale);
 
-	void ElementReactionStiffness(FESolidElement& el, matrix& ke);
+	void DiffusionMatrix(FELinearSystem& LS, double scale);
 
-	void ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn);
+	void ConvectionMatrix(FELinearSystem& LS, double scale);
 
+	void AdvectionMatrix(FELinearSystem& LS, double scale);
+
+	void ReactionMatrix(FELinearSystem& LS, double scale);
+
+public:
+	void ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha);
+
+	void ElementMassMatrix(FESolidElement& el, matrix& ke, double scale);
+
+	void ElementDiffusionMatrix(FESolidElement& el, matrix& ke, double scale);
+
+	void ElementConvectionMatrix(FESolidElement& el, matrix& ke, double scale);
+
+	void ElementAdvectionMatrix(FESolidElement& el, matrix& ke, double scale);
+
+	void ElementReactionMatrix(FESolidElement& el, matrix& ke, double scale);
+
+public:
 	void UpdateElement(FESolidElement& el, const FETimeInfo& tp);
 
 private:

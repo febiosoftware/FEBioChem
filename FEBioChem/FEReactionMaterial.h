@@ -26,6 +26,7 @@ public:
 		pt->m_ca = m_ca;
 		pt->m_dc = m_dc;
 		pt->m_j = m_j;
+		pt->m_cdot = m_cdot;
 		pt->m_sbmr = m_sbmr;
 		pt->m_sbmrp = m_sbmrp;
 		pt->m_sbmri = m_sbmri;
@@ -50,9 +51,10 @@ public:
 	}
 
 public:
-	std::vector<double>	m_c;	//!< concentration values at integration points (of ALL concentration dofs)
-	std::vector<double>	m_ca;	//!< "actual" concentrations (includes both free species and solid-bound species)
-	std::vector<vec3d>	m_dc;	//!< concentration gradients at integration points (of ALL concentration dofs)
+	std::vector<double>	m_c;	//!< concentrations at current time (of ALL concentration dofs, includes both free species and solid-bound species)
+	std::vector<double>	m_ca;	//!< concentrations at intermediate time
+	std::vector<double>	m_cdot;	//!< concentration rate
+	std::vector<vec3d>	m_dc;	//!< concentration gradients (at current time)
 	std::vector<vec3d>	m_j;	//!< concentration flux
 
 	std::vector<double>	m_sbmr;		//!< apparent densities of solid-bound molecules at current time

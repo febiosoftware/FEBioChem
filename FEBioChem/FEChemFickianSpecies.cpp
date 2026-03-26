@@ -41,5 +41,5 @@ vec3d FEChemFickianSpecies::ConcentrationFlux(FEMaterialPoint& mp)
 
 	vec3d grad_c = rp.m_dc[GetLocalID()];
 	mat3d D = DiffusivityTensor(mp, GetLocalID());
-	return -D * grad_c;
+	return D * grad_c;
 }

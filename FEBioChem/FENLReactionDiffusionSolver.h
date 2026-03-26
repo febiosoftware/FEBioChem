@@ -14,6 +14,8 @@ public:
 	//! initialization
 	bool Init();
 
+	void PrepStep() override;
+
 	//! do convection or not
 	bool DoConvection() const { return m_convection; }
 

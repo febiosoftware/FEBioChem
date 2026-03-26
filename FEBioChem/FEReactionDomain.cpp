@@ -184,6 +184,8 @@ void FEChemReactionDomain::Update(const FETimeInfo& tp)
 	});
 }
 
+//#define NEW_SOLVER
+
 void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& tp)
 {
 	double dt = tp.timeIncrement;
@@ -192,12 +194,18 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 	// get the current nodal concentration values
 	int ne = el.Nodes();
 	int ndof = (int)m_dofC.Size();
-	vector<vector<double> > c(ndof, vector<double>(ne));
+	vector<vector<double> > ct(ndof, vector<double>(ne)), cp(ndof, vector<double>(ne)), ca(ndof, vector<double>(ne));
 	FEMesh& mesh = *GetMesh();
 	for (int i = 0; i < ne; ++i)
 	{
 		FENode& node = mesh.Node(el.m_node[i]);
-		for (int j = 0; j < ndof; ++j) c[j][i] = node.get(m_dofC[j]);
+		for (int j = 0; j < ndof; ++j)
+		{
+			ct[j][i] = node.get(m_dofC[j]);
+			cp[j][i] = node.get_prev(m_dofC[j]);
+
+			ca[j][i] = alpha*ct[j][i] + (1.0 - alpha)*cp[j][i];
+		}
 	}
 
 	// count solutes and sbms
@@ -223,17 +231,30 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 			FEChemDiffusiveSpecies* s = m_mat->GetSpecies(i);
 
 			// evaluate gradient at this integration point
-			rp.m_dc[s->GetLocalID()] = gradient(el, &c[i][0], n);
+#ifdef NEW_SOLVER
+			rp.m_dc[s->GetLocalID()] = gradient(el, &ca[i][0], n);
+#else
+			rp.m_dc[s->GetLocalID()] = gradient(el, &ct[i][0], n); // for new solver
+#endif
 
 			// evaluate concentration
-			double ci = el.Evaluate(&(c[i][0]), n);
+			double ci = el.Evaluate(&(ct[i][0]), n);
 			rp.m_c[s->GetLocalID()] = ci;
 
 			// evaluate "actual" concentration (this is used by the chemcial reactions)
-			rp.m_ca[s->GetLocalID()] = ci;
+#ifdef NEW_SOLVER
+			double cia = el.Evaluate(&(ca[i][0]), n);
+			rp.m_ca[s->GetLocalID()] = cia; // for new solver
+#else
+			rp.m_ca[s->GetLocalID()] = ci; // for old solver
+#endif
 
 			// evaluate the flux
 			rp.m_j[s->GetLocalID()] = s->ConcentrationFlux(mp) * f;
+
+			// rate of change of concentration
+			double cip = el.Evaluate(&(cp[i][0]), n);
+			rp.m_cdot[s->GetLocalID()] = (ci - cip) / dt;
 		}
 
 		// evaluate the solid-bound species concentrations
@@ -290,6 +311,46 @@ void FEChemReactionDomain::StiffnessMatrix(FELinearSystem& LS)
 		});
 }
 
+void FEChemReactionDomain::MassMatrix(FELinearSystem& LS, double scale)
+{
+	AssembleSolidDomain(*this, LS, [&](FESolidElement& el, matrix& ke) {
+		ke.zero();
+		ElementMassMatrix(el, ke, scale);
+	});
+}
+
+void FEChemReactionDomain::DiffusionMatrix(FELinearSystem& LS, double scale)
+{
+	AssembleSolidDomain(*this, LS, [&](FESolidElement& el, matrix& ke) {
+		ke.zero();
+		ElementDiffusionMatrix(el, ke, scale);
+	});
+}
+
+void FEChemReactionDomain::ConvectionMatrix(FELinearSystem& LS, double scale)
+{
+	AssembleSolidDomain(*this, LS, [&](FESolidElement& el, matrix& ke) {
+		ke.zero();
+		ElementConvectionMatrix(el, ke, scale);
+	});
+}
+
+void FEChemReactionDomain::AdvectionMatrix(FELinearSystem& LS, double scale)
+{
+	AssembleSolidDomain(*this, LS, [&](FESolidElement& el, matrix& ke) {
+		ke.zero();
+		ElementAdvectionMatrix(el, ke, scale);
+	});
+}
+
+void FEChemReactionDomain::ReactionMatrix(FELinearSystem& LS, double scale)
+{
+	AssembleSolidDomain(*this, LS, [&](FESolidElement& el, matrix& ke) {
+		ke.zero();
+		ElementReactionMatrix(el, ke, scale);
+	});
+}
+
 void FEChemReactionDomain::ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha)
 {
 	int ne = el.Nodes();
@@ -300,36 +361,34 @@ void FEChemReactionDomain::ElementStiffnessMatrix(FESolidElement& el, matrix& ke
 	ke.zero();
 
 	// get the diffusion matrix
-	ElementDiffusionMatrix(el, ke);
+	ElementDiffusionMatrix(el, ke, -1.0);
 
 	// get the nodal velocities
 	if (m_doConvection)
 	{
-		FEMesh& mesh = *GetMesh();
-		vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
-		for (int i = 0; i < ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
-
 		// add convection matrix
-		ElementConvectionMatrix(el, ke, vn);
+		ElementConvectionMatrix(el, ke, 1.0);
 	}
 
 	// subtract (!) the reaction stiffness
-	ElementReactionStiffness(el, ke);
+	ElementReactionMatrix(el, ke, -1.0);
 
 	// multiply by alpha*dt
 	ke *= alpha * dt;
 
 	// add mass matrix
-	ElementMassMatrix(el, ke);
+	ElementMassMatrix(el, ke, 1.0);
 }
 
-void FEChemReactionDomain::ForceVector(FEGlobalVector& R)
+void FEChemReactionDomain::SupplyVector(FEGlobalVector& R, double scale)
 {
-	auto fp = std::bind(&FEChemReactionDomain::ElementForceVector, this, std::placeholders::_1, std::placeholders::_2);
-	AssembleSolidDomain(*this, R, fp);
+	AssembleSolidDomain(*this, R, [&](FESolidElement& el, vector<double>& fe)
+	{
+		ElementSupplyVector(el, fe, scale);
+	});
 }
 
-void FEChemReactionDomain::ElementForceVector(FESolidElement& el, vector<double>& fe)
+void FEChemReactionDomain::ElementSupplyVector(FESolidElement& el, vector<double>& fe, double scale)
 {
 	int ndof = (int) m_dofC.Size();
 	vector<double> R(ndof, 0.0);
@@ -358,63 +417,53 @@ void FEChemReactionDomain::ElementForceVector(FESolidElement& el, vector<double>
 		{
 			for (int j=0; j<ndof; ++j)
 			{
-				fe[i*ndof + j] += H[i]*R[j]*gw[n]*detJ;
+				fe[i*ndof + j] += H[i]*R[j]*gw[n]*detJ * scale;
 			}
 		}
 	}
 }
 
-void FEChemReactionDomain::MassVector(FEGlobalVector& R, const vector<double>& Un)
+void FEChemReactionDomain::MassVector(FEGlobalVector& R, double scale)
 {
 	AssembleSolidDomain(*this, R, [&](FESolidElement& el, vector<double>& fe)
 	{
-		ElementMassVector(el, fe, Un);
+		ElementMassVector(el, fe, scale);
 	});
 }
 
-void FEChemReactionDomain::ElementMassVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un)
+void FEChemReactionDomain::ElementMassVector(FESolidElement& el, vector<double>& fe, double scale)
 {
-	FEMesh& mesh = *GetMesh();
-
+	int ncv = m_dofC.Size();
 	int ne = el.Nodes();
-	int ncv = (int)m_dofC.Size();
-	int ndof = ne * ncv;
-
-	matrix me(ndof, ndof);
-	me.zero();
-
-	vector<int> lm;
-	UnpackLM(el, lm);
-
-	// get the element mass matrix
-	ElementMassMatrix(el, me);
-
-	// get the nodal values
-	vector<double> un(ndof, 0.0);
-	for (int i = 0; i < ne; ++i)
+	int nint = el.GaussPoints();
+	double* gw = el.GaussWeights();
+	for (int n = 0; n < nint; ++n)
 	{
-		for (int j = 0; j < ncv; ++j)
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
+		// fluid volume fraction
+		double phi = m_mat->Porosity(pt);
+
+		// element shape function values at integration point n
+		double* H = el.H(n);
+
+		// Jacobian at this point
+		double detJ = detJt(el, n);
+
+		for (int a = 0; a < ne; ++a)
 		{
-			double cn = mesh.Node(el.m_node[i]).get(m_dofC[j]);
-			un[i * ncv + j] = cn;
+			double Ma = H[a] * gw[n] * detJ;
+
+			for (int i = 0; i < ncv; ++i)
+			{
+				fe[a * ncv + i] += Ma * phi * pt.m_cdot[i] * scale;
+			}
 		}
 	}
-
-	// subtract previous values
-	for (int i = 0; i < ndof; ++i)
-	{
-		int n = lm[i];
-		if (-n - 2 >= 0) n = -n - 2;
-		if (n >= 0) un[i] -= Un[n];
-	}
-
-	// multiply with mass matrix
-	vector<double> mun = me * un;
-
-	fe = mun;
 }
 
-void FEChemReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
+void FEChemReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke, double scale)
 {
 	int ncv = m_dofC.Size();
 	int ne = el.Nodes();
@@ -440,7 +489,7 @@ void FEChemReactionDomain::ElementMassMatrix(FESolidElement& el, matrix& ke)
 			{
 				double kab = H[a]*H[b]*gw[n]*detJ;
 
-				for (int i=0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab * phi;
+				for (int i=0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab * phi * scale;
 			}
 		}
 	}
@@ -457,7 +506,21 @@ void FEChemReactionDomain::ConvectionVector(FEGlobalVector& R, const FETimeInfo&
 {
 	AssembleSolidDomain(*this, R, [&](FESolidElement& el, vector<double>& fe) {
 		ElementConvectionVector(el, fe, Un, tp.timeIncrement, tp.alpha);
-		});
+	});
+}
+
+void FEChemReactionDomain::AdvectionVector(FEGlobalVector& R, double scale)
+{
+	AssembleSolidDomain(*this, R, [&](FESolidElement& el, vector<double>& fe) {
+		ElementAdvectionVector(el, fe, scale);
+	});
+}
+
+void FEChemReactionDomain::FluxVector(FEGlobalVector& R, double scale)
+{
+	AssembleSolidDomain(*this, R, [&](FESolidElement& el, vector<double>& fe) {
+		ElementFluxVector(el, fe, scale);
+	});
 }
 
 void FEChemReactionDomain::ElementDiffusionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha)
@@ -473,7 +536,7 @@ void FEChemReactionDomain::ElementDiffusionVector(FESolidElement& el, vector<dou
 	UnpackLM(el, lm);
 
 	// get the element diffusion matrix
-	ElementDiffusionMatrix(el, ke);
+	ElementDiffusionMatrix(el, ke, -1.0);
 
 	// get the nodal values
 	FEMesh& mesh = *GetMesh();
@@ -516,15 +579,11 @@ void FEChemReactionDomain::ElementConvectionVector(FESolidElement& el, vector<do
 	vector<int> lm;
 	UnpackLM(el, lm);
 
-	// get the nodal velocities
-	FEMesh& mesh = *GetMesh();
-	vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));
-	for (int i = 0; i < ne; ++i) vn[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
-
 	// add the convection matrix
-	ElementConvectionMatrix(el, ke, vn);
+	ElementConvectionMatrix(el, ke, 1.0);
 
 	// get the nodal values
+	FEMesh& mesh = *GetMesh();
 	vector<double> un(ndof, 0.0);
 	for (int i = 0; i < ne; ++i)
 	{
@@ -552,8 +611,84 @@ void FEChemReactionDomain::ElementConvectionVector(FESolidElement& el, vector<do
 	fe = kun;
 }
 
+void FEChemReactionDomain::ElementAdvectionVector(FESolidElement& el, vector<double>& fe, double scale)
+{
+	FEMesh& mesh = *GetMesh();
+	int ne = el.Nodes();
 
-void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke)
+	// get nodal velocities
+	vec3d vn[FEElement::MAX_NODES] = { vec3d(0,0,0) };
+	for (int i = 0; i < ne; ++i)
+		vn[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+
+	// get the number of concentration variables
+	int ncv = (int)m_dofC.Size();
+
+	const int EN = FEElement::MAX_NODES;
+	vec3d G[EN];
+
+	// loop over all integration points
+	const double* gw = el.GaussWeights();
+	int ni = el.GaussPoints();
+	for (int n = 0; n < ni; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
+		// calculate jacobian and shape function gradients
+		double detJt = ShapeGradient(el, n, G);
+
+		// shape functions
+		double* H = el.H(n);
+
+		// evaluate velocity at integration point
+		vec3d vi = el.Evaluate((vec3d*)(&vn[0]), n);
+
+		// loop over all nodes
+		for (int a = 0; a < ne; ++a)
+		{
+			for (int i = 0; i < ncv; ++i)
+			{
+				double ui = pt.m_ca[i];
+				fe[a * ncv + i] += (G[a]*vi)* ui * gw[n]*detJt* scale;
+			}
+		}
+	}
+}
+
+void FEChemReactionDomain::ElementFluxVector(FESolidElement& el, vector<double>& fe, double scale)
+{
+	int ne = el.Nodes();
+	int ncv = (int)m_dofC.Size();
+	int ndof = ne * ncv;
+
+	const int EN = FEElement::MAX_NODES;
+	vec3d G[EN];
+
+	// loop over all integration points
+	const double* gw = el.GaussWeights();
+	int ni = el.GaussPoints();
+	for (int n = 0; n < ni; ++n)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
+		// calculate jacobian and shape function gradients
+		double detJt = ShapeGradient(el, n, G);
+
+		// loop over all nodes
+		for (int a = 0; a < ne; ++a)
+		{
+			for (int i = 0; i < ncv; ++i)
+			{
+				vec3d Ji = rp.m_j[i];
+				fe[a * ncv + i] += (G[a] * Ji) * gw[n] * detJt * scale;
+			}
+		}
+	}
+}
+
+void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke, double scale)
 {
 	// get the number of concentration variables
 	int ncv = (int)m_dofC.Size();
@@ -608,7 +743,7 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 						double kab_D = (Gi[0] * DB[0] + Gi[1] * DB[1] + Gi[2] * DB[2]);
 
 						// add it all up
-						ke[a * ncv + i][b * ncv + j] -= (kab_d + kab_D) * detJt * gw[n] * phi;
+						ke[a * ncv + i][b * ncv + j] += (kab_d + kab_D) * detJt * gw[n] * phi * scale;
 					}
 				}
 			}
@@ -616,7 +751,7 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 	}
 }
 
-void FEChemReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& ke)
+void FEChemReactionDomain::ElementReactionMatrix(FESolidElement& el, matrix& ke, double scale)
 {
 	// get the number of concentration variables
 	int ncv = (int)m_dofC.Size();
@@ -665,8 +800,7 @@ void FEChemReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& 
 
 						double kpq = gij*H[a]*H[b]*gw[n]*detJt;
 
-						// NOTE: The negative sign is because we need to subtract this matrix from the global matrix
-						ke[a*ncv + i][b*ncv + j] -= kpq;
+						ke[a*ncv + i][b*ncv + j] += kpq*scale;
 					}
 				}	
 			}
@@ -674,12 +808,17 @@ void FEChemReactionDomain::ElementReactionStiffness(FESolidElement& el, matrix& 
 	}
 }
 
-void FEChemReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& ke, const vector<vec3d>& vn)
+void FEChemReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& ke, double scale)
 {
+	FEMesh& mesh = *GetMesh();
+	int ne = el.Nodes();
+	vec3d vn[FEElement::MAX_NODES] = { vec3d(0,0,0) };
+	for (int i = 0; i < ne; ++i) 
+		vn[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+
 	// get the number of concentration variables
 	int ncv = (int)m_dofC.Size();
 
-	int ne = el.Nodes();
 	int ni = el.GaussPoints();
 
 	const int EN = FEElement::MAX_NODES;
@@ -705,7 +844,49 @@ void FEChemReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& k
 			{
 				double kab = (H[a] * (vi * G[b]))*detJt*gw[n];
 
-				for (int i = 0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab;
+				for (int i = 0; i<ncv; ++i) ke[a*ncv + i][b*ncv + i] += kab* scale;
+			}
+		}
+	}
+}
+
+void FEChemReactionDomain::ElementAdvectionMatrix(FESolidElement& el, matrix& ke, double scale)
+{
+	FEMesh& mesh = *GetMesh();
+	int ne = el.Nodes();
+	vec3d vn[FEElement::MAX_NODES] = { vec3d(0,0,0) };
+	for (int i = 0; i < ne; ++i)
+		vn[i] = mesh.Node(el.m_node[i]).get_vec3d(m_dofV[0], m_dofV[1], m_dofV[2]);
+
+	// get the number of concentration variables
+	int ncv = (int)m_dofC.Size();
+
+	int ni = el.GaussPoints();
+
+	const int EN = FEElement::MAX_NODES;
+	vec3d G[EN];
+
+	// loop over all integration points
+	const double* gw = el.GaussWeights();
+	for (int n = 0; n < ni; ++n)
+	{
+		// calculate jacobian and shape function gradients
+		double detJt = ShapeGradient(el, n, G);
+
+		// shape functions
+		double* H = el.H(n);
+
+		// evaluate velocity
+		vec3d vi = el.Evaluate((vec3d*)(&vn[0]), n);
+
+		// loop over all nodes
+		for (int a = 0; a < ne; ++a)
+		{
+			for (int b = 0; b < ne; ++b)
+			{
+				double kab = (G[a] * (vi * H[b])) * detJt * gw[n];
+
+				for (int i = 0; i < ncv; ++i) ke[a * ncv + i][b * ncv + i] += kab * scale;
 			}
 		}
 	}
