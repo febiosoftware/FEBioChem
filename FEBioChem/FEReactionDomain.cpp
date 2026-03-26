@@ -69,6 +69,7 @@ bool FEChemReactionDomain::Init()
 		m_dofV[0] = dofs.GetDOF(vel, 0);
 		m_dofV[1] = dofs.GetDOF(vel, 1);
 		m_dofV[2] = dofs.GetDOF(vel, 2);
+		m_doConvection = true;
 	}
 
 	return true;
@@ -280,17 +281,16 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 	}
 }
 
-void FEChemReactionDomain::StiffnessMatrix(FEChemNLReactionDiffusionSolver* solver, FELinearSystem& LS)
+void FEChemReactionDomain::StiffnessMatrix(FELinearSystem& LS)
 {
-	FEModel& fem = *solver->GetFEModel();
-	FETimeInfo& tp = fem.GetTime();
+	FETimeInfo& tp = GetFEModel()->GetTime();
 
 	AssembleSolidDomain(*this, LS, [&](FESolidElement& el, matrix& ke) {
-			ElementStiffnessMatrix(el, ke, tp.timeIncrement, tp.alpha, solver->DoConvection());
+			ElementStiffnessMatrix(el, ke, tp.timeIncrement, tp.alpha);
 		});
 }
 
-void FEChemReactionDomain::ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha, bool bconvection)
+void FEChemReactionDomain::ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha)
 {
 	int ne = el.Nodes();
 	int ncv = (int)m_dofC.Size();
@@ -303,7 +303,7 @@ void FEChemReactionDomain::ElementStiffnessMatrix(FESolidElement& el, matrix& ke
 	ElementDiffusionMatrix(el, ke);
 
 	// get the nodal velocities
-	if (bconvection)
+	if (m_doConvection)
 	{
 		FEMesh& mesh = *GetMesh();
 		vector<vec3d> vn(FEElement::MAX_NODES, vec3d(0, 0, 0));

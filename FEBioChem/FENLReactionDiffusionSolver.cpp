@@ -314,7 +314,7 @@ bool FEChemNLReactionDiffusionSolver::StiffnessMatrix()
 	for (int ndom=0; ndom<NDOM; ++ndom)
 	{
 		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
-		if (dom) dom->StiffnessMatrix(this, LS);
+		if (dom) dom->StiffnessMatrix(LS);
 	}
 
 	return true;

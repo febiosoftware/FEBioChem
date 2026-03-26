@@ -30,7 +30,7 @@ public:
 public:
 	void ForceVector(FEGlobalVector& R);
 
-	void StiffnessMatrix(FEChemNLReactionDiffusionSolver* solver, FELinearSystem& LS);
+	void StiffnessMatrix(FELinearSystem& LS);
 
 	void MassVector(FEGlobalVector& R, const vector<double>& Un);
 
@@ -47,7 +47,7 @@ protected:
 
 	void ElementConvectionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha);
 
-	void ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha, bool bconvection);
+	void ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha);
 
 public:
 	void ElementMassMatrix(FESolidElement& el, matrix& ke);
@@ -63,6 +63,8 @@ public:
 private:
 	FEChemReactionDiffusionMaterial*	m_mat;
 	FEDofList	m_dofC;
+
+	bool m_doConvection = false;
 	int		m_dofV[3];	// velocity degrees of freedom
 };
 
