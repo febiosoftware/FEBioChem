@@ -234,7 +234,7 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 #ifdef NEW_SOLVER
 			rp.m_dc[s->GetLocalID()] = gradient(el, &ca[i][0], n);
 #else
-			rp.m_dc[s->GetLocalID()] = gradient(el, &ct[i][0], n); // for new solver
+			rp.m_dc[s->GetLocalID()] = gradient(el, &ct[i][0], n);
 #endif
 
 			// evaluate concentration
@@ -244,9 +244,9 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 			// evaluate "actual" concentration (this is used by the chemcial reactions)
 #ifdef NEW_SOLVER
 			double cia = el.Evaluate(&(ca[i][0]), n);
-			rp.m_ca[s->GetLocalID()] = cia; // for new solver
+			rp.m_ca[s->GetLocalID()] = cia;
 #else
-			rp.m_ca[s->GetLocalID()] = ci; // for old solver
+			rp.m_ca[s->GetLocalID()] = ci;
 #endif
 
 			// evaluate the flux
@@ -272,8 +272,12 @@ void FEChemReactionDomain::UpdateElement(FESolidElement& el, const FETimeInfo& t
 
 			// update the solid-bound apparent density (i.e. mass supply)
 
+#ifdef NEW_SOLVER
+			rp.m_sbmr[i] = rp.m_sbmrp[i] + dt * rhohati;
+#else
 			// time integration (midpoint-rule)
 			rp.m_sbmr[i] = rp.m_sbmrp[i] + dt * (rhohati + rp.m_sbmrhatp[i])*0.5;
+#endif
 
 			rp.m_sbmri[i] = rp.m_sbmr[i] - tmp;
 
@@ -635,6 +639,8 @@ void FEChemReactionDomain::ElementAdvectionVector(FESolidElement& el, vector<dou
 		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
 		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
+		double phi = m_mat->Porosity(pt);
+
 		// calculate jacobian and shape function gradients
 		double detJt = ShapeGradient(el, n, G);
 
@@ -650,7 +656,7 @@ void FEChemReactionDomain::ElementAdvectionVector(FESolidElement& el, vector<dou
 			for (int i = 0; i < ncv; ++i)
 			{
 				double ui = pt.m_ca[i];
-				fe[a * ncv + i] += (G[a]*vi)* ui * gw[n]*detJt* scale;
+				fe[a * ncv + i] += (G[a]*vi)* ui * gw[n]*detJt* scale * phi;
 			}
 		}
 	}
@@ -713,7 +719,9 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
 		// fluid volume fraction
+#ifndef NEW_SOLVER
 		double phi = m_mat->Porosity(pt);
+#endif
 		double* H = el.H(n);
 		for (int a = 0; a<ne; ++a)
 		{
@@ -743,7 +751,11 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 						double kab_D = (Gi[0] * DB[0] + Gi[1] * DB[1] + Gi[2] * DB[2]);
 
 						// add it all up
+#ifndef NEW_SOLVER
 						ke[a * ncv + i][b * ncv + j] += (kab_d + kab_D) * detJt * gw[n] * phi * scale;
+#else
+						ke[a * ncv + i][b * ncv + j] += (kab_d + kab_D) * detJt * gw[n] * scale;
+#endif
 					}
 				}
 			}
@@ -870,6 +882,11 @@ void FEChemReactionDomain::ElementAdvectionMatrix(FESolidElement& el, matrix& ke
 	const double* gw = el.GaussWeights();
 	for (int n = 0; n < ni; ++n)
 	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(n);
+		FEChemReactionMaterialPoint& pt = *mp.ExtractData<FEChemReactionMaterialPoint>();
+
+		double phi = m_mat->Porosity(pt);
+
 		// calculate jacobian and shape function gradients
 		double detJt = ShapeGradient(el, n, G);
 
@@ -886,7 +903,7 @@ void FEChemReactionDomain::ElementAdvectionMatrix(FESolidElement& el, matrix& ke
 			{
 				double kab = (G[a] * (vi * H[b])) * detJt * gw[n];
 
-				for (int i = 0; i < ncv; ++i) ke[a * ncv + i][b * ncv + i] += kab * scale;
+				for (int i = 0; i < ncv; ++i) ke[a * ncv + i][b * ncv + i] += kab * scale * phi;
 			}
 		}
 	}

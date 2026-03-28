@@ -6,6 +6,7 @@
 #include <FECore/sdk.h>
 #include "FENLReactionDiffusionSolver.h"
 #include "FEReactionDiffusionConvection.h"
+#include "FEReactionDiffusionAdvectionSolver.h"
 #include "FEReactionDiffusionMaterial.h"
 #include "FEReactionDomain.h"
 #include "FEMassActionReaction.h"
@@ -83,12 +84,16 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	//-----------------------------------------------------------------------------
 	// analyis classes (default type must match module name!)
 	REGISTER_FECORE_CLASS(FEBioChemAnalysis, "reaction-diffusion");
-	REGISTER_FECORE_CLASS(FEBioChemConvAnalysis, "reaction-diffusion-convection");
 
 	REGISTER_FECORE_CLASS(FEChemSpeciesData, "solute");
 	REGISTER_FECORE_CLASS(FEChemSolidBoundSpeciesData, "solid_bound");
 
+	// old solver
 	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionSolver          , "reaction-diffusion");
+
+	// new solver
+//	REGISTER_FECORE_CLASS(FEChemReactionDiffusionAdvectionSolver   , "reaction-diffusion");
+
 	REGISTER_FECORE_CLASS(FEChemReactionDiffusionMaterial          , "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FEChemMassActionReaction                 , "mass action");
 	REGISTER_FECORE_CLASS(FEChemMichaelisMentenReaction            , "Michaelis-Menten");
@@ -164,6 +169,8 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 		"}");
 
 	fecore.AddModuleDependency("reaction-diffusion");
+
+	REGISTER_FECORE_CLASS(FEBioChemConvAnalysis, "reaction-diffusion-convection");
 
 	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionConvectionSolver, "reaction-diffusion-convection");
 	REGISTER_FECORE_CLASS(FEChemPlotNodalVelocity, "nodal velocity");
