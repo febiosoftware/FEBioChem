@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEReactionDomain.h"
-#include "FENLReactionDiffusionSolver.h"
 #include <FECore/FEModel.h>
 #include <FECore/Integrate.h>
 

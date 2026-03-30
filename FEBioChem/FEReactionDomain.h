@@ -3,8 +3,6 @@
 #include <FECore/FECoreKernel.h>
 #include "FEReactionDiffusionMaterial.h"
 
-class FEChemNLReactionDiffusionSolver;
-
 class FEChemReactionDomain : public FESolidDomain
 {
 public:
