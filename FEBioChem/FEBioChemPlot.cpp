@@ -396,12 +396,13 @@ bool FEChemPlotSBSApparentDensity::Save(FEDomain &dom, FEDataStream& a)
 	FEChemReactionDomain& rdom = static_cast<FEChemReactionDomain&>(dom);
 
 	FEChemReactionDiffusionMaterial* mat = dynamic_cast<FEChemReactionDiffusionMaterial*>(rdom.GetMaterial());
+	int nsol = mat->Species();
 	int nsbm = m_sbmName.size();
 	vector<int> lid(nsbm, -1);
 	for (int i = 0; i < nsbm; ++i)
 	{
 		FEChemReactiveSpecies* rs = mat->FindSpecies(m_sbmName[i]);
-		if (rs) lid[i] = rs->GetLocalID();
+		if (rs) lid[i] = rs->GetLocalID() - nsol;
 	}
 
 	if ((nsbm == 1) && (lid[0] == -1)) return false;

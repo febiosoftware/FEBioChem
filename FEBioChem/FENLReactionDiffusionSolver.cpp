@@ -75,12 +75,23 @@ bool FEChemNLReactionDiffusionSolver::Init()
 			if (-n - 2 >= 0) n = -n - 2;
 			if (n >= 0) m_Un[n] = node.get(dofs[k]);
 		}
+
+		// TODO: is this necessary with new diffusion approach?
+		node.UpdateValues();
 	}
 
 	// evaluate the initial supply
 	vector<double> dummy(neq, 0.0);
 	FEGlobalVector R(*GetFEModel(), m_Fp, dummy);
 	ForceVector(R);
+
+	SupplyVector(R, -1.0);
+
+	DiffusionVector(R, -1.0);
+	if (m_convection)
+	{
+		ConvectionVector(R, -1.0);
+	}
 
 	return true;
 }
@@ -210,7 +221,7 @@ double FEChemNLReactionDiffusionSolver::CalculateSBMNorm()
 	return normS;
 }
 
-void FEChemNLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
+void FEChemNLReactionDiffusionSolver::SupplyVector(FEGlobalVector& R, double scale)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -220,15 +231,25 @@ void FEChemNLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
 	for (int n = 0; n<NDOM; ++n)
 	{
 		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(n));
-		if (dom) dom->SupplyVector(R, 1.0);
+		if (dom) dom->SupplyVector(R, scale);
 	}
+}
 
+void FEChemNLReactionDiffusionSolver::ForceVector(FEGlobalVector& R)
+{
 	// do the surface loads
+	FEModel& fem = *GetFEModel();
 	for (int i = 0; i<fem.ModelLoads(); ++i)
 	{
 		FEModelLoad& ml = *fem.ModelLoad(i);
 		if (ml.IsActive()) ml.LoadVector(R);
 	}
+
+	// I need to flip the sign here
+	// TODO: double-check the conventions for the concentration fluxes, since there might be a sign issue. 
+	// Note that this also assumes that this function in the first function called in Residual,
+	// otherwise we might be flipping the sign of other residual contributions as well!
+	R *= -1.0;
 }
 
 //! calculates the global residual vector
@@ -247,27 +268,28 @@ bool FEChemNLReactionDiffusionSolver::Residual(vector<double>& R)
 	FEGlobalVector RHS(*GetFEModel(), R, dummy);
 	int neq = RHS.Size();
 
-	// evaluate force vector
+	// evaluate external force vector first! 
 	ForceVector(RHS);
+
+	// evaluate supply vector
+	SupplyVector(RHS, -1.0);
+
+	DiffusionVector(RHS, -1.0);
+	// add convection contribution
+	if (m_convection)
+	{
+		ConvectionVector(RHS, -1.0);
+	}
 
 	// store this vector since we'll need it later
 	for (int i = 0; i<neq; ++i) m_F[i] = RHS[i];
 
 	// multiply by time step
 	for (int i=0; i<neq; ++i)
-		RHS[i] = -dt*(m_alpha*RHS[i] + (1.0 - m_alpha)*m_Fp[i]);
+		RHS[i] = (m_alpha*RHS[i] + (1.0 - m_alpha)*m_Fp[i]);
 
 	// add mass matrix contribution
-	MassVector(RHS);
-
-	// add diffusion matrix contribution
-	DiffusionVector(RHS, ti);
-
-	// add convection contribution
-	if (m_convection)
-	{
-		ConvectionVector(RHS, ti);
-	}
+	MassVector(RHS, 1.0);
 
 	// multiply everything by -1
 	R *= -1.0;
@@ -278,20 +300,19 @@ bool FEChemNLReactionDiffusionSolver::Residual(vector<double>& R)
 	return true;
 }
 
-void FEChemNLReactionDiffusionSolver::MassVector(FEGlobalVector& R)
+void FEChemNLReactionDiffusionSolver::MassVector(FEGlobalVector& R, double scale)
 {
-	double dt = GetFEModel()->GetTime().timeIncrement;
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 	int NDOM = mesh.Domains();
 	for (int n = 0; n<NDOM; ++n)
 	{
 		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(n));
-		if (dom) dom->MassVector(R, dt);
+		if (dom) dom->MassVector(R, scale);
 	}
 }
 
-void FEChemNLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEChemNLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, double scale)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -299,11 +320,11 @@ void FEChemNLReactionDiffusionSolver::DiffusionVector(FEGlobalVector& R, const F
 	for (int ndom = 0; ndom<NDOM; ++ndom)
 	{
 		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
-		if (dom) dom->DiffusionVector(R, tp, m_Un);
+		if (dom) dom->DiffusionVector(R, scale);
 	}
 }
 
-void FEChemNLReactionDiffusionSolver::ConvectionVector(FEGlobalVector& R, const FETimeInfo& tp)
+void FEChemNLReactionDiffusionSolver::ConvectionVector(FEGlobalVector& R, double scale)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
@@ -311,26 +332,88 @@ void FEChemNLReactionDiffusionSolver::ConvectionVector(FEGlobalVector& R, const 
 	for (int ndom = 0; ndom < NDOM; ++ndom)
 	{
 		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
-		if (dom) dom->ConvectionVector(R, tp, m_Un);
+		if (dom) dom->ConvectionVector(R, scale);
 	}
 }
 
 //! calculates the global stiffness matrix
 bool FEChemNLReactionDiffusionSolver::StiffnessMatrix()
 {
+	const FETimeInfo& tp = GetFEModel()->GetTime();
+	double dt = tp.timeIncrement;
+	double alpha = tp.alpha;
+
 	// setup the linear system
 	FELinearSystem LS(GetFEModel(), *m_pK, m_Fd, m_ui, (m_msymm == REAL_SYMMETRIC));
 
 	// add contributions from domains
 	FEMesh& mesh = GetFEModel()->GetMesh();
 	int NDOM = mesh.Domains();
-	for (int ndom=0; ndom<NDOM; ++ndom)
+
+	// add mass matrix
+	MassMatrix(LS, 1.0 / dt);
+
+	// add diffusion matrix
+	DiffusionMatrix(LS, -alpha);
+
+	// add convection matrix (if needed)
+	if (m_convection)
 	{
-		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
-		if (dom) dom->StiffnessMatrix(LS);
+		ConvectionMatrix(LS, -alpha);
 	}
 
+	// reaction matrix
+	ReactionMatrix(LS, -alpha);
+
 	return true;
+}
+
+void FEChemNLReactionDiffusionSolver::MassMatrix(FELinearSystem& LS, double scale)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int NDOM = mesh.Domains();
+	for (int n = 0; n<NDOM; ++n)
+	{
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(n));
+		if (dom) dom->MassMatrix(LS, scale);
+	}
+}
+
+void FEChemNLReactionDiffusionSolver::DiffusionMatrix(FELinearSystem& LS, double scale)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int NDOM = mesh.Domains();
+	for (int ndom = 0; ndom < NDOM; ++ndom)
+	{
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
+		if (dom) dom->DiffusionMatrix(LS, scale);
+	}
+}
+
+void FEChemNLReactionDiffusionSolver::ConvectionMatrix(FELinearSystem& LS, double scale)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int NDOM = mesh.Domains();
+	for (int ndom = 0; ndom < NDOM; ++ndom)
+	{
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
+		if (dom) dom->ConvectionMatrix(LS, scale);
+	}
+}
+
+void FEChemNLReactionDiffusionSolver::ReactionMatrix(FELinearSystem& LS, double scale)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+	int NDOM = mesh.Domains();
+	for (int ndom = 0; ndom < NDOM; ++ndom)
+	{
+		FEChemReactionDomain* dom = dynamic_cast<FEChemReactionDomain*>(&mesh.Domain(ndom));
+		if (dom) dom->ReactionMatrix(LS, scale);
+	}
 }
 
 void FEChemNLReactionDiffusionSolver::Update(std::vector<double>& u)

@@ -34,11 +34,22 @@ public: // from FENewtonSolver
 	void Update(std::vector<double>& u) override;
 
 private:
-	void MassVector(FEGlobalVector& R);
+	void MassMatrix(FELinearSystem& LS, double scale);
 
-	void DiffusionVector(FEGlobalVector& R, const FETimeInfo& tp);
+	void DiffusionMatrix(FELinearSystem& LS, double scale);
 
-	void ConvectionVector(FEGlobalVector& R, const FETimeInfo& tp);
+	void ConvectionMatrix(FELinearSystem& LS, double scale);
+
+	void ReactionMatrix(FELinearSystem& LS, double scale);
+
+private:
+	void MassVector(FEGlobalVector& R, double scale);
+
+	void DiffusionVector(FEGlobalVector& R, double scale);
+
+	void ConvectionVector(FEGlobalVector& R, double scale);
+
+	void SupplyVector(FEGlobalVector& F, double scale);
 
 	void ForceVector(FEGlobalVector& F);
 

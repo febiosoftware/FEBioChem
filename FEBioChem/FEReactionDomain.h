@@ -30,11 +30,9 @@ public:
 
 	void MassVector(FEGlobalVector& R, double scale);
 
-	void DiffusionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un);
+	void DiffusionVector(FEGlobalVector&R, double scale);
 
-	void ConvectionVector(FEGlobalVector&R, const FETimeInfo& tp, const vector<double>& Un);
-
-	void AdvectionVector(FEGlobalVector&R, double scale);
+	void ConvectionVector(FEGlobalVector&R, double scale);
 
 	void FluxVector(FEGlobalVector&R, double scale);
 
@@ -43,37 +41,27 @@ protected:
 
 	void ElementMassVector(FESolidElement& el, vector<double>& fe, double scale);
 
-	void ElementDiffusionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha);
+	void ElementDiffusionVector(FESolidElement& el, vector<double>& fe, double scale);
 
-	void ElementConvectionVector(FESolidElement& el, vector<double>& fe, const vector<double>& Un, double dt, double alpha);
-
-	void ElementAdvectionVector(FESolidElement& el, vector<double>& fe, double scale);
+	void ElementConvectionVector(FESolidElement& el, vector<double>& fe, double scale);
 
 	void ElementFluxVector(FESolidElement& el, vector<double>& fe, double scale);
 
 public:
-	void StiffnessMatrix(FELinearSystem& LS);
-
 	void MassMatrix(FELinearSystem& LS, double scale);
 
 	void DiffusionMatrix(FELinearSystem& LS, double scale);
 
 	void ConvectionMatrix(FELinearSystem& LS, double scale);
 
-	void AdvectionMatrix(FELinearSystem& LS, double scale);
-
 	void ReactionMatrix(FELinearSystem& LS, double scale);
 
 public:
-	void ElementStiffnessMatrix(FESolidElement& el, matrix& ke, double dt, double alpha);
-
 	void ElementMassMatrix(FESolidElement& el, matrix& ke, double scale);
 
 	void ElementDiffusionMatrix(FESolidElement& el, matrix& ke, double scale);
 
 	void ElementConvectionMatrix(FESolidElement& el, matrix& ke, double scale);
-
-	void ElementAdvectionMatrix(FESolidElement& el, matrix& ke, double scale);
 
 	void ElementReactionMatrix(FESolidElement& el, matrix& ke, double scale);
 

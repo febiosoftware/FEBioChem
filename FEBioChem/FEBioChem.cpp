@@ -6,7 +6,6 @@
 #include <FECore/sdk.h>
 #include "FENLReactionDiffusionSolver.h"
 #include "FEReactionDiffusionConvection.h"
-#include "FEReactionDiffusionAdvectionSolver.h"
 #include "FEReactionDiffusionMaterial.h"
 #include "FEReactionDomain.h"
 #include "FEMassActionReaction.h"
@@ -90,9 +89,6 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 
 	// old solver
 	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionSolver          , "reaction-diffusion");
-
-	// new solver
-//	REGISTER_FECORE_CLASS(FEChemReactionDiffusionAdvectionSolver   , "reaction-diffusion");
 
 	REGISTER_FECORE_CLASS(FEChemReactionDiffusionMaterial          , "reaction-diffusion");
 	REGISTER_FECORE_CLASS(FEChemMassActionReaction                 , "mass action");
