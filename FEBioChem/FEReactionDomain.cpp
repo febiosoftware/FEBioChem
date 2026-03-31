@@ -533,8 +533,8 @@ void FEChemReactionDomain::ElementConvectionVector(FESolidElement& el, vector<do
 		{
 			for (int i = 0; i < ncv; ++i)
 			{
-				double ui = pt.m_ca[i];
-				fe[a * ncv + i] += (G[a]*vi)* ui * gw[n]*detJt* scale * phi;
+				vec3d gradu = pt.m_dc[i];
+				fe[a * ncv + i] += (H[a]*(vi* gradu)) * gw[n]*detJt* scale * phi;
 			}
 		}
 	}
@@ -732,8 +732,7 @@ void FEChemReactionDomain::ElementConvectionMatrix(FESolidElement& el, matrix& k
 		{
 			for (int b = 0; b < ne; ++b)
 			{
-				double kab = (G[a] * (vi * H[b])) * detJt * gw[n];
-
+				double kab = (H[a] * (vi * G[b])) * detJt * gw[n];
 				for (int i = 0; i < ncv; ++i) ke[a * ncv + i][b * ncv + i] += kab * scale * phi;
 			}
 		}

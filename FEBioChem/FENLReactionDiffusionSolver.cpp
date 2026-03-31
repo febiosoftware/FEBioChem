@@ -90,7 +90,7 @@ bool FEChemNLReactionDiffusionSolver::Init()
 	DiffusionVector(R, -1.0);
 	if (m_convection)
 	{
-		ConvectionVector(R, -1.0);
+		ConvectionVector(R, 1.0);
 	}
 
 	return true;
@@ -278,7 +278,7 @@ bool FEChemNLReactionDiffusionSolver::Residual(vector<double>& R)
 	// add convection contribution
 	if (m_convection)
 	{
-		ConvectionVector(RHS, -1.0);
+		ConvectionVector(RHS, 1.0);
 	}
 
 	// store this vector since we'll need it later
@@ -359,7 +359,7 @@ bool FEChemNLReactionDiffusionSolver::StiffnessMatrix()
 	// add convection matrix (if needed)
 	if (m_convection)
 	{
-		ConvectionMatrix(LS, -alpha);
+		ConvectionMatrix(LS, alpha);
 	}
 
 	// reaction matrix
