@@ -52,10 +52,10 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemReactionRateScript : public FEChemReactionRate, public FEPhysicsProperty
+class FEChemUserReactionRate : public FEChemReactionRate, public FEPhysicsProperty
 {
 public:
-	FEChemReactionRateScript(FEModel* fem) : FEChemReactionRate(fem), FEPhysicsProperty(fem) {}
+	FEChemUserReactionRate(FEModel* fem) : FEChemReactionRate(fem), FEPhysicsProperty(fem) {}
 
 	bool Init() override;
 

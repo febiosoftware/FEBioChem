@@ -88,6 +88,8 @@ public:
 	//! set the parent material
 	void SetReactionDiffusionParent(FEChemReactionDiffusionMaterial* mat);
 
+	FEChemReactionDiffusionMaterial* GetReactionDiffusionParent() { return m_pRDM; }
+
 public:
 
 	//! Evaluate the reaction rate at this integration point

@@ -112,7 +112,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemSpeciesPointSource                 , "point source");
 
 	// reaction rate classes
-	REGISTER_FECORE_CLASS(FEChemReactionRateScript, "user reaction-rate");
+	REGISTER_FECORE_CLASS(FEChemUserReactionRate, "user reaction-rate");
 
 	// diffusivity classes
 	REGISTER_FECORE_CLASS(FEChemDiffusivityScript, "user diffusivity");

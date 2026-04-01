@@ -27,30 +27,6 @@ bool FEChemCustomReaction::Init()
 	int nsbm = m_pRDM->SolidBoundSpecies();
 	int ntot = nsol + nsbm;
 
-	// we need to add all the species that are involved in the reaction to the valuator's variable list
-	for (int i = 0; i < reactants.size(); ++i)
-	{
-		ReactionTerm& reactant_i = reactants[i];
-
-		FEChemReactiveSpecies* spec = m_pRDM->FindSpecies(reactant_i.second);
-		if (spec == nullptr)
-		{
-			// Oh, oh. This shouldn't happen
-			return false;// MaterialError("Invalid reaction equation");
-		}
-	}
-	for (int i = 0; i < products.size(); ++i)
-	{
-		ReactionTerm& product_i = products[i];
-
-		FEChemReactiveSpecies* spec = m_pRDM->FindSpecies(product_i.second);
-		if (spec == nullptr)
-		{
-			// Oh, oh. This shouldn't happen
-			return false;// MaterialError("Invalid reaction equation");
-		}
-	}
-
 	// allocate coefficient tables
 	m_vP.resize(ntot, 0);
 	m_vR.resize(ntot, 0);
@@ -116,23 +92,23 @@ double FEChemCustomReaction::GetReactionRateDeriv(FEMaterialPoint& pt, int id)
 	return m_rate->ReactionRateDeriv(pt, id);
 }
 
-BEGIN_FECORE_CLASS(FEChemReactionRateScript, FEChemReactionRate)
+BEGIN_FECORE_CLASS(FEChemUserReactionRate, FEChemReactionRate)
 	ADD_PARAMETER(m_scriptName, "script")->setLongName("reaction rate script")->SetFlags(FE_PARAM_ATTRIBUTE);
 END_FECORE_CLASS();
 
-double FEChemReactionRateScript::ReactionRate(FEMaterialPoint& pt)
+double FEChemUserReactionRate::ReactionRate(FEMaterialPoint& pt)
 {
 	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
 	return Value(rmp.m_ca);
 }
 
-double FEChemReactionRateScript::ReactionRateDeriv(FEMaterialPoint& pt, int id)
+double FEChemUserReactionRate::ReactionRateDeriv(FEMaterialPoint& pt, int id)
 {
 	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
 	return DerivValue(rmp.m_ca, id);
 }
 
-bool FEChemReactionRateScript::Init()
+bool FEChemUserReactionRate::Init()
 {
 	if (m_pReaction == nullptr)
 	{
@@ -142,16 +118,19 @@ bool FEChemReactionRateScript::Init()
 
 	FEPhysicsProperty::SetSibling(static_cast<FECoreBase*>(this));
 
-	for (int i=0; i<m_pReaction->Reactants(); ++i)
+	// need to add all the species from the parent reaction-diffusion material
+	FEChemReactionDiffusionMaterial* rdm = m_pReaction->GetReactionDiffusionParent();
+
+	for (int i=0; i<rdm->Species(); ++i)
 	{
-		const ReactionTerm& reactant_i = m_pReaction->GetReactant(i);
-		AddVariable(reactant_i.second, FEValueType::Double);
+		FEChemReactiveSpecies* spec_i = rdm->GetSpecies(i);
+		AddVariable(spec_i->GetName(), FEValueType::Double);
 	}
 
-	for (int i = 0; i < m_pReaction->Products(); ++i)
+	for (int i=0; i<rdm->SolidBoundSpecies(); ++i)
 	{
-		const ReactionTerm& product_i = m_pReaction->GetProduct(i);
-		AddVariable(product_i.second, FEValueType::Double);
+		FEChemSolidBoundSpecies* sbm_i = rdm->GetSolidBoundSpecies(i);
+		AddVariable(sbm_i->GetName(), FEValueType::Double);
 	}
 
 	return FEChemReactionRate::Init() && FEPhysicsProperty::Init();
