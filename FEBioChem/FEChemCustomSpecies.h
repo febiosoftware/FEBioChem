@@ -54,10 +54,30 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemDiffusivityScript : public FEChemDiffusivity, public FEPhysicsProperty
+class FEChemUserDiffusivity : public FEChemDiffusivity, public FEPhysicsProperty
 {
 public:
-	FEChemDiffusivityScript(FEModel* fem) : FEChemDiffusivity(fem), FEPhysicsProperty(fem) {}
+	FEChemUserDiffusivity(FEModel* fem) : FEChemDiffusivity(fem), FEPhysicsProperty(fem) {}
+
+	bool Init() override;
+
+	// concentration flux
+	vec3d ConcentrationFlux(FEMaterialPoint& mp) override;
+
+	// derivative of flux with respect to concentration (dJ/dc)
+	vec3d FluxConcentrationTangent(FEMaterialPoint& mp, int id) override;
+
+	// evaluate diffusivity (dJ/d(grad c))
+	mat3d DiffusivityTensor(FEMaterialPoint& mp, int id) override;
+
+private:
+	DECLARE_FECORE_CLASS();
+};
+
+class FEChemUserDiffusiveFlux : public FEChemDiffusivity, public FEPhysicsProperty
+{
+public:
+	FEChemUserDiffusiveFlux(FEModel* fem) : FEChemDiffusivity(fem), FEPhysicsProperty(fem) {}
 
 	bool Init() override;
 

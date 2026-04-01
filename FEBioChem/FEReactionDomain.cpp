@@ -599,29 +599,30 @@ void FEChemReactionDomain::ElementDiffusionMatrix(FESolidElement& el, matrix& ke
 		// fluid volume fraction
 		double phi = m_mat->Porosity(pt);
 
-		double* H = el.H(n);
-		for (int a = 0; a<ne; ++a)
+		for (int i = 0; i < ncv; ++i)
 		{
-			Gi[0] = G[a].x;
-			Gi[1] = G[a].y;
-			Gi[2] = G[a].z;
-
-			for (int b = 0; b<ne; ++b)
+			for (int j = 0; j < ncv; ++j)
 			{
-				Gj[0] = G[b].x;
-				Gj[1] = G[b].y;
-				Gj[2] = G[b].z;
+				vec3d d = m_mat->GetSpecies(i)->FluxConcentrationTangent(mp, j);
+				mat3d D = m_mat->GetSpecies(i)->DiffusivityTensor(mp, j);
 
-				for (int i = 0; i<ncv; ++i)
+				double* H = el.H(n);
+				for (int a = 0; a<ne; ++a)
 				{
-					for (int j = 0; j < ncv; ++j)
+					Gi[0] = G[a].x;
+					Gi[1] = G[a].y;
+					Gi[2] = G[a].z;
+
+					for (int b = 0; b<ne; ++b)
 					{
+						Gj[0] = G[b].x;
+						Gj[1] = G[b].y;
+						Gj[2] = G[b].z;
+
 						// Flux concentration tangent stiffness matrix contribution
-						vec3d d = m_mat->GetSpecies(i)->FluxConcentrationTangent(mp, j);
 						double kab_d = (Gi[0] * d.x + Gi[1] * d.y + Gi[2] * d.z) * H[b];
 
 						// Diffusivity contribution to stiffness matrix
-						mat3d D = m_mat->GetSpecies(i)->DiffusivityTensor(mp, j);
 						DB[0] = D(0, 0) * Gj[0] + D(0, 1) * Gj[1] + D(0, 2) * Gj[2];
 						DB[1] = D(1, 0) * Gj[0] + D(1, 1) * Gj[1] + D(1, 2) * Gj[2];
 						DB[2] = D(2, 0) * Gj[0] + D(2, 1) * Gj[1] + D(2, 2) * Gj[2];

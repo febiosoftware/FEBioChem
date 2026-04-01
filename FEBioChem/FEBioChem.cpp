@@ -115,7 +115,8 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemUserReactionRate, "user reaction-rate");
 
 	// diffusivity classes
-	REGISTER_FECORE_CLASS(FEChemDiffusivityScript, "user diffusivity");
+	REGISTER_FECORE_CLASS(FEChemUserDiffusivity, "user diffusivity");
+	REGISTER_FECORE_CLASS(FEChemUserDiffusiveFlux, "user diffusive flux");
 
 	// initial conditions
 	REGISTER_FECORE_CLASS(FEChemInitialConcentration, "initial concentration");

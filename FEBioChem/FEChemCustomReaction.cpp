@@ -117,6 +117,7 @@ bool FEChemUserReactionRate::Init()
 	}
 
 	FEPhysicsProperty::SetSibling(static_cast<FECoreBase*>(this));
+	FEPhysicsProperty::SetProgramReturnType(FEValueType::Double);
 
 	// need to add all the species from the parent reaction-diffusion material
 	FEChemReactionDiffusionMaterial* rdm = m_pReaction->GetReactionDiffusionParent();
