@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#febiochem" class="md-skip">
+        <a href="#overview" class="md-skip">
           Skip to content
         </a>
       
@@ -303,8 +303,24 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="." class="md-nav__link md-nav__link--active">
         
@@ -322,6 +338,56 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -711,11 +777,33 @@
 
 
 
-<h1 id="febiochem">FEBioChem<a class="headerlink" href="#febiochem" title="Permanent link">&para;</a></h1>
-<p>This is the documentation for <strong>FEBioChem</strong>, an FEBio plugin that allows users to solve reaction-diffusion and reaction-diffusion-convection problems in the context of a (non-deformable) mixture with multiple chemical species. The species can be solutes that flow with the solvent, or can be bound to the solid phase of the mixture. In this regard, this plugin offers similar capabilities as the FEBioMix module in FEBio (at least for non-deformable mixtures). However, since the mixture is assumed non-deformable, the calculations are optimized and the performance improved.</p>
-<p>Please see the <a href="febiochem_tutorial1/">Tutorial</a> page for a practical guide on using the FEBio Chem plugin with FEBio Studio. </p>
-<p>The <a href="febiochem_user_manual/">User Manual</a> page describes the features of the plugin in the context of the FEBio Input file. </p>
-<p>For some background on the theory, please see the <a href="febiochem_theory/">Theory</a> page. </p>
+  <h1>Home</h1>
+
+<p><img alt="FEBioChem logo" src="figs/FEBioChem_logo_high_res.png" style="display:block; margin:0 auto; width:50%;" /></p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><strong>FEBioChem</strong> is an FEBio plugin for modeling <strong>reaction–diffusion</strong> and <strong>reaction–diffusion–convection</strong> processes in non-deformable mixtures. It is designed for systems involving multiple interacting chemical species, where transport occurs through diffusion and advection, and species may also participate in complex reaction networks. These species can exist either as <strong>mobile solutes</strong> carried by the solvent or as <strong>solid-bound constituents</strong> attached to the mixture matrix. By assuming the mixture is non-deformable, FEBioChem eliminates the need to solve for solid mechanics, leading to <strong>simplified formulations</strong>, <strong>reduced computational cost</strong>, and <strong>improved performance</strong>—while still capturing the essential physics of chemically reactive transport.</p>
+<hr />
+<h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p>📘 <strong><a href="febiochem_tutorial1/">Tutorial</a></strong><br />
+  Step-by-step guide using FEBioChem with FEBio Studio  </p>
+</li>
+<li>
+<p>📖 <strong><a href="febiochem_user_manual/">User Manual</a></strong><br />
+  Detailed reference for input file configuration  </p>
+</li>
+<li>
+<p>🧠 <strong><a href="febiochem_theory/">Theory</a></strong><br />
+  Background on governing equations and implementation details </p>
+</li>
+</ul>
+<h2 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h2>
+<p>The easiest way to get to the FEBioChem plugin is to use the Plugin Repo in FEBio Studio. Just open FEBio Studio, use the menu <strong>FEBio → Plugin Repository</strong> to open the plugin repo, then find and download the FEBio Chem plugin. </p>
+<p>Some additional resources are linked below. </p>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg></span> <a href="https://github.com/febiosoftware/FEBioChem">FEBioChem</a> on Github.</p>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.59 13.41c.41.39.41 1.03 0 1.42-.39.39-1.03.39-1.42 0a5.003 5.003 0 0 1 0-7.07l3.54-3.54a5.003 5.003 0 0 1 7.07 0 5.003 5.003 0 0 1 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48a2.98 2.98 0 0 0 0-4.24 2.98 2.98 0 0 0-4.24 0l-3.53 3.53a2.98 2.98 0 0 0 0 4.24m2.82-4.24c.39-.39 1.03-.39 1.42 0a5.003 5.003 0 0 1 0 7.07l-3.54 3.54a5.003 5.003 0 0 1-7.07 0 5.003 5.003 0 0 1 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47a2.98 2.98 0 0 0 0 4.24 2.98 2.98 0 0 0 4.24 0l3.53-3.53a2.98 2.98 0 0 0 0-4.24.973.973 0 0 1 0-1.42"/></svg></span> <a href="https://repo.febio.org/pluginRepo/Plugins?id=2" rel="noopener noreferrer" target="_blank">FEBioChem</a> on the Plugin Repo website.</p>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.59 13.41c.41.39.41 1.03 0 1.42-.39.39-1.03.39-1.42 0a5.003 5.003 0 0 1 0-7.07l3.54-3.54a5.003 5.003 0 0 1 7.07 0 5.003 5.003 0 0 1 0 7.07l-1.49 1.49c.01-.82-.12-1.64-.4-2.42l.47-.48a2.98 2.98 0 0 0 0-4.24 2.98 2.98 0 0 0-4.24 0l-3.53 3.53a2.98 2.98 0 0 0 0 4.24m2.82-4.24c.39-.39 1.03-.39 1.42 0a5.003 5.003 0 0 1 0 7.07l-3.54 3.54a5.003 5.003 0 0 1-7.07 0 5.003 5.003 0 0 1 0-7.07l1.49-1.49c-.01.82.12 1.64.4 2.43l-.47.47a2.98 2.98 0 0 0 0 4.24 2.98 2.98 0 0 0 4.24 0l3.53-3.53a2.98 2.98 0 0 0 0-4.24.973.973 0 0 1 0-1.42"/></svg></span> The <a href="https://febio.org/" rel="noopener noreferrer" target="_blank">FEBio</a> website </p>
 
 
 
