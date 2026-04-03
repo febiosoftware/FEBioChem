@@ -80,7 +80,7 @@ Finally, we need to assign this material to the box. First select the box by cli
 We'll apply only one boundary condition, namely an initial concentration flux for species A. Use the menu  **Physics** → **Add Surface Load...** to open the _Add Surface Load_ dialog box. Select the _concentration flux_ option and click OK. Set the following parameters:
 
 * `flux` : -1
-* `solute_id` : 1 (A has solute ID 1 since we created it first. B would have ID 2)
+* `solute_id` : 1 (species *A* has solute ID 1 since we created it first. Species *B* would have ID 2)
 
 To assign this load to the left face of the box, proceed as follows:
 

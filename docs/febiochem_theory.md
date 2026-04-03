@@ -8,7 +8,7 @@ Consider $N$ chemical species that undergo diffusion and can react with each oth
 \end{equation}
 \]
 
-Here, ${{u}^{\left( i \right)}}$ represents the concentration of chemical species i, $\mathbf{J}^{(i)}$ is the concentration flux, and ${{R}^{\left( i \right)}}$ accounts for all local reactions that contribute to the concentration of species $i$. The vector ${{\mathbf{u}}^{T}}=\left[ {{u}^{\left( 1 \right)}},...,{{u}^{\left( N \right)}} \right]$ represents all the concentrations.
+Here, ${{u}^{\left( i \right)}}$ represents the concentration of chemical species $i$, $\mathbf{J}^{(i)}$ is the concentration flux, and ${{R}^{\left( i \right)}}$ accounts for all local reactions that contribute to the concentration of species $i$. The vector ${{\mathbf{u}}^{T}}=\left[ {{u}^{\left( 1 \right)}},...,{{u}^{\left( N \right)}} \right]$ represents all the concentrations.
 
 Note that we assume that the concentration flux in general can be a function of both the concentrations $\mathbf{u}$ and their gradients $\nabla \mathbf{u}$. As a simple example, consider the case of Fickian diffusion, where the concentration flux takes on the familiar form.
 
@@ -17,6 +17,19 @@ Note that we assume that the concentration flux in general can be a function of 
 \]
 
 Here, ${{\mathbf{D}}^{\left( i \right)}}$ the diffusion tensor of species $i$. 
+
+Note that all terms in equation ($\ref{eq:strong-form}$) have units
+
+\[\frac{\text{amount}}{\text{volume}\cdot \text{time}}\]
+
+From this it follows that the quantities involved in the equations above have the following units.
+
+•	Concentration $u$ : $\text{mol} / m^3$ 
+•	Flux $\mathbf{J}$: $\text{mol} / m^2.s$
+•	Reaction rate $R$: $\text{mol} / m^3.s$
+•	Diffusivity $D$: $m^2 / s$
+•	Concentration gradient $\nabla{u}$: $\text{mol} / m^4$
+
 
 ## Weak Formulation
 
@@ -92,11 +105,11 @@ From this we can find ${{\mathbf{\dot{U}}}_{n+1}}$,
 
 \[\,{{\mathbf{\dot{U}}}_{n+1}}=\frac{1}{\alpha }\left[ \frac{1}{\Delta t}\left( {{\mathbf{U}}_{n+1}}-{{\mathbf{U}}_{n}} \right)-\left( 1-\alpha  \right){{{\mathbf{\dot{U}}}}_{n}} \right]\]
 
-Substitution back into the semi-discrete equation results in the *generalized trapezoidal rule*.
+After some algebra, this can be written as,
 
-\[\left( \mathbf{M}+\alpha \Delta t\mathbf{C} \right){{\mathbf{U}}_{n+1}}-\alpha \Delta t\mathbf{D}\left( {{\mathbf{U}}_{n+1}} \right)=\alpha \Delta t\mathbf{F}\left( {{\mathbf{U}}_{n+1}} \right)+\mathbf{M}{{\mathbf{U}}_{n}}+\left( 1-\alpha  \right)\Delta t\mathbf{M}{{\mathbf{\dot{U}}}_{n}}\]
+\[\mathbf{M}\frac{{{\mathbf{U}}_{n+1}}-{{\mathbf{U}}_{n}}}{\Delta t}={{\mathbf{S}}_{n+\alpha }}-{{\mathbf{F}}_{n+\alpha }}+{{\mathbf{G}}_{n+\alpha }}-\mathbf{C}{{\mathbf{U}}_{n+\alpha }}\]
 
-which is a nonlinear system of equations. This can be solved using Newton's method. 
+Here, we use the notation ${{\left( \bullet  \right)}_{n+\alpha }}=\alpha {{\left( \bullet  \right)}_{n+1}}+\left( 1-\alpha  \right){{\left( \bullet  \right)}_{n}}$. This is a nonlinear system of equations and can be solved using Newton's method. 
 
 
 ### Backward Euler
@@ -166,25 +179,31 @@ Here, $D\left( {{u}^{\left( i \right)}} \right)$ is a scalar function of the con
 
 ## Chemical Reactions
 
-Thus far, F remained unspecified, or better R. We look now at the specific form this function takes when considering chemical reactions.
+Thus far, $F$ remained unspecified, or better $R$. We look now at the specific form this function takes when considering chemical reactions.
 
 A general chemical reaction is specified as,
 
-\[\sum\limits_{i}{{{{{v}'}}_{ij}}}{{M}_{i}}\overset{{{k}_{j}}}{\mathop{\to }}\,\sum\limits_{i}{{{{{v}''}}_{ij}}{{M}_{i}}}\]
+\[\sum\limits_{i}{{{{{v}'}}_{ij}}}{{M}_{i}}\overset{{{r}_{j}}}{\mathop{\to }}\,\sum\limits_{i}{{{{{v}''}}_{ij}}{{M}_{i}}}\]
 
-Here, ${{M}_{i}}$ denotes the chemical species.
+Here, ${{M}_{i}}$ denotes the chemical species. The quantities $v'$ and $v''$ are the stoichiometric coefficients of the reactants and products, respectively. The reaction rate $r_{j}$ is determined by the reaction kinetics, but the following always applies,
 
-For chemical reactions, $R^{(i)}$ takes on the following form,
+\[
+    \frac{dM_{i}}{dt}=v_{ij}\,r_{j}
+  \]
+
+Here, ${{v}_{ij}}={{{v}''}_{ij}}-{{{v}'}_{ij}}$ is the net stoichiometric coefficient. 
+
+For chemical reactions, the source term $R^{(i)}$ is the sum of all the contributions from each reation.
 
 \[{{R}^{\left( i \right)}}=\sum\limits_{j=1}^{J}{{{v}_{ij}}{{r}_{j}}}\]
 
-Here, the sum is over $J$ reactions and ${{v}_{ij}}={{{v}''}_{ij}}-{{{v}'}_{ij}}$ and,
+As an example of reaction kinetics, consider the reaction rate according to the *law of mass-action*,
 
 \[{{r}_{j}}={{k}_{j}}\prod\limits_{i=1}^{I}{{{\left[ {{u}^{\left( i \right)}} \right]}^{{{\mu }_{ij}}}}}\]
 
-the reaction rate of reaction $j$. Usually, the exponent is taken to be ${{\mu }_{ij}}={{{\nu }'}_{ij}}$, as according to the law of mass action.
+The exponent $\mu_{ij}$ needs to be determined experimentally, but is often taken to be ${{\mu }_{ij}}={{{\nu }'}_{ij}}$.
 
-Let’s evaluate the stiffness matrix for $\mathbf{F}$.
+Let’s evaluate the stiffness matrix for $R$.
 
 \[{{k}_{pq}}=\int\limits_{{{V}^{e}}}{{{N}_{a}}\frac{d}{d{{u}_{q}}}{{R}^{\left( i \right)}}\left( \mathbf{u} \right)}dV\]
 
