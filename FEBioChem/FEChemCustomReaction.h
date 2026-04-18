@@ -1,6 +1,6 @@
 #pragma once
 #include "FEReactionMaterial.h"
-#include <FECore/FEPhysicsProperty.h>
+#include <FECore/FEScriptedBehavior.h>
 #include <FECore/FEMaterial.h>
 
 class FEChemCustomReaction;
@@ -52,10 +52,10 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemUserReactionRate : public FEChemReactionRate, public FEPhysicsProperty
+class FEChemUserReactionRate : public FEChemReactionRate, public FEScriptedBehavior
 {
 public:
-	FEChemUserReactionRate(FEModel* fem) : FEChemReactionRate(fem), FEPhysicsProperty(fem) {}
+	FEChemUserReactionRate(FEModel* fem) : FEChemReactionRate(fem), FEScriptedBehavior(fem) {}
 
 	bool Init() override;
 

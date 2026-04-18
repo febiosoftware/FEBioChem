@@ -116,8 +116,8 @@ bool FEChemUserReactionRate::Init()
 		return false; // MaterialError("Reaction rate must be assigned to a reaction");
 	}
 
-	FEPhysicsProperty::SetSibling(static_cast<FECoreBase*>(this));
-	FEPhysicsProperty::SetProgramReturnType(FEValueType::Double);
+	FEScriptedBehavior::SetSibling(static_cast<FECoreBase*>(this));
+	FEScriptedBehavior::SetProgramReturnType(FEValueType::Double);
 
 	// need to add all the species from the parent reaction-diffusion material
 	FEChemReactionDiffusionMaterial* rdm = m_pReaction->GetReactionDiffusionParent();
@@ -134,5 +134,5 @@ bool FEChemUserReactionRate::Init()
 		AddVariable(sbm_i->GetName(), FEValueType::Double);
 	}
 
-	return FEChemReactionRate::Init() && FEPhysicsProperty::Init();
+	return FEChemReactionRate::Init() && FEScriptedBehavior::Init();
 }

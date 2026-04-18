@@ -76,7 +76,7 @@ bool FEChemUserDiffusivity::Init()
 
 	AddVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
 
-	return FEChemDiffusivity::Init() && FEPhysicsProperty::Init();
+	return FEChemDiffusivity::Init() && FEScriptedBehavior::Init();
 }
 
 // concentration flux
@@ -151,8 +151,8 @@ bool FEChemUserDiffusiveFlux::Init()
 		return false;
 	}
 
-	FEPhysicsProperty::SetSibling(static_cast<FECoreBase*>(this));
-	FEPhysicsProperty::SetProgramReturnType(FEValueType::Vec3d);
+	FEScriptedBehavior::SetSibling(static_cast<FECoreBase*>(this));
+	FEScriptedBehavior::SetProgramReturnType(FEValueType::Vec3d);
 
 	// we need to add a variable for each species and solid-bound species in the parent material, 
 	// so that we can evaluate the diffusivity as a function of the concentrations of all species
@@ -186,7 +186,7 @@ bool FEChemUserDiffusiveFlux::Init()
 
 	AddVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
 
-	return FEChemDiffusivity::Init() && FEPhysicsProperty::Init();
+	return FEChemDiffusivity::Init() && FEScriptedBehavior::Init();
 }
 
 // concentration flux

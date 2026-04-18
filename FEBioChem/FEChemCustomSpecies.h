@@ -1,11 +1,13 @@
 #pragma once
 #include "FEChemDiffusiveSpecies.h"
-#include <FECore/FEPhysicsProperty.h>
+#include <FECore/FEScriptedBehavior.h>
 
 class FEChemReactionDiffusionMaterial;
 
 class FEChemDiffusivity : public FEMaterialProperty
 {
+	FECORE_BASE_CLASS(FEChemDiffusivity);
+
 public:
 	FEChemDiffusivity(FEModel* fem) : FEMaterialProperty(fem) {}
 
@@ -21,8 +23,6 @@ public:
 
 	// evaluate diffusivity (dJ/d(grad c))
 	virtual mat3d DiffusivityTensor(FEMaterialPoint& mp, int id) = 0;
-
-	FECORE_BASE_CLASS(FEChemReactionRate);
 
 protected:
 	int localSpeciesId = -1;	//!< local species ID (index in parent material's species list)
@@ -54,10 +54,10 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemUserDiffusivity : public FEChemDiffusivity, public FEPhysicsProperty
+class FEChemUserDiffusivity : public FEChemDiffusivity, public FEScriptedBehavior
 {
 public:
-	FEChemUserDiffusivity(FEModel* fem) : FEChemDiffusivity(fem), FEPhysicsProperty(fem) {}
+	FEChemUserDiffusivity(FEModel* fem) : FEChemDiffusivity(fem), FEScriptedBehavior(fem) {}
 
 	bool Init() override;
 
@@ -74,10 +74,10 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemUserDiffusiveFlux : public FEChemDiffusivity, public FEPhysicsProperty
+class FEChemUserDiffusiveFlux : public FEChemDiffusivity, public FEScriptedBehavior
 {
 public:
-	FEChemUserDiffusiveFlux(FEModel* fem) : FEChemDiffusivity(fem), FEPhysicsProperty(fem) {}
+	FEChemUserDiffusiveFlux(FEModel* fem) : FEChemDiffusivity(fem), FEScriptedBehavior(fem) {}
 
 	bool Init() override;
 
