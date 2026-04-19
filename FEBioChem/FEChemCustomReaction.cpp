@@ -99,13 +99,13 @@ END_FECORE_CLASS();
 double FEChemUserReactionRate::ReactionRate(FEMaterialPoint& pt)
 {
 	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
-	return Value(rmp.m_ca);
+	return Value(pt, rmp.m_ca);
 }
 
 double FEChemUserReactionRate::ReactionRateDeriv(FEMaterialPoint& pt, int id)
 {
 	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
-	return DerivValue(rmp.m_ca, id);
+	return DerivValue(pt, rmp.m_ca, id);
 }
 
 bool FEChemUserReactionRate::Init()

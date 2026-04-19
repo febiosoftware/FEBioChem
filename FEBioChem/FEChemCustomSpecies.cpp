@@ -108,7 +108,7 @@ vec3d FEChemUserDiffusivity::FluxConcentrationTangent(FEMaterialPoint& mp, int i
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	double dD = DerivValue(vars, id).d;
+	double dD = DerivValue(mp, vars, id).d;
 	vec3d grad_c = rp.m_dc[id];
 	return -(grad_c * dD);
 }
@@ -132,7 +132,7 @@ mat3d FEChemUserDiffusivity::DiffusivityTensor(FEMaterialPoint& mp, int id)
 		vars.back().v3 = mp.m_r0;
 
 		// run the script
-		double D = Value(vars).d;
+		double D = Value(mp, vars).d;
 		return mat3dd(-D);
 	}
 	else
@@ -209,7 +209,7 @@ vec3d FEChemUserDiffusiveFlux::ConcentrationFlux(FEMaterialPoint& mp)
 	vars.back().type = FEValueType::Vec3d;
 	vars.back().v3 = mp.m_r0;
 
-	vec3d flux = Value(vars).v3;
+	vec3d flux = Value(mp, vars).v3;
 	return flux;
 }
 
@@ -236,7 +236,7 @@ vec3d FEChemUserDiffusiveFlux::FluxConcentrationTangent(FEMaterialPoint& mp, int
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	vec3d dJdc = DerivValue(vars, id).v3;
+	vec3d dJdc = DerivValue(mp, vars, id).v3;
 	return dJdc;
 }
 
@@ -263,6 +263,6 @@ mat3d FEChemUserDiffusiveFlux::DiffusivityTensor(FEMaterialPoint& mp, int id)
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	mat3d dJdgradc = DerivValue(vars, ncv + id).m3;
+	mat3d dJdgradc = DerivValue(mp, vars, ncv + id).m3;
 	return dJdgradc;
 }
