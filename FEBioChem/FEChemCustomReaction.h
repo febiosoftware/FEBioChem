@@ -5,6 +5,7 @@
 
 class FEChemCustomReaction;
 
+// Base class for reaction rates that can be defined in the FEChemCustomReaction class.
 class FEChemReactionRate : public FEMaterialProperty
 {
 public:
@@ -17,11 +18,12 @@ public:
 	virtual double ReactionRateDeriv(FEMaterialPoint& pt, int id) = 0;
 
 protected:
-	FEChemCustomReaction* m_pReaction;	//!< parent reaction (will be set by parent during Init)
+	FEChemCustomReaction* m_pReaction = nullptr;	//!< parent reaction (will be set by parent during Init)
 
 	FECORE_BASE_CLASS(FEChemReactionRate);
 };
 
+// The FEChemCustomReaction class allows users to define custom reactions by specifying a reaction equation and a reaction rate
 class FEChemCustomReaction : public FEChemReactionMaterial
 {
 public:
@@ -52,6 +54,7 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
+// This class defines a reaction rate defined by a user-specified script.
 class FEChemScriptedReactionRate : public FEChemReactionRate
 {
 public:

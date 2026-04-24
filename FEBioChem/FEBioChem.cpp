@@ -94,10 +94,10 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemMassActionReaction                 , "mass action");
 	REGISTER_FECORE_CLASS(FEChemMichaelisMentenReaction            , "Michaelis-Menten");
 	REGISTER_FECORE_CLASS(FEChemLogisticGrowthReaction             , "Logistic growth");
-	REGISTER_FECORE_CLASS(FEChemCustomReaction                     , "custom reaction");
+	REGISTER_FECORE_CLASS(FEChemCustomReaction                     , "rate-defined reaction");
 	REGISTER_FECORE_CLASS(FEChemFickianSpecies                     , "species");
 	REGISTER_FECORE_CLASS(FEChemSolidBoundSpecies                  , "solid_bound_species");
-	REGISTER_FECORE_CLASS(FEChemCustomSpecies                      , "custom species");
+	REGISTER_FECORE_CLASS(FEChemCustomSpecies                      , "flux-defined species");
 	REGISTER_FECORE_CLASS(FEChemConcentrationFlux                  , "concentration flux");
 	REGISTER_FECORE_CLASS(FEChemFixedConcentration                 , "zero concentration");
 	REGISTER_FECORE_CLASS(FEChemPrescribedConcentration            , "prescribed concentration");
@@ -115,7 +115,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemScriptedReactionRate, "reaction-rate script");
 
 	// diffusivity classes
-	REGISTER_FECORE_CLASS(FEChemScriptedDiffusivity, "diffusivity script");
+	REGISTER_FECORE_CLASS(FEChemScriptedFluxLaw      , "flux-law script");
 	REGISTER_FECORE_CLASS(FEChemScriptedDiffusiveFlux, "diffusive flux script");
 
 	// initial conditions

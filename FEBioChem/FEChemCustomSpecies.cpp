@@ -4,12 +4,12 @@
 BEGIN_FECORE_CLASS(FEChemCustomSpecies, FEChemDiffusiveSpecies)
 	ADD_PARAMETER(m_speciesId, "name", FE_PARAM_ATTRIBUTE, "$(species)");
 	
-	ADD_PROPERTY(m_diffusivity, "diffusivity");
+	ADD_PROPERTY(m_flux, "flux");
 END_FECORE_CLASS();
 
 FEChemCustomSpecies::FEChemCustomSpecies(FEModel* fem) : FEChemDiffusiveSpecies(fem)
 {
-	m_diffusivity = nullptr;
+	m_flux = nullptr;
 }
 
 bool FEChemCustomSpecies::Init()
@@ -21,37 +21,37 @@ bool FEChemCustomSpecies::Init()
 	FEChemReactionDiffusionMaterial* pmat = dynamic_cast<FEChemReactionDiffusionMaterial*>(GetParent());
 	if (pmat == nullptr) return false;
 
-	if (m_diffusivity == nullptr)
+	if (m_flux == nullptr)
 	{
 		// Oh, oh. This shouldn't happen
-		return false; // MaterialError("Diffusivity must be specified for diffusive species");
+		return false; // MaterialError("Flux law must be specified for diffusive species");
 	}
-	m_diffusivity->SetParent(pmat);
-	m_diffusivity->SetLocalSpeciesId(GetLocalID());
+	m_flux->SetParent(pmat);
+	m_flux->SetLocalSpeciesId(GetLocalID());
 
 	return FEChemReactiveSpecies::Init();
 }
 
 mat3d FEChemCustomSpecies::DiffusivityTensor(FEMaterialPoint& mp, int id)
 {
-	return m_diffusivity->DiffusivityTensor(mp, id);
+	return m_flux->DiffusivityTensor(mp, id);
 }
 
 vec3d FEChemCustomSpecies::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
 {
-	return m_diffusivity->FluxConcentrationTangent(mp, id);
+	return m_flux->FluxConcentrationTangent(mp, id);
 }
 
 vec3d FEChemCustomSpecies::ConcentrationFlux(FEMaterialPoint& mp)
 {
-	return m_diffusivity->ConcentrationFlux(mp);
+	return m_flux->ConcentrationFlux(mp);
 }
 
-BEGIN_FECORE_CLASS(FEChemScriptedDiffusivity, FEChemDiffusivity)
+BEGIN_FECORE_CLASS(FEChemScriptedFluxLaw, FEChemFluxLaw)
 	ADD_PROPERTY(m_script, "script");
 END_FECORE_CLASS();
 
-FEChemScriptedDiffusivity::FEChemScriptedDiffusivity(FEModel* fem) : FEChemDiffusivity(fem), m_script(fem) 
+FEChemScriptedFluxLaw::FEChemScriptedFluxLaw(FEModel* fem) : FEChemFluxLaw(fem), m_script(fem) 
 {
 	// temporary context so scripts can be validated in FEBio Studio
 	ScriptContext context;
@@ -60,7 +60,7 @@ FEChemScriptedDiffusivity::FEChemScriptedDiffusivity(FEModel* fem) : FEChemDiffu
 	m_script.SetScriptContext(context);
 }
 
-bool FEChemScriptedDiffusivity::Init()
+bool FEChemScriptedFluxLaw::Init()
 {
 	if (m_pRDM == nullptr)
 	{
@@ -88,11 +88,11 @@ bool FEChemScriptedDiffusivity::Init()
 	context.addVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
 	m_script.SetScriptContext(context);
 
-	return FEChemDiffusivity::Init();
+	return FEChemFluxLaw::Init();
 }
 
 // concentration flux
-vec3d FEChemScriptedDiffusivity::ConcentrationFlux(FEMaterialPoint& mp)
+vec3d FEChemScriptedFluxLaw::ConcentrationFlux(FEMaterialPoint& mp)
 {
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
@@ -102,7 +102,7 @@ vec3d FEChemScriptedDiffusivity::ConcentrationFlux(FEMaterialPoint& mp)
 }
 
 // derivative of flux with respect to concentration (dJ/dc)
-vec3d FEChemScriptedDiffusivity::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
+vec3d FEChemScriptedFluxLaw::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
 {
 	if (!m_script.HasDerivative(id)) return vec3d(0.0);
 
@@ -126,7 +126,7 @@ vec3d FEChemScriptedDiffusivity::FluxConcentrationTangent(FEMaterialPoint& mp, i
 }
 
 // evaluate diffusivity (dJ/d(grad c))
-mat3d FEChemScriptedDiffusivity::DiffusivityTensor(FEMaterialPoint& mp, int id)
+mat3d FEChemScriptedFluxLaw::DiffusivityTensor(FEMaterialPoint& mp, int id)
 {
 	if (id == localSpeciesId)
 	{
@@ -152,11 +152,11 @@ mat3d FEChemScriptedDiffusivity::DiffusivityTensor(FEMaterialPoint& mp, int id)
 }
 
 //=================================================================================================
-BEGIN_FECORE_CLASS(FEChemScriptedDiffusiveFlux, FEChemDiffusivity)
+BEGIN_FECORE_CLASS(FEChemScriptedDiffusiveFlux, FEChemFluxLaw)
 	ADD_PROPERTY(m_script, "script");
 END_FECORE_CLASS();
 
-FEChemScriptedDiffusiveFlux::FEChemScriptedDiffusiveFlux(FEModel* fem) : FEChemDiffusivity(fem), m_script(fem) 
+FEChemScriptedDiffusiveFlux::FEChemScriptedDiffusiveFlux(FEModel* fem) : FEChemFluxLaw(fem), m_script(fem) 
 {
 	// temporary context so scripts can be validated in FEBio Studio
 	ScriptContext context;
@@ -208,7 +208,7 @@ bool FEChemScriptedDiffusiveFlux::Init()
 	context.addVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
 	m_script.SetScriptContext(context);
 
-	return FEChemDiffusivity::Init();
+	return FEChemFluxLaw::Init();
 }
 
 // concentration flux

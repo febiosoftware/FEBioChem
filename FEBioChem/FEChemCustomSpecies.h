@@ -4,12 +4,13 @@
 
 class FEChemReactionDiffusionMaterial;
 
-class FEChemDiffusivity : public FEMaterialProperty
+// Base class for flux laws that can be defined in the FEChemCustomSpecies class.
+class FEChemFluxLaw : public FEMaterialProperty
 {
-	FECORE_BASE_CLASS(FEChemDiffusivity);
+	FECORE_BASE_CLASS(FEChemFluxLaw);
 
 public:
-	FEChemDiffusivity(FEModel* fem) : FEMaterialProperty(fem) {}
+	FEChemFluxLaw(FEModel* fem) : FEMaterialProperty(fem) {}
 
 	void SetParent(FEChemReactionDiffusionMaterial* pMat) { m_pRDM = pMat; }
 
@@ -30,7 +31,7 @@ protected:
 };
 
 // A species that is active in a reaction-diffusion domain
-// with a more general diffusivity
+// with a more general flux law
 class FEChemCustomSpecies : public FEChemDiffusiveSpecies
 {
 public:
@@ -49,15 +50,16 @@ public:
 	mat3d DiffusivityTensor(FEMaterialPoint& mp, int id) override;
 
 private:
-	FEChemDiffusivity*	m_diffusivity; //!< diffusion property
+	FEChemFluxLaw*	m_flux; //!< flux law property
 
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemScriptedDiffusivity : public FEChemDiffusivity
+// This class defines a flux law defined by a user-specified script.
+class FEChemScriptedFluxLaw : public FEChemFluxLaw
 {
 public:
-	FEChemScriptedDiffusivity(FEModel* fem);
+	FEChemScriptedFluxLaw(FEModel* fem);
 
 	bool Init() override;
 
@@ -76,7 +78,11 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemScriptedDiffusiveFlux : public FEChemDiffusivity
+// This class defines a diffusive flux law defined by a user-specified script. 
+// The flux is assumed to be linearly dependent on the concentration gradient, 
+// but the diffusivity can be a function of the concentrations of all species.
+// J = -D(c)*grad(c)
+class FEChemScriptedDiffusiveFlux : public FEChemFluxLaw
 {
 public:
 	FEChemScriptedDiffusiveFlux(FEModel* fem);
