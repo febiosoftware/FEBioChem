@@ -54,10 +54,10 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemUserDiffusivity : public FEChemDiffusivity, public FEScriptedBehavior
+class FEChemScriptedDiffusivity : public FEChemDiffusivity
 {
 public:
-	FEChemUserDiffusivity(FEModel* fem) : FEChemDiffusivity(fem), FEScriptedBehavior(fem) {}
+	FEChemScriptedDiffusivity(FEModel* fem);
 
 	bool Init() override;
 
@@ -71,13 +71,15 @@ public:
 	mat3d DiffusivityTensor(FEMaterialPoint& mp, int id) override;
 
 private:
+	FEScriptedBehavior m_script;
+
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemUserDiffusiveFlux : public FEChemDiffusivity, public FEScriptedBehavior
+class FEChemScriptedDiffusiveFlux : public FEChemDiffusivity
 {
 public:
-	FEChemUserDiffusiveFlux(FEModel* fem) : FEChemDiffusivity(fem), FEScriptedBehavior(fem) {}
+	FEChemScriptedDiffusiveFlux(FEModel* fem);
 
 	bool Init() override;
 
@@ -91,5 +93,7 @@ public:
 	mat3d DiffusivityTensor(FEMaterialPoint& mp, int id) override;
 
 private:
+	FEScriptedBehavior m_script;
+
 	DECLARE_FECORE_CLASS();
 };

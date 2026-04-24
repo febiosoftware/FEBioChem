@@ -1,7 +1,6 @@
 #include "FEChemCustomReaction.h"
 #include "FEReactionDiffusionMaterial.h"
 #include <FECore/FEModel.h>
-#include <FECore/FECodeValuator.h>
 #include <FECore/FECoreClass.h>
 #include <FECore/log.h>
 #include <memory>
@@ -92,23 +91,32 @@ double FEChemCustomReaction::GetReactionRateDeriv(FEMaterialPoint& pt, int id)
 	return m_rate->ReactionRateDeriv(pt, id);
 }
 
-BEGIN_FECORE_CLASS(FEChemUserReactionRate, FEChemReactionRate)
-	ADD_PARAMETER(m_scriptName, "script")->setLongName("reaction rate script")->SetFlags(FE_PARAM_ATTRIBUTE);
+BEGIN_FECORE_CLASS(FEChemScriptedReactionRate, FEChemReactionRate)
+	ADD_PROPERTY(m_script, "script");
 END_FECORE_CLASS();
 
-double FEChemUserReactionRate::ReactionRate(FEMaterialPoint& pt)
+FEChemScriptedReactionRate::FEChemScriptedReactionRate(FEModel* fem) : FEChemReactionRate(fem), m_script(fem) 
 {
-	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
-	return Value(pt, rmp.m_ca);
+	// temporary context so scripts can be validated in FEBio Studio
+	ScriptContext context;
+	context.returnType = FEValueType::Double;
+	context.addVariable("$(species)", FEValueType::Double, true);
+	m_script.SetScriptContext(context);
 }
 
-double FEChemUserReactionRate::ReactionRateDeriv(FEMaterialPoint& pt, int id)
+double FEChemScriptedReactionRate::ReactionRate(FEMaterialPoint& pt)
 {
 	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
-	return DerivValue(pt, rmp.m_ca, id);
+	return m_script.Value(pt, rmp.m_ca);
 }
 
-bool FEChemUserReactionRate::Init()
+double FEChemScriptedReactionRate::ReactionRateDeriv(FEMaterialPoint& pt, int id)
+{
+	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
+	return m_script.DerivValue(pt, rmp.m_ca, id);
+}
+
+bool FEChemScriptedReactionRate::Init()
 {
 	if (m_pReaction == nullptr)
 	{
@@ -116,8 +124,8 @@ bool FEChemUserReactionRate::Init()
 		return false; // MaterialError("Reaction rate must be assigned to a reaction");
 	}
 
-	FEScriptedBehavior::SetSibling(static_cast<FECoreBase*>(this));
-	FEScriptedBehavior::SetProgramReturnType(FEValueType::Double);
+	ScriptContext context;
+	context.returnType = FEValueType::Double;
 
 	// need to add all the species from the parent reaction-diffusion material
 	FEChemReactionDiffusionMaterial* rdm = m_pReaction->GetReactionDiffusionParent();
@@ -125,14 +133,15 @@ bool FEChemUserReactionRate::Init()
 	for (int i=0; i<rdm->Species(); ++i)
 	{
 		FEChemReactiveSpecies* spec_i = rdm->GetSpecies(i);
-		AddVariable(spec_i->GetName(), FEValueType::Double);
+		context.addVariable(spec_i->GetName(), FEValueType::Double, true);
 	}
 
 	for (int i=0; i<rdm->SolidBoundSpecies(); ++i)
 	{
 		FEChemSolidBoundSpecies* sbm_i = rdm->GetSolidBoundSpecies(i);
-		AddVariable(sbm_i->GetName(), FEValueType::Double);
+		context.addVariable(sbm_i->GetName(), FEValueType::Double, true);
 	}
+	m_script.SetScriptContext(context);
 
-	return FEChemReactionRate::Init() && FEScriptedBehavior::Init();
+	return FEChemReactionRate::Init();
 }

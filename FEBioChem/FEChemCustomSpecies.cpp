@@ -47,16 +47,28 @@ vec3d FEChemCustomSpecies::ConcentrationFlux(FEMaterialPoint& mp)
 	return m_diffusivity->ConcentrationFlux(mp);
 }
 
-BEGIN_FECORE_CLASS(FEChemUserDiffusivity, FEChemDiffusivity)
-	ADD_PARAMETER(m_scriptName, "script")->setLongName("diffusivity script")->SetFlags(FE_PARAM_ATTRIBUTE);
+BEGIN_FECORE_CLASS(FEChemScriptedDiffusivity, FEChemDiffusivity)
+	ADD_PROPERTY(m_script, "script");
 END_FECORE_CLASS();
 
-bool FEChemUserDiffusivity::Init()
+FEChemScriptedDiffusivity::FEChemScriptedDiffusivity(FEModel* fem) : FEChemDiffusivity(fem), m_script(fem) 
+{
+	// temporary context so scripts can be validated in FEBio Studio
+	ScriptContext context;
+	context.returnType = FEValueType::Double;
+	context.addVariable("$(species)", FEValueType::Double, true);
+	m_script.SetScriptContext(context);
+}
+
+bool FEChemScriptedDiffusivity::Init()
 {
 	if (m_pRDM == nullptr)
 	{
 		return false;
 	}
+
+	ScriptContext context;
+	context.returnType = FEValueType::Double;
 
 	// we need to add a variable for each species and solid-bound species in the parent material, 
 	// so that we can evaluate the diffusivity as a function of the concentrations of all species
@@ -65,22 +77,22 @@ bool FEChemUserDiffusivity::Init()
 	{
 		FEChemReactiveSpecies* s = RDM.GetSpecies(i);
 		if (s == nullptr) return false;
-		AddVariable(s->GetName(), FEValueType::Double);
+		context.addVariable(s->GetName(), FEValueType::Double, true);
 	}
 	for (size_t i = 0; i < RDM.SolidBoundSpecies(); ++i)
 	{
 		FEChemSolidBoundSpecies* s = RDM.GetSolidBoundSpecies(i);
 		if (s == nullptr) return false;
-		AddVariable(s->GetName(), FEValueType::Double);
+		context.addVariable(s->GetName(), FEValueType::Double, true);
 	}
+	context.addVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
+	m_script.SetScriptContext(context);
 
-	AddVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
-
-	return FEChemDiffusivity::Init() && FEScriptedBehavior::Init();
+	return FEChemDiffusivity::Init();
 }
 
 // concentration flux
-vec3d FEChemUserDiffusivity::ConcentrationFlux(FEMaterialPoint& mp)
+vec3d FEChemScriptedDiffusivity::ConcentrationFlux(FEMaterialPoint& mp)
 {
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
@@ -90,9 +102,9 @@ vec3d FEChemUserDiffusivity::ConcentrationFlux(FEMaterialPoint& mp)
 }
 
 // derivative of flux with respect to concentration (dJ/dc)
-vec3d FEChemUserDiffusivity::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
+vec3d FEChemScriptedDiffusivity::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
 {
-	if (!HasDerivative(id)) return vec3d(0.0);
+	if (!m_script.HasDerivative(id)) return vec3d(0.0);
 
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
@@ -108,13 +120,13 @@ vec3d FEChemUserDiffusivity::FluxConcentrationTangent(FEMaterialPoint& mp, int i
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	double dD = DerivValue(mp, vars, id).d;
+	double dD = m_script.DerivValue(mp, vars, id).d;
 	vec3d grad_c = rp.m_dc[id];
 	return -(grad_c * dD);
 }
 
 // evaluate diffusivity (dJ/d(grad c))
-mat3d FEChemUserDiffusivity::DiffusivityTensor(FEMaterialPoint& mp, int id)
+mat3d FEChemScriptedDiffusivity::DiffusivityTensor(FEMaterialPoint& mp, int id)
 {
 	if (id == localSpeciesId)
 	{
@@ -132,7 +144,7 @@ mat3d FEChemUserDiffusivity::DiffusivityTensor(FEMaterialPoint& mp, int id)
 		vars.back().v3 = mp.m_r0;
 
 		// run the script
-		double D = Value(mp, vars).d;
+		double D = m_script.Value(mp, vars).d;
 		return mat3dd(-D);
 	}
 	else
@@ -140,19 +152,29 @@ mat3d FEChemUserDiffusivity::DiffusivityTensor(FEMaterialPoint& mp, int id)
 }
 
 //=================================================================================================
-BEGIN_FECORE_CLASS(FEChemUserDiffusiveFlux, FEChemDiffusivity)
-	ADD_PARAMETER(m_scriptName, "script")->setLongName("diffusive flux script")->SetFlags(FE_PARAM_ATTRIBUTE);
+BEGIN_FECORE_CLASS(FEChemScriptedDiffusiveFlux, FEChemDiffusivity)
+	ADD_PROPERTY(m_script, "script");
 END_FECORE_CLASS();
 
-bool FEChemUserDiffusiveFlux::Init()
+FEChemScriptedDiffusiveFlux::FEChemScriptedDiffusiveFlux(FEModel* fem) : FEChemDiffusivity(fem), m_script(fem) 
+{
+	// temporary context so scripts can be validated in FEBio Studio
+	ScriptContext context;
+	context.returnType = FEValueType::Vec3d;
+	context.addVariable("$(species)", FEValueType::Double, true);
+	context.addVariable("grad_$(species)", FEValueType::Vec3d, true);
+	m_script.SetScriptContext(context);
+}
+
+bool FEChemScriptedDiffusiveFlux::Init()
 {
 	if (m_pRDM == nullptr)
 	{
 		return false;
 	}
 
-	FEScriptedBehavior::SetSibling(static_cast<FECoreBase*>(this));
-	FEScriptedBehavior::SetProgramReturnType(FEValueType::Vec3d);
+	ScriptContext context;
+	context.returnType = FEValueType::Vec3d;
 
 	// we need to add a variable for each species and solid-bound species in the parent material, 
 	// so that we can evaluate the diffusivity as a function of the concentrations of all species
@@ -161,13 +183,13 @@ bool FEChemUserDiffusiveFlux::Init()
 	{
 		FEChemReactiveSpecies* s = RDM.GetSpecies(i);
 		if (s == nullptr) return false;
-		AddVariable(s->GetName(), FEValueType::Double);
+		context.addVariable(s->GetName(), FEValueType::Double, true);
 	}
 	for (size_t i = 0; i < RDM.SolidBoundSpecies(); ++i)
 	{
 		FEChemSolidBoundSpecies* s = RDM.GetSolidBoundSpecies(i);
 		if (s == nullptr) return false;
-		AddVariable(s->GetName(), FEValueType::Double);
+		context.addVariable(s->GetName(), FEValueType::Double, true);
 	}
 
 	// also add the gradients of all species, since the flux may depend on those as well
@@ -175,22 +197,22 @@ bool FEChemUserDiffusiveFlux::Init()
 	{
 		FEChemReactiveSpecies* s = RDM.GetSpecies(i);
 		if (s == nullptr) return false;
-		AddVariable("grad_" + s->GetName(), FEValueType::Vec3d);
+		context.addVariable("grad_" + s->GetName(), FEValueType::Vec3d, true);
 	}
 	for (size_t i = 0; i < RDM.SolidBoundSpecies(); ++i)
 	{
 		FEChemSolidBoundSpecies* s = RDM.GetSolidBoundSpecies(i);
 		if (s == nullptr) return false;
-		AddVariable("grad_" + s->GetName(), FEValueType::Vec3d);
+		context.addVariable("grad_" + s->GetName(), FEValueType::Vec3d, true);
 	}
+	context.addVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
+	m_script.SetScriptContext(context);
 
-	AddVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
-
-	return FEChemDiffusivity::Init() && FEScriptedBehavior::Init();
+	return FEChemDiffusivity::Init();
 }
 
 // concentration flux
-vec3d FEChemUserDiffusiveFlux::ConcentrationFlux(FEMaterialPoint& mp)
+vec3d FEChemScriptedDiffusiveFlux::ConcentrationFlux(FEMaterialPoint& mp)
 {
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
@@ -209,14 +231,14 @@ vec3d FEChemUserDiffusiveFlux::ConcentrationFlux(FEMaterialPoint& mp)
 	vars.back().type = FEValueType::Vec3d;
 	vars.back().v3 = mp.m_r0;
 
-	vec3d flux = Value(mp, vars).v3;
+	vec3d flux = m_script.Value(mp, vars).v3;
 	return flux;
 }
 
 // derivative of flux with respect to concentration (dJ/dc)
-vec3d FEChemUserDiffusiveFlux::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
+vec3d FEChemScriptedDiffusiveFlux::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
 {
-	if (!HasDerivative(id)) return vec3d(0.0);
+	if (!m_script.HasDerivative(id)) return vec3d(0.0);
 
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
@@ -236,17 +258,17 @@ vec3d FEChemUserDiffusiveFlux::FluxConcentrationTangent(FEMaterialPoint& mp, int
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	vec3d dJdc = DerivValue(mp, vars, id).v3;
+	vec3d dJdc = m_script.DerivValue(mp, vars, id).v3;
 	return dJdc;
 }
 
 // evaluate diffusivity (dJ/d(grad c))
-mat3d FEChemUserDiffusiveFlux::DiffusivityTensor(FEMaterialPoint& mp, int id)
+mat3d FEChemScriptedDiffusiveFlux::DiffusivityTensor(FEMaterialPoint& mp, int id)
 {
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 	int ncv = rp.m_ca.size(); // number of concentration variables
 
-	if (!HasDerivative(ncv + id)) return mat3dd(0.0);
+	if (!m_script.HasDerivative(ncv + id)) return mat3dd(0.0);
 
 	// prepare global variable values
 	thread_local std::vector<FEValue> vars;
@@ -263,6 +285,6 @@ mat3d FEChemUserDiffusiveFlux::DiffusivityTensor(FEMaterialPoint& mp, int id)
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	mat3d dJdgradc = DerivValue(mp, vars, ncv + id).m3;
+	mat3d dJdgradc = m_script.DerivValue(mp, vars, ncv + id).m3;
 	return dJdgradc;
 }

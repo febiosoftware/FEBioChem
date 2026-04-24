@@ -52,10 +52,10 @@ private:
 	DECLARE_FECORE_CLASS();
 };
 
-class FEChemUserReactionRate : public FEChemReactionRate, public FEScriptedBehavior
+class FEChemScriptedReactionRate : public FEChemReactionRate
 {
 public:
-	FEChemUserReactionRate(FEModel* fem) : FEChemReactionRate(fem), FEScriptedBehavior(fem) {}
+	FEChemScriptedReactionRate(FEModel* fem);
 
 	bool Init() override;
 
@@ -64,5 +64,7 @@ public:
 	virtual double ReactionRateDeriv(FEMaterialPoint& pt, int id) override;
 
 private:
+	FEScriptedBehavior m_script;
+
 	DECLARE_FECORE_CLASS();
 };
