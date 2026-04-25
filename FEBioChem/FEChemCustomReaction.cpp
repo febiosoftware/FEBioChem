@@ -91,29 +91,25 @@ double FEChemCustomReaction::GetReactionRateDeriv(FEMaterialPoint& pt, int id)
 	return m_rate->ReactionRateDeriv(pt, id);
 }
 
-BEGIN_FECORE_CLASS(FEChemScriptedReactionRate, FEChemReactionRate)
-	ADD_PROPERTY(m_script, "script");
-END_FECORE_CLASS();
-
-FEChemScriptedReactionRate::FEChemScriptedReactionRate(FEModel* fem) : FEChemReactionRate(fem), m_script(fem) 
+FEChemScriptedReactionRate::FEChemScriptedReactionRate(FEModel* fem) : FEScripted<FEChemReactionRate>(fem)
 {
 	// temporary context so scripts can be validated in FEBio Studio
 	ScriptContext context;
 	context.returnType = FEValueType::Double;
 	context.addVariable("$(species)", FEValueType::Double, true);
-	m_script.SetScriptContext(context);
+	SetScriptContext(context);
 }
 
 double FEChemScriptedReactionRate::ReactionRate(FEMaterialPoint& pt)
 {
 	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
-	return m_script.Value(pt, rmp.m_ca);
+	return Value(pt, rmp.m_ca);
 }
 
 double FEChemScriptedReactionRate::ReactionRateDeriv(FEMaterialPoint& pt, int id)
 {
 	FEChemReactionMaterialPoint& rmp = *pt.ExtractData<FEChemReactionMaterialPoint>();
-	return m_script.DerivValue(pt, rmp.m_ca, id);
+	return DerivValue(pt, rmp.m_ca, id);
 }
 
 bool FEChemScriptedReactionRate::Init()
@@ -141,7 +137,7 @@ bool FEChemScriptedReactionRate::Init()
 		FEChemSolidBoundSpecies* sbm_i = rdm->GetSolidBoundSpecies(i);
 		context.addVariable(sbm_i->GetName(), FEValueType::Double, true);
 	}
-	m_script.SetScriptContext(context);
+	SetScriptContext(context);
 
 	return FEChemReactionRate::Init();
 }

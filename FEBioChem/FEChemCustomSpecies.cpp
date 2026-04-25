@@ -47,17 +47,13 @@ vec3d FEChemCustomSpecies::ConcentrationFlux(FEMaterialPoint& mp)
 	return m_flux->ConcentrationFlux(mp);
 }
 
-BEGIN_FECORE_CLASS(FEChemScriptedFluxLaw, FEChemFluxLaw)
-	ADD_PROPERTY(m_script, "script");
-END_FECORE_CLASS();
-
-FEChemScriptedFluxLaw::FEChemScriptedFluxLaw(FEModel* fem) : FEChemFluxLaw(fem), m_script(fem) 
+FEChemScriptedFluxLaw::FEChemScriptedFluxLaw(FEModel* fem) : FEScripted<FEChemFluxLaw>(fem)
 {
 	// temporary context so scripts can be validated in FEBio Studio
 	ScriptContext context;
 	context.returnType = FEValueType::Double;
 	context.addVariable("$(species)", FEValueType::Double, true);
-	m_script.SetScriptContext(context);
+	SetScriptContext(context);
 }
 
 bool FEChemScriptedFluxLaw::Init()
@@ -86,7 +82,7 @@ bool FEChemScriptedFluxLaw::Init()
 		context.addVariable(s->GetName(), FEValueType::Double, true);
 	}
 	context.addVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
-	m_script.SetScriptContext(context);
+	SetScriptContext(context);
 
 	return FEChemFluxLaw::Init();
 }
@@ -104,7 +100,7 @@ vec3d FEChemScriptedFluxLaw::ConcentrationFlux(FEMaterialPoint& mp)
 // derivative of flux with respect to concentration (dJ/dc)
 vec3d FEChemScriptedFluxLaw::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
 {
-	if (!m_script.HasDerivative(id)) return vec3d(0.0);
+	if (!HasDerivative(id)) return vec3d(0.0);
 
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
@@ -120,7 +116,7 @@ vec3d FEChemScriptedFluxLaw::FluxConcentrationTangent(FEMaterialPoint& mp, int i
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	double dD = m_script.DerivValue(mp, vars, id).d;
+	double dD = DerivValue(mp, vars, id).d;
 	vec3d grad_c = rp.m_dc[id];
 	return -(grad_c * dD);
 }
@@ -144,7 +140,7 @@ mat3d FEChemScriptedFluxLaw::DiffusivityTensor(FEMaterialPoint& mp, int id)
 		vars.back().v3 = mp.m_r0;
 
 		// run the script
-		double D = m_script.Value(mp, vars).d;
+		double D = Value(mp, vars).d;
 		return mat3dd(-D);
 	}
 	else
@@ -152,18 +148,14 @@ mat3d FEChemScriptedFluxLaw::DiffusivityTensor(FEMaterialPoint& mp, int id)
 }
 
 //=================================================================================================
-BEGIN_FECORE_CLASS(FEChemScriptedDiffusiveFlux, FEChemFluxLaw)
-	ADD_PROPERTY(m_script, "script");
-END_FECORE_CLASS();
-
-FEChemScriptedDiffusiveFlux::FEChemScriptedDiffusiveFlux(FEModel* fem) : FEChemFluxLaw(fem), m_script(fem) 
+FEChemScriptedDiffusiveFlux::FEChemScriptedDiffusiveFlux(FEModel* fem) : FEScripted<FEChemFluxLaw>(fem)
 {
 	// temporary context so scripts can be validated in FEBio Studio
 	ScriptContext context;
 	context.returnType = FEValueType::Vec3d;
 	context.addVariable("$(species)", FEValueType::Double, true);
 	context.addVariable("grad_$(species)", FEValueType::Vec3d, true);
-	m_script.SetScriptContext(context);
+	SetScriptContext(context);
 }
 
 bool FEChemScriptedDiffusiveFlux::Init()
@@ -206,7 +198,7 @@ bool FEChemScriptedDiffusiveFlux::Init()
 		context.addVariable("grad_" + s->GetName(), FEValueType::Vec3d, true);
 	}
 	context.addVariable("pos0", FEValueType::Vec3d, false); // initial position (for spatially varying diffusivity)
-	m_script.SetScriptContext(context);
+	SetScriptContext(context);
 
 	return FEChemFluxLaw::Init();
 }
@@ -231,14 +223,14 @@ vec3d FEChemScriptedDiffusiveFlux::ConcentrationFlux(FEMaterialPoint& mp)
 	vars.back().type = FEValueType::Vec3d;
 	vars.back().v3 = mp.m_r0;
 
-	vec3d flux = m_script.Value(mp, vars).v3;
+	vec3d flux = Value(mp, vars).v3;
 	return flux;
 }
 
 // derivative of flux with respect to concentration (dJ/dc)
 vec3d FEChemScriptedDiffusiveFlux::FluxConcentrationTangent(FEMaterialPoint& mp, int id)
 {
-	if (!m_script.HasDerivative(id)) return vec3d(0.0);
+	if (!HasDerivative(id)) return vec3d(0.0);
 
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 
@@ -258,7 +250,7 @@ vec3d FEChemScriptedDiffusiveFlux::FluxConcentrationTangent(FEMaterialPoint& mp,
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	vec3d dJdc = m_script.DerivValue(mp, vars, id).v3;
+	vec3d dJdc = DerivValue(mp, vars, id).v3;
 	return dJdc;
 }
 
@@ -268,7 +260,7 @@ mat3d FEChemScriptedDiffusiveFlux::DiffusivityTensor(FEMaterialPoint& mp, int id
 	FEChemReactionMaterialPoint& rp = *mp.ExtractData<FEChemReactionMaterialPoint>();
 	int ncv = rp.m_ca.size(); // number of concentration variables
 
-	if (!m_script.HasDerivative(ncv + id)) return mat3dd(0.0);
+	if (!HasDerivative(ncv + id)) return mat3dd(0.0);
 
 	// prepare global variable values
 	thread_local std::vector<FEValue> vars;
@@ -285,6 +277,6 @@ mat3d FEChemScriptedDiffusiveFlux::DiffusivityTensor(FEMaterialPoint& mp, int id
 	vars.back().v3 = mp.m_r0;
 
 	// call the derivative
-	mat3d dJdgradc = m_script.DerivValue(mp, vars, ncv + id).m3;
+	mat3d dJdgradc = DerivValue(mp, vars, ncv + id).m3;
 	return dJdgradc;
 }

@@ -55,7 +55,7 @@ private:
 };
 
 // This class defines a reaction rate defined by a user-specified script.
-class FEChemScriptedReactionRate : public FEChemReactionRate
+class FEChemScriptedReactionRate : public FEScripted<FEChemReactionRate>
 {
 public:
 	FEChemScriptedReactionRate(FEModel* fem);
@@ -65,9 +65,4 @@ public:
 	virtual double ReactionRate(FEMaterialPoint& pt) override;
 
 	virtual double ReactionRateDeriv(FEMaterialPoint& pt, int id) override;
-
-private:
-	FEScriptedBehavior m_script;
-
-	DECLARE_FECORE_CLASS();
 };

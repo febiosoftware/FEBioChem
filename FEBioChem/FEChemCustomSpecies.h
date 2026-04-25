@@ -56,7 +56,7 @@ private:
 };
 
 // This class defines a flux law defined by a user-specified script.
-class FEChemScriptedFluxLaw : public FEChemFluxLaw
+class FEChemScriptedFluxLaw : public FEScripted<FEChemFluxLaw>
 {
 public:
 	FEChemScriptedFluxLaw(FEModel* fem);
@@ -71,18 +71,13 @@ public:
 
 	// evaluate diffusivity (dJ/d(grad c))
 	mat3d DiffusivityTensor(FEMaterialPoint& mp, int id) override;
-
-private:
-	FEScriptedBehavior m_script;
-
-	DECLARE_FECORE_CLASS();
 };
 
 // This class defines a diffusive flux law defined by a user-specified script. 
 // The flux is assumed to be linearly dependent on the concentration gradient, 
 // but the diffusivity can be a function of the concentrations of all species.
 // J = -D(c)*grad(c)
-class FEChemScriptedDiffusiveFlux : public FEChemFluxLaw
+class FEChemScriptedDiffusiveFlux : public FEScripted<FEChemFluxLaw>
 {
 public:
 	FEChemScriptedDiffusiveFlux(FEModel* fem);
@@ -97,9 +92,4 @@ public:
 
 	// evaluate diffusivity (dJ/d(grad c))
 	mat3d DiffusivityTensor(FEMaterialPoint& mp, int id) override;
-
-private:
-	FEScriptedBehavior m_script;
-
-	DECLARE_FECORE_CLASS();
 };
