@@ -11,6 +11,7 @@
 #include "FEMassActionReaction.h"
 #include "FEMichaelisMentenReaction.h"
 #include "FEChemLogisticGrowthReaction.h"
+#include "FEChemNegativeOrderReaction.h"
 #include "FEChemFickianSpecies.h"
 #include "FEChemCustomSpecies.h"
 #include "FEConcentrationFlux.h"
@@ -90,11 +91,16 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	// old solver
 	REGISTER_FECORE_CLASS(FEChemNLReactionDiffusionSolver          , "reaction-diffusion");
 
+	// parent material
 	REGISTER_FECORE_CLASS(FEChemReactionDiffusionMaterial          , "reaction-diffusion");
+
+	// reaction materials
 	REGISTER_FECORE_CLASS(FEChemMassActionReaction                 , "mass action");
 	REGISTER_FECORE_CLASS(FEChemMichaelisMentenReaction            , "Michaelis-Menten");
 	REGISTER_FECORE_CLASS(FEChemLogisticGrowthReaction             , "Logistic growth");
+	REGISTER_FECORE_CLASS(FEChemNegativeOrderReaction              , "negative-order reaction");
 	REGISTER_FECORE_CLASS(FEChemCustomReaction                     , "rate-defined reaction");
+
 	REGISTER_FECORE_CLASS(FEChemFickianSpecies                     , "species");
 	REGISTER_FECORE_CLASS(FEChemSolidBoundSpecies                  , "solid_bound_species");
 	REGISTER_FECORE_CLASS(FEChemCustomSpecies                      , "flux-defined species");
