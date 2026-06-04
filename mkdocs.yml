@@ -54,4 +54,5 @@ nav:
       - Mass-action reaction: mass_action_reaction.md
       - Michaelis-Menten reaction: michaelis_menten_reaction.md
       - Logistic growth reaction: logistic_growth_reaction.md
+      - Negative-order reaction: negative_order_reaction.md
   - Theory: febiochem_theory.md
