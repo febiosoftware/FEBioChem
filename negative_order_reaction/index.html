@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../febiochem_tutorial1/">
+        <link rel="prev" href="../logistic_growth_reaction/">
       
       
-        <link rel="next" href="../febiochem_user_manual/">
+        <link rel="next" href="../negative_order_production/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Using the FEBioChem plugin - FEBioChem</title>
+        <title>Negative-order reaction - FEBioChem</title>
       
     
     
@@ -75,11 +75,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#from-febio-studio" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -109,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Using the FEBioChem plugin
+              Negative-order reaction
             
           </span>
         </div>
@@ -227,7 +222,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../using_the_febiochem_plugin/" class="md-tabs__link">
           
   
   
@@ -463,35 +458,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Using the FEBioChem plugin
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../using_the_febiochem_plugin/" class="md-nav__link">
         
   
   
@@ -507,46 +477,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#from-febio-studio" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        From FEBio Studio
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#from-the-command-line" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        From the command line
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -584,6 +514,8 @@
                 
   
   
+    
+  
   
   
     
@@ -594,11 +526,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
@@ -619,7 +551,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -718,10 +650,17 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../negative_order_reaction/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -737,6 +676,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -829,15 +769,48 @@
 
 
 
-  <h1>Using the FEBioChem plugin</h1>
+  <h1>Negative-order reaction</h1>
 
-<h2 id="from-febio-studio">From FEBio Studio<a class="headerlink" href="#from-febio-studio" title="Permanent link">&para;</a></h2>
-<p>You can download and install the FEBioChem plugin in FEBio Studio using the Plugin Repo. </p>
-<h2 id="from-the-command-line">From the command line<a class="headerlink" href="#from-the-command-line" title="Permanent link">&para;</a></h2>
-<p>Like any other FEBio plugin, the plugin must be placed in a folder and the path to the plugin must be defined in the FEBio configuration file. This file is usually called <code>febio.xml</code> and can be found in the same location as the FEBio executable. In this file, add the following line:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&lt;import&gt;</span>C:\path\to\febio\plugin\FEBioChem.dll<span class="nt">&lt;/import&gt;</span>
-</code></pre></div>
-<p>Make sure to include the full path name and file name of the plugin. When FEBio starts it will read the configuration file and load all the plugins defined therein. A message will be shown to the screen to inform the user whether the plugin was loaded successfully or not.</p>
+<p>The <code>negative-order reaction</code> reaction is a reaction whose rate depends inversely on the concentration of the reactant. For such reactions, the reaction rate will increase as the concentration of the reactant decreases. The reaction is represented as a conversion of a reactant <span class="arithmatex">\(R\)</span> into a product <span class="arithmatex">\(P\)</span>,</p>
+<div class="arithmatex">\[
+    R \to P
+\]</div>
+<p>The reaction rate is defined by,</p>
+<div class="arithmatex">\[
+    r = \frac{k}{\left( c_R + \epsilon \right)^{n}}
+\]</div>
+<p>Here, <span class="arithmatex">\(k\)</span> is the rate coefficient, <span class="arithmatex">\(\epsilon\)</span> is the concentration offset and <span class="arithmatex">\(n\)</span> is the order of the reaction. The concentration offset <span class="arithmatex">\(\epsilon\)</span> prevents the reaction rate from becoming singular as the reactant concentration approaches zero. The reaction order <span class="arithmatex">\(n\)</span> may be any non-negative real number."</p>
+<p>The following table lists the input parameters for this type of reaction. </p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Default</th>
+<th>Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>k</code></td>
+<td>rate coefficient <span class="arithmatex">\(k\)</span></td>
+<td>0</td>
+<td><span class="arithmatex">\(\ge 0\)</span></td>
+</tr>
+<tr>
+<td><code>offset</code></td>
+<td>concentration offset (<span class="arithmatex">\(\epsilon\)</span>)</td>
+<td>0</td>
+<td><span class="arithmatex">\(\ge 0\)</span></td>
+</tr>
+<tr>
+<td><code>n</code></td>
+<td>reaction order <span class="arithmatex">\(n\)</span>.</td>
+<td>1</td>
+<td><span class="arithmatex">\(\ge 0\)</span></td>
+</tr>
+</tbody>
+</table>
 
 
 
