@@ -1,10 +1,10 @@
 #pragma once
 #include "FEReactionMaterial.h"
 
-class FEChemNegativeOrderReaction : public FEChemReactionMaterial
+class FEChemNegativeOrderProduction : public FEChemReactionMaterial
 {
 public:
-	FEChemNegativeOrderReaction(FEModel* fem);
+	FEChemNegativeOrderProduction(FEModel* fem);
 
 	// one-time initialization
 	bool Init() override;
@@ -16,15 +16,14 @@ public:
 	double GetReactionRateDeriv(FEMaterialPoint& mp, int id) override;
 
 private:
-	FEParamDouble	m_k;		//!< rate constant
-	FEParamDouble	m_offset;	//!< concentration offset
-	double			m_n;		//!< reaction order
+	FEParamDouble	m_r0;	//!< rate offset
+	FEParamDouble	m_k;	//!< rate constant
+	FEParamDouble	m_c0;	//!< concentration offset
+	double			m_n;	//!< order
 
-	std::string		m_reactant;	//!< name of reactant
 	std::string		m_product;	//!< name of product
 
 private:
-	int				m_reactantID;	//!< reactant ID
 	int				m_productID;	//!< product ID
 
 	DECLARE_FECORE_CLASS();

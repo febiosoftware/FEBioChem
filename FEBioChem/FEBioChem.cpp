@@ -12,6 +12,7 @@
 #include "FEMichaelisMentenReaction.h"
 #include "FEChemLogisticGrowthReaction.h"
 #include "FEChemNegativeOrderReaction.h"
+#include "FEChemNegativeOrderProduction.h"
 #include "FEChemFickianSpecies.h"
 #include "FEChemCustomSpecies.h"
 #include "FEConcentrationFlux.h"
@@ -99,6 +100,7 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS(FEChemMichaelisMentenReaction            , "Michaelis-Menten");
 	REGISTER_FECORE_CLASS(FEChemLogisticGrowthReaction             , "Logistic growth");
 	REGISTER_FECORE_CLASS(FEChemNegativeOrderReaction              , "negative-order reaction");
+	REGISTER_FECORE_CLASS(FEChemNegativeOrderProduction            , "negative-order production");
 	REGISTER_FECORE_CLASS(FEChemCustomReaction                     , "rate-defined reaction");
 
 	REGISTER_FECORE_CLASS(FEChemFickianSpecies                     , "species");
