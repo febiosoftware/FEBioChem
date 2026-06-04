@@ -55,4 +55,5 @@ nav:
       - Michaelis-Menten reaction: michaelis_menten_reaction.md
       - Logistic growth reaction: logistic_growth_reaction.md
       - Negative-order reaction: negative_order_reaction.md
+      - Negative-order production: negative_order_production.md
   - Theory: febiochem_theory.md

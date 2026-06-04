@@ -1,7 +1,7 @@
 The `logistic growth` reaction models the limited growth of a species. It can be used to model auto-catalytic reactions, where the product $P$ is also the catalyst of the reaction.
 
 \[
-    \to P
+   \emptyset \to P
 \]
 
 The reaction rate for a logistic growth reaction is given by,
