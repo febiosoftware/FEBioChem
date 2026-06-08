@@ -88,3 +88,19 @@ public:
 	FEChemLogSBSConcentration(FEModel* pfem) : FEChemLogSBSConcentration_(pfem, N, 0) {}
 	double value(FEElement& el) { return FEChemLogSBSConcentration_::value(el); }
 };
+
+class FEChemLogSBSApparentDensity_ : public FELogElemData
+{
+protected:
+	FEChemLogSBSApparentDensity_(FEModel* pfem, int nsbs, int comp) : FELogElemData(pfem), m_nsbs(nsbs) {}
+	double value(FEElement& el);
+private:
+	int	m_nsbs;	// species id
+};
+
+template <int N> class FEChemLogSBSApparentDensity : public FEChemLogSBSApparentDensity_
+{
+public:
+	FEChemLogSBSApparentDensity(FEModel* pfem) : FEChemLogSBSApparentDensity_(pfem, N, 0) {}
+	double value(FEElement& el) { return FEChemLogSBSApparentDensity_::value(el); }
+};

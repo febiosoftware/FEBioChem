@@ -163,6 +163,14 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 1, "sbsc2");
 	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 2, "sbsc3");
 
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 0, "sbsr1");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 1, "sbsr2");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 2, "sbsr3");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 3, "sbsr4");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 4, "sbsr5");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 5, "sbsr6");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 6, "sbsr7");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 7, "sbsr8");
 
 	// Reaction-diffusion-convection module
 	fecore.CreateModule(new FEBioChemConvModule, "reaction-diffusion-convection", "{ " \

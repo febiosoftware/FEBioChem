@@ -84,3 +84,21 @@ double FEChemLogSBSConcentration_::value(FEElement& el)
 	}
 	return val / (double)nint;
 }
+
+double FEChemLogSBSApparentDensity_::value(FEElement& el)
+{
+	if (m_nsbs < 0) return 0.0;
+
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i = 0; i < nint; ++i)
+	{
+		FEMaterialPoint& mp = *el.GetMaterialPoint(i);
+		FEChemReactionMaterialPoint* pt = (mp.ExtractData<FEChemReactionMaterialPoint>());
+		if (pt && (m_nsbs < pt->m_sbmr.size()))
+		{
+			val += pt->m_sbmr[m_nsbs];
+		}
+	}
+	return val / (double)nint;
+}
