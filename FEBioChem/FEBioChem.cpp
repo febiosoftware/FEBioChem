@@ -158,10 +158,20 @@ FECORE_PLUGIN void PluginInitialize(FECoreKernel& fecore)
 	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 0, "c1");
 	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 1, "c2");
 	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 2, "c3");
+	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 3, "c4");
+	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 4, "c5");
+	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 5, "c6");
+	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 6, "c7");
+	REGISTER_FECORE_CLASS_T(FEChemLogConcentration, 7, "c8");
 
 	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 0, "sbsc1");
 	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 1, "sbsc2");
 	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 2, "sbsc3");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 3, "sbsc4");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 4, "sbsc5");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 5, "sbsc6");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 6, "sbsc7");
+	REGISTER_FECORE_CLASS_T(FEChemLogSBSConcentration, 7, "sbsc8");
 
 	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 0, "sbsr1");
 	REGISTER_FECORE_CLASS_T(FEChemLogSBSApparentDensity, 1, "sbsr2");
